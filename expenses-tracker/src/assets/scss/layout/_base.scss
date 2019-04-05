@@ -1,0 +1,64 @@
+@import 'assets/scss/helpers/variables';
+@import 'assets/scss/helpers/functions';
+@import 'assets/scss/helpers/mixins';
+@import 'assets/scss/helpers/placeholder';
+
+html {
+  box-sizing: border-box;
+  /* set base font-size to equiv "10px", which is adapted to rem unit */
+  font-size: 62.5%;
+  /* IE9-IE11 math fixing. See http://bit.ly/1g4X0bX */
+  font-size: calc(1em * 0.625);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+  /* Avoid min-width: auto on flex & grid children */
+  min-width: 0;
+  min-height: 0;
+}
+
+body {
+  margin: 0;
+  line-height: $lineHeightBase;
+  font-family: $fontFamilyBase;
+  font-size: $ ;
+}
+
+a {
+  color: $linkBaseColor;
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: $linkBaseActiveColor;
+  }
+}
+
+/* Headings */
+h1 { @extend %isH1; }
+h2 { @extend %isH2; }
+h3 { @extend %isH3; }
+h4 { @extend %isH4; }
+h5 { @extend %isH5; }
+h6 { @extend %isH6; }
+
+/* Max values */
+img,
+table,
+td,
+blockquote,
+code,
+pre,
+textarea,
+input,
+video,
+svg {
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}

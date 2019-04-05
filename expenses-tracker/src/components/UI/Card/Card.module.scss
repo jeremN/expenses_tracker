@@ -1,0 +1,22 @@
+@import 'assets/scss/helpers/_variables.scss';
+
+$cardBgColor: $white;
+$cardBorderColor: $grey;
+
+.Card {
+	background-color: $cardBgColor;
+	border: 1px solid $cardBorderColor;
+	border-radius: 4px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 50px;
+	margin: 1rem 0.5rem;
+	padding: 1rem;
+	
+	&--column {
+		flex-direction: column;
+	}
+
+	&:first-child {}
+}

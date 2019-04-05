@@ -1,0 +1,293 @@
+/* Sommaire:
+*
+*  visuallyHidden
+*  visuallyHidden-focusable
+*  dimension
+*  backgroundImg
+*  css-triangle
+*  font-styling
+*  font-face
+*  font-size
+*  scrollbars
+*  truncate
+*  forIE
+*  opacity
+*  mq
+*
+*/
+
+// Hide content, but still visible for screen reader or assistance
+@mixin visuallyHidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  white-space: nowrap;
+}
+
+//Display content only when focused for screen reader
+@mixin visuallyHidden-focusable {
+  &:active,
+  &:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    clip-path: none;
+  }
+}
+
+/* Dimension
+*  @param {Size} $width, $height - Taille de l'élément
+*/
+@mixin dimension($width, $height)  {
+  width: $width;
+  height: $height;
+}
+
+/* Background image
+*  @param {Path} $imgPath - Chemnin du fichier
+*  @param {Position} $position - Position du background image
+*  @param {Repeat} $repeat - Répéter le background ou non
+*  @param {Size} $size - Taille du background
+*  @param {Color} $color - Couleur du background
+*/
+@mixin backgroundImg($imgPath, $position: 0 0, $repeat: no-repeat, $size: false, $color: false)  {
+  background: {
+    image: url($imgPath);
+    position: $position;
+    repeat: $repeat;
+  }
+
+  @if $size { background-size: $size; }
+  @if $color { background-color: $color; }
+}
+
+/* CSS triangles
+*  @param {Color} $color - Triangle color
+*  @param {String} $direction - Triangle direction (up, down, left, right)
+*  @param {Size} $size - Triangle size (px)
+*  @param {Position} $position - Triangle position
+*  @param {Radius} $round - Triangle border radius
+*/
+@mixin css-triangle($color, $direction, $size: 6px, $position: absolute, $round: false){
+
+  @include pseudo($pos: $position);
+  width: 0;
+  height: 0;
+
+  @if $round {
+    border-radius: $round;
+  }
+  @if $direction == down {
+    border-left: $size solid transparent;
+    border-right: $size solid transparent;
+    border-top: $size solid $color;
+    margin-top: 0 - round( $size / 2.5 );
+  }
+  @else if $direction == up {
+    border-left: $size solid transparent;
+    border-right: $size solid transparent;
+    border-bottom: $size solid $color;
+    margin-bottom: 0 - round( $size / 2.5 );
+  }
+  @else if $direction == right {
+    border-top: $size solid transparent;
+    border-bottom: $size solid transparent;
+    border-left: $size solid $color;
+    margin-right: -$size;
+  }
+  @else if  $direction == left {
+    border-top: $size solid transparent;
+    border-bottom: $size solid transparent;
+    border-right: $size solid $color;
+    margin-left: -$size;
+  }
+}
+
+
+// ----- Fonts -----
+/* Font styling
+*  @param {String} $family - Famille de la police
+*  @param {Size} $size - Taille de la police in px, em, rem etc...
+*  @param {Color} $color - Couleur de la police
+*  @param {Number} $weight - Graisse de la police
+*  @param {Number} $lh - Line-height
+*  @param {String} $transform - Text-transform
+*/
+@mixin font-styling($family: false, $size: false, $colour: false, $weight: false,  $lh: false, $transform: false) {
+  @if $family{ font-family: $family, Helvetica, Arial, sans-serif };
+  @if $size { font-size: $size; }
+  @if $colour { color: $colour; }
+  @if $weight { font-weight: $weight; }
+  @if $lh { line-height: $lh; }
+  @if $transform{ text-transform: $transform; }
+}
+
+/* Font face
+*  @param {Name} $font-name - Nom de la police
+*  @param {Path} $file-name - Chemin vers la police
+*  @param {Number} $weight - Graisse de la police
+*  @param {String} $style - Style de la police
+*/
+@mixin font-face($font-name, $file-name, $weight: normal, $style: normal) {
+  @font-face {
+    font-family: quote($font-name);
+    src: url($file-name + '.eot');
+    src: url($file-name + '.eot?#iefix')  format('embedded-opentype'),
+         url($file-name + '.woff') format('woff'),
+         url($file-name + '.ttf')  format('truetype'),
+         url($file-name + '.svg##{$font-name}')  format('svg');
+    font-weight: $weight;
+    font-style: $style;
+  }
+}
+
+/* Font size (voir $fontSizes dans _variables.scss)
+*  @param {Element} elem - Nom de l'élément (h1, h2 etc...)
+*/
+$fontSizes: (
+  base: (
+    mobile: 1.4rem,
+    desktop: $fontSizeBase
+  ),
+  h1: (
+    mobile: 2.8rem,
+    desktop: 3.2rem
+  ),
+  h2: (
+    mobile: 2.4rem,
+    desktop: 2.8rem
+
+  ),
+  h3: (
+    mobile: 2rem,
+    desktop: 2.4rem
+
+  ),
+  h4: (
+    mobile: 1.8rem,
+    desktop: 2rem
+
+  ),
+  h5: (
+    mobile: 1.6rem,
+    desktop: 1.8rem
+
+  ),
+  h6: (
+    mobile: 1.4rem,
+    desktop: 1.6rem
+
+  ),
+);
+
+@mixin font-size($elem, $mobile: false) {
+  $q: map_get($fontSizes, $elem);
+  $mob: map_get($q, "mobile");
+  $desk: map_get($q, "desktop");
+
+  @if $mobile == true {
+    font-size: $mob;
+  }
+
+  @include mq("sm") {
+    font-size: $desk;
+  }
+}
+
+// ----- Scrollbar -----
+/* Customize scrollbars
+*  Beware, this does not work in all browsers
+*  @author Hugo Giraudel
+*  @param {Length} $size - Horizontal scrollbar's height and vertical scrollbar's width
+*  @param {Color} $foreground-color - Scrollbar's color
+*  @param {Color} $background-color [mix($foreground-color, white, 50%)] - Scrollbar's color
+*  @example scss - Scrollbar styling
+*/
+@mixin scrollbars($size, $foreground-color, $background-color: mix($foreground-color, white,  50%)) {
+  // For Google Chrome
+  ::-webkit-scrollbar {
+    width:  $size;
+    height: $size;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: $foreground-color;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: $background-color;
+  }
+
+  // For Internet Explorer
+  body {
+    scrollbar-face-color: $foreground-color;
+    scrollbar-track-color: $background-color;
+  }
+}
+
+/* String ellipsis
+*  @param {Size} $truncation-boundary - Taille de l'élément avant de le tronquer
+*/
+@mixin truncate($truncation-boundary) {
+    max-width: $truncation-boundary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+//  ----- Support for IE 7-8-9 -----
+// You will need to add conditional classes on your <html> element
+@mixin forIE( $ieVersion ) {
+    .ie#{$ieVersion} & {
+        @content;
+    }
+}
+
+//Opacity
+@mixin opacity($opacity) {
+  opacity: $opacity;
+  $opacity-ie: $opacity * 100;
+  filter: alpha(opacity=$opacity-ie); //IE8
+}
+
+
+// ----- Responsive -----
+$breakpoints: (
+    "xs":    320px,
+    "sm":    576px,
+    "md":    768px,
+    "lg":    992px,
+    "xl":   1200px,
+);
+
+/* Media query
+*  @param {Size || String} $width - Taille du breakpoint
+*  @param {String} $type - Type du breakpoint (min-width ou max-width)
+*/
+@mixin mq($width, $type: min) {
+  @if map_has_key($breakpoints, $width) {
+    $width: map_get($breakpoints, $width);
+
+    @if $type == max {
+      $width: $width - 1px;
+    }
+
+    @media only screen and (#{$type}-width: $width) {
+      @content;
+    }
+  }
+
+  @else {
+    @warn "Unfortunately, no value could be retrieved from `#{$width}`. "
+        + "Please make sure it is defined in `#{$breakpoints}` map.";
+  }
+}

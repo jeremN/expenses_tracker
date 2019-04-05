@@ -1,0 +1,3 @@
+*.env
+/expenses-tracker/package-lock.json
+/expenses-tracker/yarn.lock

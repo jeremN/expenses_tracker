@@ -1,0 +1,58 @@
+%clearfix {
+  &:before,
+  &:after {
+    content: " ";
+    display: table;
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+%borderBox {
+  box-sizing: border-box;
+}
+
+%displayFlex {
+  display: flex;
+}
+
+%row {
+  @extend %displayFlex;
+  flex-wrap:wrap;
+  flex-grow: 1;
+  max-width: 100%;
+}
+
+%inputReset {
+  appearance: none;
+  vertical-align: text-bottom;
+  outline: 0;
+  cursor: pointer;
+}
+
+%isH1 {
+  @include font-size(h1);
+  font-weight: $fontWeight-medium;
+}
+
+%isH2 {
+  @include font-size(h2);
+  font-weight: $fontWeight-medium;
+}
+%isH3 {
+  @include font-size(h3);
+  font-weight: $fontWeight-medium;
+}
+%isH4 {
+  @include font-size(h4);
+  font-weight: $fontWeight-medium;
+}
+%isH5 {
+  @include font-size(h5);
+  font-weight: $fontWeight-medium;
+}
+%isH6 {
+  @include font-size(h6);
+  font-weight: $fontWeight-medium;
+}

@@ -1,0 +1,10 @@
+@import 'assets/scss/helpers/variables';
+
+
+$inputBorderColor: $grey;
+
+.Input {
+	width: 100%;
+	border: 1px solid $inputBorderColor;
+	padding: 0.5rem;
+}

@@ -1,0 +1,33 @@
+$white: hsl(0°, 0%, 100%);
+$black: hsl(0°, 0%, 0%);
+
+$blueDark: hsl(223°, 12%, 41%);
+$lightGrey: hsl(218°, 15%, 85%);
+$grey: hsl(230°, 17%, 93%);
+$blue: hsl(221°, 100%, 65%);
+$green: hsl(160°, 68%, 84%);
+$red: hsl(356°, 99%, 66%);
+$yellow: hsl(45°, 100%, 51%);
+
+$inputBorder: $grey;
+$btnBlue: $blue;
+
+// Font family
+$fontFamilyBase: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !default; // system font stack;
+
+// Font sizes
+$fontSizeBase: 1.6rem !default;
+
+// Font weight
+$fontWeight-light:    200 !default;
+$fontWeight-regular:  400 !default;
+$fontWeight-medium:   500 !default;
+$fontWeight-bold:     700 !default;
+$fontWeight-black:    900 !default;
+
+// Line height
+$lineHeightBase: 1.5 !default;
+
+//Links
+$linkBaseColor: $lightgrey !default;
+$linkBaseActiveColor: $nandclightblue !default;
