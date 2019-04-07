@@ -1,0 +1,17 @@
+@import '../helpers/variables';
+
+.navbar {
+	padding: 0 1rem;
+	background-color: $white;
+	display: flex;
+	flex-direction: column;
+	grid-column-start: 1;
+	grid-row-start: 2;
+	grid-row-end: 4;
+	border-top: 1px solid $grey;
+	box-shadow: 2px 0 12px -1px $grey;
+
+	li {
+		margin: 2rem auto;
+	}
+}

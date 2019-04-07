@@ -1,0 +1,18 @@
+.navbar {
+	&__link {
+		padding: 0.8rem;
+		position: relative;
+
+		&--active {
+			&:after {
+				position: absolute;
+				top: 0;
+				right: calc(-1.5rem + 3px);
+				content: '';
+				background-color: $blue;
+				height: 100%;
+				width: 3px;
+			}
+		}
+	}
+}

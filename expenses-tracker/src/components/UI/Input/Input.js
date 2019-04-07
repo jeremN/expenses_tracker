@@ -6,9 +6,9 @@ const input = (props) => {
 	let inputElement = null
 	const inputClasses = [classes.InputElement];
 
-	// if (props.invalid && props.shouldValidate && props.touched) {
-	// 	inputClasses.push(classes.Invalid)
-	// }
+	if (props.invalid && props.shouldValidate && props.touched) {
+		inputClasses.push(classes.Invalid)
+	}
 
 	switch(props.elementType) {
 		case ('input'):
@@ -19,12 +19,13 @@ const input = (props) => {
 				value={ props.value }
 				onChange={ props.changed } />; 
 			break;
+
 		case ('select'):
 			inputElement = <select
 				className={ inputClasses.join(' ') }
 				value={ props.value }
 				onChange={ props.changed }>
-				{ ...props.elementConfig.options.map(option => (
+				{ props.elementConfig.options.map(option => (
 					<option
 						key={ option.value }
 						value={ option.value }>
@@ -33,6 +34,7 @@ const input = (props) => {
 				))} 
 			</select>;
 			break;
+
 		default:
 			inputElement = <input
 				className={ inputClasses.join(' ') }
@@ -43,13 +45,18 @@ const input = (props) => {
 	}
 
 	return (
-		<div className={}>
+		<div className={ classes.form__group }>
 			<label
 				for={ props.inputId } 
-				className={}>
+				className={ classes.form__label }>
 				{ props.labelValue }
 			</label>
 			{ inputElement }
+			<div className={ classes.form__errorMsg }>
+				{ props.errorMsg }
+			</div>
 		</div>
 	)
 }
+
+export default input;

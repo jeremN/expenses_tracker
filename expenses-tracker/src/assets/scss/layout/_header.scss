@@ -1,0 +1,27 @@
+@import '../helpers/variables';
+
+.header {
+	padding: 1rem 1.6rem;
+	display: flex;
+	align-items: center;
+	background-color: $white;
+	grid-column-start: 1;
+	grid-row-start: 1;
+	grid-column-end: 3;
+	box-shadow: 0 2px 23px -1px $grey;
+
+	&__list {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		margin-left: auto;
+		flex-grow: 1;
+		max-width: 30%;
+	}
+
+	&__item,
+	&__link {
+		color: $lightGrey;
+		margin-right: 4.8rem;
+	}
+}

@@ -1,10 +1,36 @@
-@import 'assets/scss/helpers/variables';
-
+@import '../../../assets/scss/helpers/_variables.scss';
 
 $inputBorderColor: $grey;
+$inputHasErrorColor: $red;
+$labelColor: $blueDark;
 
-.Input {
-	width: 100%;
-	border: 1px solid $inputBorderColor;
-	padding: 0.5rem;
+.form {
+	&__group {
+
+		&--isInvalid {
+			.form__field {
+				border-color: 1px solid $inputHasErrorColor;
+			}
+		}
+	}
+
+	&__label {
+		line-height: 1.8;
+		font-size: 1.4rem;
+		font-weight: 700;
+		color: $labelColor;
+	}
+
+	&__errorMsg {
+		display: none;
+		font-size: 1.4rem;
+		color: $inputHasErrorColor;
+	}
+
+	&__field {
+		width: 100%;
+		height: 3.2rem;
+		border: 1px solid $inputBorderColor;
+		padding: 0.5rem;
+	}
 }

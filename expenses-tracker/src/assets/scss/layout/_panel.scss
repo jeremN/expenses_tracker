@@ -1,0 +1,10 @@
+@import 'assets/scss/helpers/variables';
+@import 'assets/scss/helpers/functions';
+@import 'assets/scss/helpers/mixins';
+@import 'assets/scss/helpers/placeholder';
+
+.panel {
+	background-color: $white;
+	border: 1px solid $grey;
+	box-shadow: 0 0 16px 4px $grey;
+}

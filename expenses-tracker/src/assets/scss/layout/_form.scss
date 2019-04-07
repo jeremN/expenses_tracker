@@ -1,0 +1,14 @@
+@import 'assets/scss/helpers/variables';
+@import 'assets/scss/helpers/functions';
+@import 'assets/scss/helpers/mixins';
+@import 'assets/scss/helpers/placeholder';
+
+.form {
+	max-width: 300px;
+	margin: 1rem auto;
+	padding: 1.5rem;
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: flex-start;
+	justify-content: center;
+}
