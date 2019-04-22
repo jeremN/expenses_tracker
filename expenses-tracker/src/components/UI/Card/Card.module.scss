@@ -1,4 +1,4 @@
-@import 'assets/scss/helpers/_variables.scss';
+@import '../../../assets/scss/helpers/_variables.scss';
 
 $cardBgColor: $white;
 $cardBorderColor: $grey;
@@ -14,11 +14,11 @@ $cardBorderColor: $grey;
 	margin: 1rem 0.5rem;
 	padding: 1rem;
 	
-	&--column {
+	&__column {
 		flex-direction: column;
 	}
 
-	&--transparent { background: none; }
+	&__transparent { background: none; }
 
 	&__title {
 		font-size: 1.25rem;
@@ -31,5 +31,5 @@ $cardBorderColor: $grey;
 		> span { font-size: 0.875rem; }
 	}
 
-	&:first-child {}
+	&:first-child { margin-top: 4.75rem; }
 }

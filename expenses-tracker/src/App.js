@@ -29,7 +29,7 @@ class App extends Component {
         <Switch>
           <Route path="/logout" component={ Logout } />
           <Route path="/auth" component={ Auth } />
-          <Route path="/" component={ Home } />
+          <Route path="/" exact component={ Home } />
           <Redirect to="/" />
         </Switch>
       )

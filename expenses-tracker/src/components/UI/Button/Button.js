@@ -1,9 +1,10 @@
 import React from 'react';
 
-import classes from './Button.module.css';
+import classes from './Button.module.scss';
 
 const button = (props) => (
 	<button
+		type={ !props.typeBtn ? 'button' : props.typeBtn }
 		className={ [classes.button, classes[props.btnType]].join(' ') }
 		disabled={ props.disabled }
 		onClick={ props.clicked }>

@@ -1,0 +1,20 @@
+@import '../../assets/scss/helpers/_variables.scss';
+
+.addExpense {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: flex-start;
+	justify-content: center;
+	margin: 0 1rem 1rem auto;
+	background-color: $white;
+	border: 1px solid $grey;
+	border-radius: 4px;
+	padding: 1rem;
+	width: 75%;
+
+	button[type="submit"] { margin-top: 3.5rem; }
+	input, select { 
+		border-right: 0; 
+		font-size: 1.4rem;
+	}
+}

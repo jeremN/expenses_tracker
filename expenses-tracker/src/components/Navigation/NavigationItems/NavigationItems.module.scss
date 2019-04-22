@@ -1,18 +1,18 @@
-.navbar {
-	&__link {
-		padding: 0.8rem;
-		position: relative;
+@import '../../../assets/scss/helpers/_variables.scss';
 
-		&--active {
-			&:after {
-				position: absolute;
-				top: 0;
-				right: calc(-1.5rem + 3px);
-				content: '';
-				background-color: $blue;
-				height: 100%;
-				width: 3px;
-			}
+.Link {
+	padding: 0.8rem;
+	position: relative;
+
+	&__active {
+		&:after {
+			position: absolute;
+			top: 0;
+			right: calc(-1.5rem + 3px);
+			content: '';
+			background-color: $blue;
+			height: 100%;
+			width: 3px;
 		}
 	}
 }

@@ -1,0 +1,25 @@
+.Header {
+	padding: 0.625rem 1rem;
+	display: flex;
+	align-items: center;
+	background-color: white;
+	grid-column-start: 1;
+	grid-row-start: 1;
+	grid-column-end: 2;
+	box-shadow: 0 2px 12px -1px #eeeef2; 
+
+	&__list {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		margin-left: auto;
+		flex-grow: 1;
+		max-width: 30%;
+		list-style: none;
+	}
+
+	&__item {
+		color: #cfd5dd;
+		margin-right: 3rem;
+	} 
+}

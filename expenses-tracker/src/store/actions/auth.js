@@ -8,7 +8,7 @@ export const authStart = () => {
 }	
 
 export const logout = () => {
-	localStorage.removeItem('expensesTracker');
+	// localStorage.removeItem('expensesTracker');
 	return {
 		type: actionTypes.AUTH_LOGOUT
 	}
@@ -62,9 +62,12 @@ export const auth = (email, password, isSignUp) => {
 					token: data.idToken,
 					userId: data.localId
 				}
-				localStorage.setItem('expensesTracker', localStorageDatas)
+				localStorage.setItem('expensesTracker', JSON.stringify(localStorageDatas))
+				dispatch(authSuccess(response.data.idToken, response.data.localId));
+				dispatch(checkAuthTimeout(response.data.expiresIn));
 			})
 			.catch(error => {
+				console.debug(error)
 				dispatch(authFail(error.response.data.error))
 			});
 	}
@@ -83,7 +86,7 @@ export const authCheckState = () => {
 		if (!localStorageDatas) {
 			dispatch(logout())
 		} else {
-			const { token, userId, expireDate } = localStorageDatas;
+			const { token, userId, expireDate } = JSON.parse(localStorageDatas);
 			const expirationDate = new Date(expireDate);
 
 			if (expirationDate <= new Date()) {

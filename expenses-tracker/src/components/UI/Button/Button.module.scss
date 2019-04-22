@@ -3,6 +3,7 @@
 $btnBlueBgColor: $blue;
 $btnBlueBorderColor: $blue;
 $btnBlueTextColor: $white;
+$btnTransparentHoverColor: $blue;
 
 .button {
 	background: none;
@@ -15,10 +16,21 @@ $btnBlueTextColor: $white;
 	flex-basis: 100%;
 	height: 3.2rem;
 
-	&--blue {
+	&__blue {
 		border: 1px solid $btnBlueBorderColor;
 		background-color: $btnBlueBgColor;
 		color: $btnBlueTextColor;
 		border-radius: 0;
+	}
+
+	&__transparent {
+		border: none;
+		background: none;
+		font-size: 1.2rem;
+		text-transform: inherit;
+		margin: auto;
+		width: auto;
+
+		&:hover { color: $btnTransparentHoverColor; }
 	}
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import classes from './Input.module.scss';
+import classes, { form__field } from './Input.module.scss';
 
 const input = (props) => {
 	let inputElement = null
@@ -14,7 +14,7 @@ const input = (props) => {
 		case ('input'):
 			inputElement = <input
 				id={ props.inputId }
-				className={ inputClasses.join(' ') }
+				className={ form__field }
 				{ ...props.elementConfig }
 				value={ props.value }
 				onChange={ props.changed } />; 
@@ -22,7 +22,7 @@ const input = (props) => {
 
 		case ('select'):
 			inputElement = <select
-				className={ inputClasses.join(' ') }
+				className={ form__field }
 				value={ props.value }
 				onChange={ props.changed }>
 				{ props.elementConfig.options.map(option => (
@@ -37,19 +37,22 @@ const input = (props) => {
 
 		default:
 			inputElement = <input
-				className={ inputClasses.join(' ') }
+				className={ form__field }
 				{ ...props.elementConfig }
 				value={ props.value }
 				onChange={ props.changed } />; 
 			break;
 	}
 
+	const labelSmall = (
+		<small>({ props.labelSmall })</small>
+	)
 	return (
 		<div className={ classes.form__group }>
 			<label
-				for={ props.inputId } 
+				htmlFor={ props.inputId } 
 				className={ classes.form__label }>
-				{ props.labelValue }
+				{ props.labelValue } { labelSmall }
 			</label>
 			{ inputElement }
 			<div className={ classes.form__errorMsg }>

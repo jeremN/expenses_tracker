@@ -1,0 +1,33 @@
+@import '../../../assets/scss/helpers/_variables.scss';
+
+.c__indicator {
+	flex-direction: column;
+
+	&__title {
+		margin: 0 0 1.5rem 0;
+		font-size: 1.2rem;
+		color: $grey;
+	}
+
+	&__value {
+		color: $blueDark;
+		font-size: 2rem;
+		font-weight: 700;
+		display: flex;
+		align-items: center;
+		justify-content: space-evenly;
+		flex-grow: 1;
+		margin: 0 auto;
+
+		> span {
+			font-size: 1.4rem;
+			margin-left: 0.75rem;
+			
+			.is {
+				&__positive { color: $green; }
+				&__negative { color: $red; }
+				&__stable { color: $blue; }
+			}
+		}
+	}
+}

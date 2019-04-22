@@ -1,35 +1,15 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 
+import Header from '../../components/Header/Header';
+import { dashboard__content } from './Layout.module.css';
+
 class Layout extends Component {
-	render() {
-	
-		let sideNav = ''
-		let header = (
-			<header>
-				Unauhenticated header
-			</header>
-		)
-
-		if (this.props.isAuth) {
-			header = (
-				<header>
-					Authenticated header
-				</header>
-			)
-
-			sideNav = (
-				<nav>
-					Side nav
-				</nav>
-			)
-		}
-
+	render() {		
 		return (
 			<Fragment>
-				{ header }
-				{ sideNav }
-				<main>
+				<Header isAuth={this.props.isAuth} />
+				<main className={ dashboard__content }>
 					{ this.props.children }
 				</main>
 			</Fragment>
@@ -42,6 +22,5 @@ const mapStateToProps = state => {
 		isAuth: state.auth.token !== null
 	}
 }
-
 
 export default connect(mapStateToProps)(Layout);
