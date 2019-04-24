@@ -1,0 +1,14 @@
+@import '../../../assets/scss/helpers/_variables.scss';
+
+.table {
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	border-spacing: 0;
+
+	&__sort {
+		display: flex;
+		flex-direction: column;
+		margin-left: 0.8rem;
+	}
+}

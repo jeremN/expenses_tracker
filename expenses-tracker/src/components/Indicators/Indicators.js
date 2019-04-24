@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 
 import Indicator from './Indicator/Indicator';
 
 const indicators = (props) => {
-	let indicatorsElements = props.kpis.map(kpi => {
+	let indicatorsElements = props.kpis.map((kpi, index) => {
 		return (			
 			<Indicator 
+				key={ `kpi-${index}` }
 				title={ kpi.title }
 			  value={ kpi.value }
 			  currency="€"
@@ -15,9 +16,9 @@ const indicators = (props) => {
 	})
 
 	return (
-		<div className="col-3">
+		<Fragment>
 			{ indicatorsElements }
-		</div>
+		</Fragment>
 	); 
 }
 

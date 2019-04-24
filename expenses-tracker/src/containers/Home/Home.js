@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import Aux from '../../hoc/Auxiliary/Auxiliary';
 import AddExpense from '../../components/AddExpenseForm/AddExpenseForm';
 import Indicators from '../../components/Indicators/Indicators';
+import Table from '../../components/UI/Table/Table';
 
 import * as actions from '../../store/actions';
 import axios from 'axios';
@@ -29,7 +30,33 @@ class Home extends Component {
 				progression: '=',
 				progressClass: 'is__stable'
 			},
-		]
+		],
+		table: {
+			headings: [
+				'Catégorie',
+				'Type',
+				'Date',
+				'Montant',
+				'Actions'
+			],
+			body: [
+				[
+					'course',
+					'outcome',
+					'21/04/2019',
+					'201.12',
+					''
+				],
+				[
+					'jeux',
+					'outcome',
+					'19/04/2019',
+					'54.99',
+					''
+				]
+			],
+			footer: []
+		}
 	}
 
 	render() {
@@ -40,7 +67,12 @@ class Home extends Component {
 					<AddExpense />
 				</div>
 				<div className="row">
-					<Indicators kpis={ this.state.indicators }/>
+					<div className="col-3">
+						<Indicators kpis={ this.state.indicators } />
+					</div>
+					<div className="col-9">
+						<Table headings={ this.state.table.headings } rows={ this.state.table.body } />
+					</div>
 				</div>
 			</Fragment>
 		)

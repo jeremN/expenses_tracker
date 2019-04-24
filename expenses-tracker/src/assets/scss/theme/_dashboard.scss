@@ -25,3 +25,59 @@
 		color: $blueDark;
 	}
 }
+
+table {
+	width: 100%;
+	
+	td {
+		vertical-align: middle;
+
+		&:first-child {
+			box-shadow: inset 1px 1px 0 0 #eaedf4, inset 0 -2px 0 -1px #eaedf4;
+		}
+	}
+}
+
+thead {
+	tr {
+		background: none;
+		border: none;
+		color: $blue;
+		color: $blueDark;
+	}
+
+	th {
+		font-weight: 700;
+
+		&:first-child { border: none; }
+		> div {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+	}
+}
+
+tbody {
+	font-size: 1.4rem;
+	font-weight: 700;
+}
+
+tr {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+	background-color: $white;
+	border-top: 8px solid $lightGrey;
+	border-bottom: 8px solid $lightGrey;
+}
+
+td, th {
+	padding: 1rem;
+	text-align: center;
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
+}
+
+td {
+	box-shadow: inset 0 2px 0 -1px #eaedf4, inset 0 -2px 0 -1px #eaedf4;
+}
