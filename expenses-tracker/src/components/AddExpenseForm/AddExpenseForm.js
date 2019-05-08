@@ -5,7 +5,9 @@ import Input from '../UI/Input/Input';
 import Button from '../UI/Button/Button';
 import Card from '../UI/Card/Card';
 
+import * as actions from '../../store/actions';
 import { addExpense } from './AddExpenseForm.module.scss';
+import { updateObject, formCheckValidity } from '../../shared/utility';
 
 class AddExpense extends Component {
 	state = {
@@ -88,6 +90,24 @@ class AddExpense extends Component {
 		},
 	}
 
+	submitExpenseHandler = (event) => {
+		event.preventDefault();
+		const { category, date, type, values } = this.state.controls;
+	}
+
+	inputChangedHandler = (event, controlName) => {
+		const { target } = event
+		const updatedControls = updateObject(this.state.controls, {
+			[controlName]: updateObject(this.state.controls[controlName], {
+				...this.state.controls[controlName],
+				value: target.value,
+				valid: formCheckValidity(target.value, this.state.controls[controlName]),
+				touched: true,
+			})
+		});
+		this.setState({ controls: updatedControls });
+	}
+
 	render() {
 		const formElementsArray = [];
 
@@ -136,4 +156,17 @@ class AddExpense extends Component {
 	}
 }
 
-export default AddExpense;
+const mapStateToProps = state => {
+	return {
+		token: state.auth.token,
+		userId: state.auth.userId,
+	}
+}
+
+const mapDispatchToProps = dispatch => {
+	return {
+		onAddNewExpense: (userId, token, key, data) => dispatch(actions.addNewExpense(userId, token, key, data))
+	}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddExpense);

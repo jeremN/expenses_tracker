@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Cell from './Cell/Cell';
+import './Table.module.scss';
 
 const table = (props) => {
 	const { headings, rows, footer } = props
@@ -19,7 +20,7 @@ const table = (props) => {
 
 	let body = rows ? (
 		<tbody>
-			{ rows.map((row, rowIndex) => <tr key={ `row-${rowIndex}` }>
+			{ rows.map((row, rowIndex) => <tr id={ rowIndex } key={ `row-${rowIndex}` }>
 					{ row.map((content, cellIndex) => <Cell 
 						key={ `cell-${rowIndex}-${cellIndex}` }>{ content }</Cell>
 					)}

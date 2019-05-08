@@ -1,5 +1,6 @@
 import * as actionTypes from './actionTypes';
 import axios from 'axios';
+import { getUserData, setNewUserData } from './user';
 
 export const authStart = () => {
 	return {
@@ -8,7 +9,7 @@ export const authStart = () => {
 }	
 
 export const logout = () => {
-	// localStorage.removeItem('expensesTracker');
+	localStorage.removeItem('expensesTracker');
 	return {
 		type: actionTypes.AUTH_LOGOUT
 	}
@@ -63,8 +64,13 @@ export const auth = (email, password, isSignUp) => {
 					userId: data.localId
 				}
 				localStorage.setItem('expensesTracker', JSON.stringify(localStorageDatas))
-				dispatch(authSuccess(response.data.idToken, response.data.localId));
-				dispatch(checkAuthTimeout(response.data.expiresIn));
+				if (isSignUp) {
+					dispatch(setNewUserData(data.localId, data.idToken));
+				} else {
+					dispatch(getUserData(data.localId, data.idToken));
+				}
+				dispatch(authSuccess(data.idToken, data.localId));
+				dispatch(checkAuthTimeout(data.expiresIn));
 			})
 			.catch(error => {
 				console.debug(error)

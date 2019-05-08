@@ -28,12 +28,16 @@
 
 table {
 	width: 100%;
+	color: $blueDark;
 	
 	td {
 		vertical-align: middle;
 
 		&:first-child {
-			box-shadow: inset 1px 1px 0 0 #eaedf4, inset 0 -2px 0 -1px #eaedf4;
+			box-shadow: inset 1px 1px 0 0 $tableBorderColor, inset 0 -2px 0 -1px $tableBorderColor;
+		}
+		&:last-child {
+			box-shadow: inset -1px 1px 0 0 $tableBorderColor, inset 0 -2px 0 -1px $tableBorderColor;
 		}
 	}
 }

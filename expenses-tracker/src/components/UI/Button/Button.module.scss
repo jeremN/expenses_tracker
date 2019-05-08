@@ -33,4 +33,13 @@ $btnTransparentHoverColor: $blue;
 
 		&:hover { color: $btnTransparentHoverColor; }
 	}
+
+	&--td {
+		border: none;
+		background: none;
+		font-size: 1.2rem;
+		text-transform: initial;
+
+		&:hover { color: $btnTransparentHoverColor; }
+	}
 }
