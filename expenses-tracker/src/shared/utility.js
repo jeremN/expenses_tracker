@@ -37,3 +37,19 @@ export const formCheckValidity = (value, rules) => {
 
 	return isValid;
 }
+
+export const getDate = () => {
+	const locale = 'en-us';
+	const formatterMonth = new Intl.DateTimeFormat(locale, {
+		month: 'long'
+	});
+	const currentDate = new Date();
+	const currentYear = currentDate.getFullYear();
+	const currentMonth = formatterMonth.format(currentDate);
+	
+	return {
+		currentDate,
+		currentYear,
+		currentMonth
+	};
+}

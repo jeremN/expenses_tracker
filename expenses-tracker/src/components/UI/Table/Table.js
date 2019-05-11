@@ -4,8 +4,8 @@ import Cell from './Cell/Cell';
 import './Table.module.scss';
 
 const table = (props) => {
-	const { headings, rows, footer } = props
-	console.debug(rows)
+	const { headings, rows, footer } = props;
+	console.debug(rows);
 
 	let head = props.headings ? (
 		<thead>
@@ -16,7 +16,7 @@ const table = (props) => {
 				)}
 			</tr>
 		</thead>
-	) : ''
+	) : '';
 
 	let body = rows ? (
 		<tbody>
@@ -27,19 +27,17 @@ const table = (props) => {
 				</tr>
 			) }
 		</tbody>
-	) : ''
+	) : '';
 
-	let foot = footer ? (
-		<tfooter>
-			
-		</tfooter>
-	) : ''
+	// let foot = footer ? (
+	// 	<tfooter>
+	// 	</tfooter>
+	// ) : ''
 
-	return (
+	return (		
 		<table>
 			{ head }
 			{ body }
-			{ footer }
 		</table>
 	);
 }

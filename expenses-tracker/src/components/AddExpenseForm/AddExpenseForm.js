@@ -7,7 +7,7 @@ import Card from '../UI/Card/Card';
 
 import * as actions from '../../store/actions';
 import { addExpense } from './AddExpenseForm.module.scss';
-import { updateObject, formCheckValidity } from '../../shared/utility';
+import { updateObject, formCheckValidity, getDate } from '../../shared/utility';
 
 class AddExpense extends Component {
 	state = {
@@ -92,7 +92,28 @@ class AddExpense extends Component {
 
 	submitExpenseHandler = (event) => {
 		event.preventDefault();
+		let datas = {};
 		const { category, date, type, values } = this.state.controls;
+		const { userId, token, currentKey } = this.props;
+		const actualDate = getDate()
+		
+		if (!this.props.currentExpenses) {
+			datas = {
+				[actualDate.currentYear]: {
+					[actualDate.currentMonth]: []
+				}
+			};
+		} else {
+			datas = this.props.currentExpenses;
+		}
+
+		datas[actualDate.currentYear][actualDate.currentMonth].push({
+			type: type.value,
+			category: category.value,
+			value: values.value,
+			date: date.value
+		});
+		this.props.onAddNewExpense(userId, token, currentKey, datas);
 	}
 
 	inputChangedHandler = (event, controlName) => {
@@ -150,7 +171,8 @@ class AddExpense extends Component {
 				{ form }
 				<Button 
 					btnType="button__blue"
-					typeBtn="submit">Ajouter</Button>
+					typeBtn="submit"
+					clicked={ this.submitExpenseHandler }>Ajouter</Button>
 			</form>
 		);
 	}
@@ -158,14 +180,17 @@ class AddExpense extends Component {
 
 const mapStateToProps = state => {
 	return {
+		loading: state.auth.loading,
 		token: state.auth.token,
 		userId: state.auth.userId,
+		currentExpenses: state.user.currentExpenses,
+		currentKey: state.user.currentKey
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-		onAddNewExpense: (userId, token, key, data) => dispatch(actions.addNewExpense(userId, token, key, data))
+		onAddNewExpense: (userId, token, key, data) => dispatch(actions.updateExpense(userId, token, key, data))
 	}
 }
 

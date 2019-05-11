@@ -6,8 +6,14 @@ const formatterMonth = new Intl.DateTimeFormat(locale, {
 	month: 'short'
 })
 
+export const getUserDataStart = () => {
+	return {
+		type: actionTypes.GET_USER_DATA_START
+	}
+}
+
 export const getUserDataSuccess = (data) => {
-	const dataKey = Object.keys(data).map(key => key)
+	const dataKey = Object.keys(data).map(key => key)[0]
 	const { profile, expenses, currentExpenses, categories } = data[dataKey]
 	return {
 		profile,
@@ -19,22 +25,16 @@ export const getUserDataSuccess = (data) => {
 	}
 }
 
-export const getUserDataStart = () => {
+export const getUserDataFail = (error) => {
 	return {
-		type: actionTypes.GET_USER_DATA_START
+		type: actionTypes.GET_USER_DATA_FAIL,
+		error: error
 	}
 }
 
 export const setUserDataStart = () => {
 	return {
 		type: actionTypes.SET_USER_DATA_START
-	}
-}
-
-export const getUserDataFail = (error) => {
-	return {
-		type: actionTypes.GET_USER_DATA_FAIL,
-		error: error
 	}
 }
 
@@ -51,6 +51,26 @@ export const setNewUserDataFail = (error) => {
 	}
 }
 
+export const updateExpenseStart = () => {
+	return {
+		type: actionTypes.UPDATE_EXPENSE_START
+	}
+}
+
+export const updateExpenseSuccess = (data) => {
+	return {
+		currentExpenses: data,
+		type: actionTypes.UPDATE_EXPENSE_SUCCESS
+	}
+}
+
+export const updateExpenseFail = (error) => {
+	return {
+		type: actionTypes.UPDATE_EXPENSE_FAIL,
+		error: error
+	}
+}
+
 export const setNewUserData = (userId, token) => {
 	return dispatch => {	
 		dispatch(setUserDataStart())
@@ -63,7 +83,10 @@ export const setNewUserData = (userId, token) => {
 				name: '',
 				verified: false,
 				currency: ''
-			}
+			}, 
+			expenses: '',
+			currentExpenses: '',
+			categories: ''
 		}
 
 		axios.post(`users/${userId}.json?auth=${token}`, newUserData)
@@ -84,7 +107,7 @@ export const getUserData = (userId, token) => {
 		dispatch(getUserDataStart())
 		axios.get(`users/${userId}.json?auth=${token}`)
 			.then(response => {
-				console.log(response)
+				console.log(response);
 				dispatch(getUserDataSuccess(response.data));
 			})
 			.catch(error => {
@@ -94,18 +117,17 @@ export const getUserData = (userId, token) => {
 	}
 }
 
-export const addNewExpenseSuccess = () => {}
-
-export const addNewExpenseFail = () => {}
-
-export const addNewExpense = (userId, token, key, data) => {
+export const updateExpense = (userId, token, key, datas) => {
 	return dispatch => {	
-		axios.put(`users/${userId}/${key}.json?auth=${token}`)
+		dispatch(updateExpenseStart());
+		axios.put(`users/${userId}/${key}/currentExpenses.json?auth=${token}`, datas)
 			.then(response => {
-				console.info(response);
+				console.info(response.data);
+				dispatch(updateExpenseSuccess(response.data));
 			})
 			.catch(error => {
-				console.info(error);
+				console.error(error);
+				dispatch(updateExpenseFail(error.response.data.error));
 			})
 	}
 }

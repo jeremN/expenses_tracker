@@ -8,5 +8,5 @@ export {
 export {
 	setNewUserData,
 	getUserData,
-	addNewExpense
+	updateExpense,
 } from './user';

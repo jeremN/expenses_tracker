@@ -109,7 +109,7 @@ class Auth extends Component {
 					shouldValidate={ validation }
 					touched={ touched }
 					changed={ (event) => this.inputChangedHandler(event, formElement.id)} />
-			)
+			);
 		});
 
 		let errorMessage = null;
