@@ -5,12 +5,11 @@ import './Table.module.scss';
 
 const table = (props) => {
 	const { headings, rows, footer } = props;
-	console.debug(rows);
 
 	let head = props.headings ? (
 		<thead>
 			<tr>
-				{ props.headings.map((heading, index) => <Cell 
+				{ props.headings.map((heading, index) => <Cell
 					key={ `thead-${index}` }
 					type={ 'head' }>{ heading }</Cell>
 				)}

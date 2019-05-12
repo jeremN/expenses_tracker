@@ -6,6 +6,7 @@ const button = (props) => (
 	<button
 		type={ !props.typeBtn ? 'button' : props.typeBtn }
 		className={ [classes.button, classes[props.btnType]].join(' ') }
+		style={ props.cssStyle ? { ...props.cssStyle } : null }
 		disabled={ props.disabled }
 		onClick={ props.clicked }
 		{ ...props.attributes }>

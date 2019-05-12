@@ -47,13 +47,18 @@ const input = (props) => {
 	const labelSmall = (
 		<small>({ props.labelSmall })</small>
 	)
-	return (
-		<div className={ classes.form__group }>
+
+	const label = props.labelValue ? (
 			<label
 				htmlFor={ props.inputId } 
 				className={ classes.form__label }>
 				{ props.labelValue } { labelSmall }
 			</label>
+			) : null;
+
+	return (
+		<div className={ classes.form__group }>
+			{ label }
 			{ inputElement }
 			<div className={ classes.form__errorMsg }>
 				{ props.errorMsg }

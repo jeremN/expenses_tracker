@@ -107,7 +107,6 @@ export const getUserData = (userId, token) => {
 		dispatch(getUserDataStart())
 		axios.get(`users/${userId}.json?auth=${token}`)
 			.then(response => {
-				console.log(response);
 				dispatch(getUserDataSuccess(response.data));
 			})
 			.catch(error => {
@@ -122,7 +121,6 @@ export const updateExpense = (userId, token, key, datas) => {
 		dispatch(updateExpenseStart());
 		axios.put(`users/${userId}/${key}/currentExpenses.json?auth=${token}`, datas)
 			.then(response => {
-				console.info(response.data);
 				dispatch(updateExpenseSuccess(response.data));
 			})
 			.catch(error => {

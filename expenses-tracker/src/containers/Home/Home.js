@@ -5,6 +5,7 @@ import AddExpense from '../../components/AddExpenseForm/AddExpenseForm';
 import Indicators from '../../components/Indicators/Indicators';
 import Table from '../../components/UI/Table/Table';
 import Button from '../../components/UI/Button/Button';
+import Input from '../../components/UI/Input/Input';
 
 import * as actions from '../../store/actions';
 import { updateObject, getDate } from '../../shared/utility';
@@ -44,32 +45,168 @@ class Home extends Component {
 			body: null,
 			footer: [], 
 		},
-		currentYear: new Date(),
-
+		editControls: {
+			category: {
+				elementType: 'input',
+				elementConfig: {
+					type: 'text',
+					placeholder: ''
+				},
+				value: '',
+				touched: false
+			},
+			type: {
+				elementType: 'select',
+				elementConfig: {
+					type: '',
+					placeholder: '',
+					options: [
+						{
+							value: 'initial',
+							displayValue: 'Choisir un type'
+						},
+						{
+							value: 'outcome',
+							displayValue: 'Dépense'
+						},
+						{
+							value: 'income',
+							displayValue: 'Revenu'
+						}
+					]
+				},
+				value: '',
+				touched: false
+			},
+			date: {
+				elementType: 'input',
+				elementConfig: {
+					type: 'date',
+					placeholder: ''
+				},
+				value: '',
+				touched: false
+			},
+			value: {
+				elementType: 'input',
+				elementConfig: {
+					type: 'number',
+					placeholder: '',
+					step: '0.01',
+				},
+				value: '',
+				touched: false
+			}
+		},
 	}
 
 	componentDidUpdate(prevProps) {
 		if (this.props.currentExpenses !== prevProps.currentExpenses) {
-			this.processTableBodyData(this.props.currentExpenses);
+			this.switchDataMode(this.props.currentExpenses);
 		}
 	}
 
-	processTableBodyData = (data) => {
-		let tBody = [];
-		const btnsGroup = (
+	updateControls = (name, val, touch) => {
+		const updatedControls = updateObject(this.state.editControls, {
+			[name]: updateObject(this.state.editControls[name], {
+				...this.state.editControls[name],
+				value: val,
+				touched: touch
+			})
+		});
+		this.setState({ editControls: updatedControls });
+	}
+
+	updateTableBodyInputs = () => {
+
+	}
+
+	inputChangedHandler = (event, name) => {
+		const { target } = event;
+		this.updateControls(name, target.value);
+	}
+
+	switchBtnsGroups = (edit = false) => {
+		return (
 			<span>
-				<Button 
+				<Button
+					cssStyle={{ display: edit ? 'flex' : 'none' }} 
+					btnType="button--td"
+					attributes={ {'data-type': 'save'} } 
+					clicked={ this.saveTableRow }>Save</Button>
+				<Button
+					cssStyle={{ display: edit ? 'flex' : 'none' }} 
+					btnType="button--td"
+					attributes={ {'data-type': 'cancel'} } 
+					clicked={ this.cancelEditRow }>Cancel</Button>
+				<Button
+					cssStyle={{ display: !edit ? 'flex' : 'none' }} 
 					btnType="button--td"
 					attributes={ {'data-type': 'edit'} } 
-					clicked={ this.updateTableRow }>Editer</Button>
-				<Button 
+					clicked={ this.editTableRow }>Edit</Button>
+				<Button
+					cssStyle={{ display: !edit ? 'flex' : 'none' }} 
 					btnType="button--td"
 					attributes={ {'data-type': 'delete'} } 
-					clicked={ this.deleteTableRow }>Supprimer</Button>
+					clicked={ this.deleteTableRow }>Delete</Button>
 			</span>
 		);
+	}
+
+	switchEditMode = (rowId) => {
+		const editedArray = [...this.state.table.body];
+		const toEditRow = [...this.state.table.body[+rowId]];
+		const currentControls = this.state.editControls;
+		const btnsGroup = this.switchBtnsGroups(true);
+		let editForm = []
+		
+		Object.keys(currentControls).forEach((key, index) => {
+			editForm.push({
+				id: key,
+				config: {
+					...this.state.editControls[key],
+					value: toEditRow[index],
+				}
+			});
+			this.updateControls(key, toEditRow[index]);
+		});
+
+		let editedRow = editForm.map((editElement, index) => {
+			const { 
+				elementType, 
+				elementConfig, 
+				touched, 
+				value 
+			} = editElement.config;
+
+			return (
+				<Input 
+					key={ editElement.id } 
+					elementType={ elementType }
+					elementConfig={ elementConfig }
+					value={ value } 
+					touched={ touched }
+					changed={ (event) => this.inputChangedHandler(event, editElement.id) } />
+			);
+		});
+
+		editedRow.push(btnsGroup);
+		editedArray.splice(+rowId, 1, editedRow);
+
+		this.setState({
+			table: {
+				headings: this.state.table.headings,
+				body: editedArray
+			}
+		});
+	}
+
+	switchDataMode = (data) => {
+		let tBody = [];
 
 		if (data) {
+			const btnsGroup = this.switchBtnsGroups(false);
+
 			const arr = Object.keys(data).map(expense => {
 				return Object.keys(data[expense]).map(current => data[expense][current]);
 			});
@@ -93,10 +230,32 @@ class Home extends Component {
 		});
 	}
 
-	updateTableRow = (event) => {
-		const { target } = event
-		const rowId = target.closest('tr').id
-		console.info(rowId)
+	saveTableRow = (event) => {
+		event.preventDefault();
+		const dates = getDate();
+		const { target } = event;
+		const rowId = target.closest('tr').id;
+		const { userId, token, currentKey } = this.props;
+		const { category, date, type, value } = this.state.editControls;
+		const newArray = [category.value, type.value, date.value, value.value];
+		const updatedArray = [...this.props.currentExpenses[dates.currentYear][dates.currentMonth]];
+		updatedArray.splice(rowId, 1, newArray);
+		const updatesExpenses = {
+			[dates.currentYear]: {
+				[dates.currentMonth]: updatedArray
+			}
+		};
+		this.props.onUpdateExpense(userId, token, currentKey, updatesExpenses);
+	}
+
+	cancelEditRow = (event) => {
+		this.switchDataMode(this.props.currentExpenses);
+	}
+
+	editTableRow = (event) => {
+		const { target } = event;
+		const rowId = target.closest('tr').id;
+		this.switchEditMode(rowId);
 	}
 
 	deleteTableRow = (event) => {
@@ -104,7 +263,7 @@ class Home extends Component {
 		const dates = getDate();
 		const { target } = event;
 		const rowId = target.closest('tr').id;
-		const { userId, token, key } = this.props;
+		const { userId, token, currentKey } = this.props;
 		const updatedArray = [...this.props.currentExpenses[dates.currentYear][dates.currentMonth]];
 		updatedArray.splice(rowId, 1);
 		const updatesExpenses = {
@@ -112,7 +271,7 @@ class Home extends Component {
 				[dates.currentMonth]: updatedArray
 			}
 		};
-		this.props.onDeleteExpense(userId, token, key, updatesExpenses);
+		this.props.onUpdateExpense(userId, token, currentKey, updatesExpenses);
 	}
 
 	render() {
@@ -169,13 +328,14 @@ const mapStateToProps = state => {
 		isAuth: state.auth.token !== null,
 		token: state.auth.token,
 		userId: state.auth.userId,
-		currentExpenses: state.user.currentExpenses
+		currentExpenses: state.user.currentExpenses,
+		currentKey: state.user.currentKey
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-		onDeleteExpense: (userId, token, key, datas) => dispatch(actions.updateExpense(userId, token, key, datas))
+		onUpdateExpense: (userId, token, key, datas) => dispatch(actions.updateExpense(userId, token, key, datas))
 	}
 }
 

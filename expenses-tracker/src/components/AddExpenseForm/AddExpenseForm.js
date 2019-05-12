@@ -117,7 +117,7 @@ class AddExpense extends Component {
 	}
 
 	inputChangedHandler = (event, controlName) => {
-		const { target } = event
+		const { target } = event;
 		const updatedControls = updateObject(this.state.controls, {
 			[controlName]: updateObject(this.state.controls[controlName], {
 				...this.state.controls[controlName],
@@ -162,7 +162,7 @@ class AddExpense extends Component {
 					invalid={ !valid }
 					shouldValidate={ validation }
 					touched={ touched }
-					changed={ (event) => this.inputChangedHandler(event, formElement.id)} />
+					changed={ (event) => this.inputChangedHandler(event, formElement.id) } />
 			)
 		});
 
