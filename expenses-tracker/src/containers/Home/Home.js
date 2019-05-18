@@ -87,7 +87,7 @@ class Home extends Component {
 				value: '',
 				touched: false
 			},
-			value: {
+			amount: {
 				elementType: 'input',
 				elementConfig: {
 					type: 'number',
@@ -106,24 +106,62 @@ class Home extends Component {
 		}
 	}
 
-	updateControls = (name, val, touch) => {
+	updateControls = (name, val, touch = false) => {
 		const updatedControls = updateObject(this.state.editControls, {
 			[name]: updateObject(this.state.editControls[name], {
 				...this.state.editControls[name],
 				value: val,
-				touched: touch
+				touched: touch,
 			})
 		});
 		this.setState({ editControls: updatedControls });
 	}
 
-	updateTableBodyInputs = () => {
-
-	}
-
-	inputChangedHandler = (event, name) => {
+	inputChangedHandler = (event, name, currentIndex) => {
 		const { target } = event;
-		this.updateControls(name, target.value);
+		const rowId = target.closest('tr').id
+		const editedArray = [...this.state.table.body[rowId]];
+		const updatedArray = [...this.state.table.body];
+		const { value: currentVal } = target;
+		const editForm = [
+			{
+				id: name,
+				config: {
+					...this.state.editControls[name],
+					value: currentVal
+				}
+			}
+		];
+		
+		let editedRow = editForm.map((editElement) => {
+			const { 
+				elementType, 
+				elementConfig, 
+				touched, 
+			} = editElement.config;
+
+			return (
+				<Input 
+					key={ editElement.id } 
+					inputId={ editElement.id } 
+					elementType={ elementType }
+					elementConfig={ elementConfig }
+					value={ currentVal } 
+					touched={ touched }
+					changed={ (event) => this.inputChangedHandler(event, editElement.id, currentIndex) } />
+			);
+		});
+
+		editedArray.splice(+currentIndex, 1, editedRow[0]);
+		updatedArray.splice(+rowId, 1, editedArray);
+
+		this.setState({
+			table: {
+				headings: this.state.table.headings,
+				body: updatedArray
+		 	}
+		});
+		this.updateControls(name, currentVal, false)
 	}
 
 	switchBtnsGroups = (edit = false) => {
@@ -156,11 +194,11 @@ class Home extends Component {
 	switchEditMode = (rowId) => {
 		const editedArray = [...this.state.table.body];
 		const toEditRow = [...this.state.table.body[+rowId]];
-		const currentControls = this.state.editControls;
+		const updatedControls = this.state.editControls;
 		const btnsGroup = this.switchBtnsGroups(true);
 		let editForm = []
-		
-		Object.keys(currentControls).forEach((key, index) => {
+
+		Object.keys(this.state.editControls).forEach((key, index) => {
 			editForm.push({
 				id: key,
 				config: {
@@ -168,7 +206,10 @@ class Home extends Component {
 					value: toEditRow[index],
 				}
 			});
-			this.updateControls(key, toEditRow[index]);
+			updatedControls[key] = {
+				...this.state.editControls[key],
+				value: toEditRow[index],
+			}
 		});
 
 		let editedRow = editForm.map((editElement, index) => {
@@ -182,11 +223,12 @@ class Home extends Component {
 			return (
 				<Input 
 					key={ editElement.id } 
+					inputId={ editElement.id } 
 					elementType={ elementType }
 					elementConfig={ elementConfig }
 					value={ value } 
 					touched={ touched }
-					changed={ (event) => this.inputChangedHandler(event, editElement.id) } />
+					changed={ (event) => this.inputChangedHandler(event, editElement.id, index) } />
 			);
 		});
 
@@ -197,7 +239,8 @@ class Home extends Component {
 			table: {
 				headings: this.state.table.headings,
 				body: editedArray
-			}
+			},
+			editControls: updatedControls,
 		});
 	}
 
@@ -236,16 +279,21 @@ class Home extends Component {
 		const { target } = event;
 		const rowId = target.closest('tr').id;
 		const { userId, token, currentKey } = this.props;
-		const { category, date, type, value } = this.state.editControls;
-		const newArray = [category.value, type.value, date.value, value.value];
+		const { category, date, type, amount } = this.state.editControls;
+		const newDatas = {
+			category: category.value, 
+			type: type.value, 
+			date: date.value, 
+			value: amount.value,
+		};
 		const updatedArray = [...this.props.currentExpenses[dates.currentYear][dates.currentMonth]];
-		updatedArray.splice(rowId, 1, newArray);
-		const updatesExpenses = {
+		updatedArray.splice(rowId, 1, newDatas);
+		const updatedExpenses = {
 			[dates.currentYear]: {
 				[dates.currentMonth]: updatedArray
 			}
 		};
-		this.props.onUpdateExpense(userId, token, currentKey, updatesExpenses);
+		this.props.onUpdateExpense(userId, token, currentKey, updatedExpenses);
 	}
 
 	cancelEditRow = (event) => {

@@ -22,6 +22,7 @@ const input = (props) => {
 
 		case ('select'):
 			inputElement = <select
+				id={ props.inputId }
 				className={ form__field }
 				value={ props.value }
 				onChange={ props.changed }>
@@ -37,6 +38,7 @@ const input = (props) => {
 
 		default:
 			inputElement = <input
+				id={ props.inputId }
 				className={ form__field }
 				{ ...props.elementConfig }
 				value={ props.value }
