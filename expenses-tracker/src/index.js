@@ -8,7 +8,7 @@ import thunk from 'redux-thunk';
 import './index.css';
 import App from './App';
 import authReducer from './store/reducers/auth';
-import userReducer from './store/reducers/user';
+import payloadReducer from './store/reducers/payload';
  
 import * as serviceWorker from './serviceWorker';
 
@@ -17,7 +17,7 @@ const composeEnhancers = process.env.NODE_ENV === 'development' ? window.__REDUX
 
 const rootReducer = combineReducers({
 	auth: authReducer,
-	user: userReducer
+	payload: payloadReducer
 });
 
 const store = createStore(rootReducer, composeEnhancers(

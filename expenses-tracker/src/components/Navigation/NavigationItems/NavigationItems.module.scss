@@ -4,15 +4,5 @@
 	padding: 0.8rem;
 	position: relative;
 
-	&__active {
-		&:after {
-			position: absolute;
-			top: 0;
-			right: calc(-1.5rem + 3px);
-			content: '';
-			background-color: $blue;
-			height: 100%;
-			width: 3px;
-		}
-	}
+	&__active { border-bottom: 4px solid $blue; }
 }

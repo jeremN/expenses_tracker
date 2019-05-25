@@ -6,20 +6,21 @@
 	grid-column-start: 1;
 	grid-row-start: 1;
 	grid-column-end: 2;
-	box-shadow: 0 2px 12px -1px #eeeef2; 
+	box-shadow: 0 2px 12px -1px hsl(240°, 13%, 94%); 
 
 	&__list {
 		display: flex;
 		align-items: center;
-		justify-content: flex-end;
-		margin-left: auto;
+		justify-content: flex-start;
+		margin-right: auto;
 		flex-grow: 1;
 		max-width: 30%;
 		list-style: none;
 	}
 
 	&__item {
-		color: #cfd5dd;
+		color: hsl(217°, 17%, 36%);
 		margin-right: 3rem;
+		position: relative;
 	} 
 }

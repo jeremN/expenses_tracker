@@ -53,3 +53,8 @@ export const getDate = () => {
 		currentMonth
 	};
 }
+
+export const sumArray = (array) => {
+	if (!Array.isArray(array) || !array.length) return;
+	return array.reduce((a, b) => a + b);
+}

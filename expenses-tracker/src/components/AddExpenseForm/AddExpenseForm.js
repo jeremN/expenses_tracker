@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 
 import Input from '../UI/Input/Input';
 import Button from '../UI/Button/Button';
-import Card from '../UI/Card/Card';
 
 import * as actions from '../../store/actions';
 import { addExpense } from './AddExpenseForm.module.scss';
@@ -183,14 +182,14 @@ const mapStateToProps = state => {
 		loading: state.auth.loading,
 		token: state.auth.token,
 		userId: state.auth.userId,
-		currentExpenses: state.user.currentExpenses,
-		currentKey: state.user.currentKey
+		currentExpenses: state.payload.currentExpenses,
+		currentKey: state.payload.currentKey
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-		onAddNewExpense: (userId, token, key, data) => dispatch(actions.updateExpense(userId, token, key, data))
+		onAddNewExpense: (userId, token, key, data) => dispatch(actions.updateCurrentExpenses(userId, token, key, data))
 	}
 }
 

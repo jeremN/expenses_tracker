@@ -6,16 +6,16 @@ import './Table.module.scss';
 const table = (props) => {
 	const { headings, rows, footer } = props;
 
-	let head = props.headings ? (
+	let head = headings ? (
 		<thead>
 			<tr>
-				{ props.headings.map((heading, index) => <Cell
+				{ headings.map((heading, index) => <Cell
 					key={ `thead-${index}` }
 					type={ 'head' }>{ heading }</Cell>
 				)}
 			</tr>
 		</thead>
-	) : '';
+	) : null ;
 
 	let body = rows ? (
 		<tbody>
@@ -26,17 +26,18 @@ const table = (props) => {
 				</tr>
 			) }
 		</tbody>
-	) : '';
+	) : null ;
 
-	// let foot = footer ? (
-	// 	<tfooter>
-	// 	</tfooter>
-	// ) : ''
+	let foot = footer ? (
+		<tfooter>
+		</tfooter>
+	) : null ;
 
 	return (		
 		<table>
 			{ head }
 			{ body }
+			{ foot }
 		</table>
 	);
 }

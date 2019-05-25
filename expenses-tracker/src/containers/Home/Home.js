@@ -6,6 +6,7 @@ import Indicators from '../../components/Indicators/Indicators';
 import Table from '../../components/UI/Table/Table';
 import Button from '../../components/UI/Button/Button';
 import Input from '../../components/UI/Input/Input';
+import Modal from '../../components/UI/Modal/Modal';
 
 import * as actions from '../../store/actions';
 import { updateObject, getDate } from '../../shared/utility';
@@ -97,6 +98,12 @@ class Home extends Component {
 				value: '',
 				touched: false
 			}
+		},
+		modal: {
+			show: true,
+			title: 'Test modal',
+			content: '',
+			footer: '',
 		},
 	}
 
@@ -364,6 +371,7 @@ class Home extends Component {
 
 		return (
 			<Fragment>
+				<Modal show={ !this.state.modal.show } modalTitle={ this.state.modal.title } />
 				{ dashboardContent }
 			</Fragment>
 		)
@@ -372,20 +380,19 @@ class Home extends Component {
 
 const mapStateToProps = state => {
 	return {
-		loading: state.user.loading,
+		loading: state.payload.loading,
 		isAuth: state.auth.token !== null,
 		token: state.auth.token,
 		userId: state.auth.userId,
-		currentExpenses: state.user.currentExpenses,
-		currentKey: state.user.currentKey
+		currentExpenses: state.payload.currentExpenses,
+		currentKey: state.payload.currentKey
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-		onUpdateExpense: (userId, token, key, datas) => dispatch(actions.updateExpense(userId, token, key, datas))
+		onUpdateExpense: (userId, token, key, datas) => dispatch(actions.updateCurrentExpenses(userId, token, key, datas))
 	}
 }
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

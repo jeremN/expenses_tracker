@@ -8,5 +8,6 @@ export {
 export {
 	setNewUserData,
 	getUserData,
+	updateCurrentExpenses,
 	updateExpense,
-} from './user';
+} from './payload';

@@ -9,12 +9,14 @@ const initialState = {
 	categories: null,
 	error: null,
 	loading: false,
+	loadType: null,
 }
 
 const getUserDataStart = (state, action) => {
 	return updateObject(state, {
 		error: null,
 		loading: true,
+		loadType: action.loadType,
 	});
 }
 
@@ -25,14 +27,16 @@ const getUserDataSuccess = (state, action) => {
 		expenses: action.expenses,
 		currentExpenses: action.currentExpenses,
 		categories: action.categories,
-		loading: false
+		loading: false,
+		loadType: null,
 	});
 }
 
 const getUserDataFail = (state, action) => {
 	return updateObject(state, {
 		error: action.error,
-		loading: false
+		loading: false,
+		loadType: null,
 	});
 }
 
@@ -40,12 +44,14 @@ const setUserDataStart = (state, action) => {
 	return updateObject(state, {
 		error: null,
 		loading: true,
+		loadType: null,
 	});
 }
 
 const setNewUserDataSuccess = (state, action) => {
 	return updateObject(state, {
 		loading: true,
+		loadType: null,
 		error: null
 	});
 }
@@ -53,28 +59,32 @@ const setNewUserDataSuccess = (state, action) => {
 const setNewUserDataFail = (state, action) => {
 	return updateObject(state, {
 		error: action.error,
-		loading: false
+		loading: false,
+		loadType: null,
 	});
 }
 
-const updateExpenseStart = (state, action) => {
+const updateStart = (state, action) => {
 	return updateObject(state, {
 		error: null,
 		loading: true,
+		loadType: action.loadType,
 	});
 }
 
-const updateExpenseSuccess = (state, action) => {
+const updateCurrentExpenseSuccess = (state, action) => {
 	return updateObject(state, {
 		currentExpenses: action.currentExpenses,
-		loading: false
+		loading: false,
+		loadType: null,
 	})
 }
 
-const updateExpenseFail = (state, action) => {
+const updateFail = (state, action) => {
 	return updateObject(state, {
 		error: action.error,
-		loading: false
+		loading: false,
+		loadType: null,
 	});
 }
 
@@ -86,9 +96,9 @@ const reducer = (state = initialState, action) => {
 		case actionTypes.SET_USER_DATA_START: return setUserDataStart(state, action);
 		case actionTypes.SET_NEW_USER_DATA_FAIL: return setNewUserDataFail(state, action);
 		case actionTypes.SET_NEW_USER_DATA_SUCCESS: return setNewUserDataSuccess(state, action);
-		case actionTypes.UPDATE_EXPENSE_START: return updateExpenseStart(state, action);
-		case actionTypes.UPDATE_EXPENSE_SUCCESS: return updateExpenseSuccess(state, action);
-		case actionTypes.UPDATE_EXPENSE_FAIL: return updateExpenseFail(state, action);
+		case actionTypes.UPDATE_START: return updateStart(state, action);
+		case actionTypes.UPDATE_CURRENT_EXPENSE_SUCCESS: return updateCurrentExpenseSuccess(state, action);
+		case actionTypes.UPDATE_FAIL: return updateFail(state, action);
 		default:
 			return state;
 	}

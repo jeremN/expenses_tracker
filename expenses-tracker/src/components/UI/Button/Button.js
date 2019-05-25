@@ -8,8 +8,7 @@ const button = (props) => (
 		className={ [classes.button, classes[props.btnType]].join(' ') }
 		style={ props.cssStyle ? { ...props.cssStyle } : null }
 		disabled={ props.disabled }
-		onClick={ props.clicked }
-		{ ...props.attributes }>
+		onClick={ props.clicked }>
 		{ props.children }
 	</button>
 );
