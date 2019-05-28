@@ -80,6 +80,14 @@ const updateCurrentExpenseSuccess = (state, action) => {
 	})
 }
 
+const updateExpenseSuccess = (state, action) => {
+	return updateObject(state, {
+		expenses: action.expenses,
+		loading: false,
+		loadType: null,
+	});
+}
+
 const updateFail = (state, action) => {
 	return updateObject(state, {
 		error: action.error,
@@ -98,6 +106,7 @@ const reducer = (state = initialState, action) => {
 		case actionTypes.SET_NEW_USER_DATA_SUCCESS: return setNewUserDataSuccess(state, action);
 		case actionTypes.UPDATE_START: return updateStart(state, action);
 		case actionTypes.UPDATE_CURRENT_EXPENSE_SUCCESS: return updateCurrentExpenseSuccess(state, action);
+		case actionTypes.UPDATE_EXPENSE_SUCCESS: return updateExpenseSuccess(state, action);
 		case actionTypes.UPDATE_FAIL: return updateFail(state, action);
 		default:
 			return state;

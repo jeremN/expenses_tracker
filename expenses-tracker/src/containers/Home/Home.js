@@ -10,6 +10,7 @@ import Modal from '../../components/UI/Modal/Modal';
 
 import * as actions from '../../store/actions';
 import { updateObject, getDate } from '../../shared/utility';
+import { hasDatesChanged } from '../../shared/procedure';
 
 import './Home.module.scss';
 
@@ -107,10 +108,32 @@ class Home extends Component {
 		},
 	}
 
+	componentDidMount() {
+		if (this.props.isAuth) {		
+			this.props.getUserDatas(this.props.userId, this.props.token);
+			console.info(this.props.expenses)
+			this.verifyDates();
+		}
+	}
+
 	componentDidUpdate(prevProps) {
 		if (this.props.currentExpenses !== prevProps.currentExpenses) {
 			this.switchDataMode(this.props.currentExpenses);
 		}
+	}
+
+	verifyDates = () => {
+		const userInfo = {
+			userId: this.props.userId,
+			token: this.props.token,
+			key: this.props.key,
+		}
+		const data = {
+			categories: this.props.categories,
+			currentExpenses: this.props.currentExpenses,
+			expenses: this.props.expenses
+		}
+		hasDatesChanged(data);	
 	}
 
 	updateControls = (name, val, touch = false) => {
@@ -326,7 +349,7 @@ class Home extends Component {
 				[dates.currentMonth]: updatedArray
 			}
 		};
-		this.props.onUpdateExpense(userId, token, currentKey, updatesExpenses);
+		this.props.onUpdateCurrentExpense(userId, token, currentKey, updatesExpenses);
 	}
 
 	render() {
@@ -385,13 +408,17 @@ const mapStateToProps = state => {
 		token: state.auth.token,
 		userId: state.auth.userId,
 		currentExpenses: state.payload.currentExpenses,
-		currentKey: state.payload.currentKey
+		currentKey: state.payload.currentKey,
+		expenses: state.payload.expenses,
+		categories: state.payload.categories,
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-		onUpdateExpense: (userId, token, key, datas) => dispatch(actions.updateCurrentExpenses(userId, token, key, datas))
+		getUserDatas: (userId, token) => dispatch(actions.getUserData(userId, token)),
+		onUpdateCurrentExpense: (userId, token, key, datas) => dispatch(actions.updateCurrentExpenses(userId, token, key, datas)),
+		onUpdateExpenses: (userId, token, key, datas, year) => dispatch(actions.updateExpenses(userId, token, key, datas, year)),
 	}
 }
 

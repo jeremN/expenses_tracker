@@ -3,14 +3,6 @@ import axios from '../../axios-user';
 import moment from 'moment';
 import { formatData, processMonth, extractDatasKeys } from '../../shared/procedure';
 
-const locale = 'en-us';
-const formatterMonth = new Intl.DateTimeFormat(locale, {
-	month: 'long'
-});
-const digitMonth = new Intl.DateTimeFormat(locale, {
-	month: '2-digit'
-});
-
 export const getUserDataStart = () => {
 	return {
 		type: actionTypes.GET_USER_DATA_START
@@ -20,10 +12,7 @@ export const getUserDataStart = () => {
 export const getUserDataSuccess = (data, userInfo) => {
 	const dataKey = Object.keys(data).map(key => key)[0]
 	const { profile, expenses, currentExpenses, categories } = data[dataKey]
-	hasDatesChanged(data[dataKey], {
-		...userInfo,
-		key: dataKey,
-	});
+
 	return {
 		profile,
 		expenses,
@@ -32,48 +21,6 @@ export const getUserDataSuccess = (data, userInfo) => {
 		currentKey: dataKey,
 		type: actionTypes.GET_USER_DATA_SUCCESS
 	}
-}
-
-export const hasDatesChanged = (data, requestInfo) => {
-	const currentDate = moment();
-	const currentYear = currentDate.format('YYYY');
-	const currentMonth = 'June'//currentDate.format('MMMM');
-	const { expenses: prevExpenses, currentExpenses: prevMonthExpenses, categories } = data
-	const savedMonth = Object.keys(prevMonthExpenses[currentYear]);
-	const savedYear = Object.keys(prevMonthExpenses);
-	console.info(savedYear)
-	
-	if (savedYear[0] !== currentYear) {
-
-	}
-
-	if (savedMonth[0] !== currentMonth) {
-		monthHasChanged(prevMonthExpenses[currentYear][savedMonth[0]], savedMonth[0]);
-	}
-}
-
-const yearHasChanged = () => {
-
-}
-
-const monthHasChanged = (currentExpenses, monthName) => {
-	const anotherMonth = [];
-	const prevMonthDatas = [];
-
-	currentExpenses.forEach((expense, index) => {
-		const dateMonthName = moment(expense.date, 'YYYY-MM-DD').format('MMMM')
-		if (dateMonthName !== monthName) {
-			anotherMonth.push(expense);
-		} else {
-			prevMonthDatas.push(expense);
-		}
-	});
-
-	const formatedData = formatData(prevMonthDatas);
-	const extractedDataKeys = extractDatasKeys(formatedData);
-	const datas = processMonth(extractedDataKeys);
-	console.info(datas)
-
 }
 
 export const getUserDataFail = (error) => {
@@ -109,16 +56,16 @@ export const updateCurrentExpenseSuccess = (data) => {
 	}
 }
 
+export const updateExpenseSuccess = (data) => {
+	return {
+		type: actionTypes.UPDATE_EXPENSE_SUCCESS,
+	}
+}
+
 export const updateStart = (loadType) => {
 	return {
 		type: actionTypes.UPDATE_START,
 		loadType: loadType
-	}
-}
-
-export const updateExpenseSuccess = (data) => {
-	return {
-		type: actionTypes.UPDATE_EXPENSE_SUCCESS,
 	}
 }
 
@@ -132,9 +79,9 @@ export const updateFail = (error) => {
 export const setNewUserData = (userId, token) => {
 	return dispatch => {	
 		dispatch(setUserDataStart())
-		const currentDate = new Date();
-		const currentYear = currentDate.getFullYear();
-		const currentMonth = formatterMonth.format(currentDate);
+		const currentDate = moment();
+		const currentYear = currentDate.format('YYYY');
+		const currentMonth = currentDate.format('MMMM');
 		const newUserData = {
 			profile: {
 				created: currentDate,
@@ -151,9 +98,8 @@ export const setNewUserData = (userId, token) => {
 
 		axios.post(`users/${userId}.json?auth=${token}`, newUserData)
 			.then(response => {
-				console.log(response)
 				dispatch(setNewUserDataSuccess(response));
-				dispatch(getUserData(userId, token));
+				// dispatch(getUserData(userId, token));
 			})
 			.catch(error => {
 				console.log(error)
@@ -190,15 +136,28 @@ export const updateCurrentExpenses = (userId, token, key, datas) => {
 	}
 }
 
-export const updateExpense = (userId, token, key, datas) => {
+export const updateExpenses = (userId, token, key, datas, year) => {
 	return dispatch => {	
 		dispatch(updateStart('expenses'));
-		axios.put(`users/${userId}/${key}/expenses.json?auth=${token}`, datas)
+		axios.put(`users/${userId}/${key}/expenses/${year}.json?auth=${token}`, datas)
 			.then(response => {
 				dispatch(updateExpenseSuccess(response.data));
+				console.info(response.data)
 			})
 			.catch(error => {
 				console.error(error);
+				dispatch(updateFail(error.response.data.error));
+			})
+	}
+}
+
+export const updateCategories = (userId, token, key, datas) => {
+	return dispatch => {
+		dispatch(updateStart());
+		axios.put()
+			.then(response => console.info(response))
+			.catch(error => {
+				console.error(error)
 				dispatch(updateFail(error.response.data.error));
 			})
 	}
