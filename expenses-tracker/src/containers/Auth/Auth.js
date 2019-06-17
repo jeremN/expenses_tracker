@@ -136,6 +136,7 @@ class Auth extends Component {
 					<Button 
 						btnType="button__transparent" 
 						clicked={ this.switchAuthModeHandler }>{ !this.state.isSignUp ? 'Créer un compte' : 'Se connecter' }</Button>
+					{ errorMessage }
 				</form>
 			</div>
 		);

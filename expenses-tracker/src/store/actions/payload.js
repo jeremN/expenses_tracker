@@ -1,7 +1,6 @@
 import * as actionTypes from './actionTypes';
 import axios from '../../axios-user';
 import moment from 'moment';
-import { formatData, processMonth, extractDatasKeys } from '../../shared/procedure';
 
 export const getUserDataStart = () => {
 	return {
@@ -58,7 +57,15 @@ export const updateCurrentExpenseSuccess = (data) => {
 
 export const updateExpenseSuccess = (data) => {
 	return {
+		expenses: data,
 		type: actionTypes.UPDATE_EXPENSE_SUCCESS,
+	}
+}
+
+export const updateCategoriesSuccess = (data) => {
+	return {
+		categories: data, 
+		type: actionTypes.UPDATE_CATEGORIES_SUCCESS,
 	}
 }
 
@@ -68,6 +75,15 @@ export const updateStart = (loadType) => {
 		loadType: loadType
 	}
 }
+
+export const datasVerified = (isVerified) => {
+	return {
+		type: actionTypes.DATAS_VERIFIED,
+		canVerifyDatas: isVerified,
+	}
+}
+
+export const showAlert = (show = false) => {}
 
 export const updateFail = (error) => {
 	return {
@@ -81,7 +97,6 @@ export const setNewUserData = (userId, token) => {
 		dispatch(setUserDataStart())
 		const currentDate = moment();
 		const currentYear = currentDate.format('YYYY');
-		const currentMonth = currentDate.format('MMMM');
 		const newUserData = {
 			profile: {
 				created: currentDate,
@@ -99,7 +114,6 @@ export const setNewUserData = (userId, token) => {
 		axios.post(`users/${userId}.json?auth=${token}`, newUserData)
 			.then(response => {
 				dispatch(setNewUserDataSuccess(response));
-				// dispatch(getUserData(userId, token));
 			})
 			.catch(error => {
 				console.log(error)
@@ -136,10 +150,11 @@ export const updateCurrentExpenses = (userId, token, key, datas) => {
 	}
 }
 
-export const updateExpenses = (userId, token, key, datas, year) => {
+export const updateExpenses = (userId, token, key, datas) => {
+	console.info(userId, token, key, datas)
 	return dispatch => {	
 		dispatch(updateStart('expenses'));
-		axios.put(`users/${userId}/${key}/expenses/${year}.json?auth=${token}`, datas)
+		axios.put(`users/${userId}/${key}/expenses.json?auth=${token}`, datas)
 			.then(response => {
 				dispatch(updateExpenseSuccess(response.data));
 				console.info(response.data)
@@ -154,11 +169,17 @@ export const updateExpenses = (userId, token, key, datas, year) => {
 export const updateCategories = (userId, token, key, datas) => {
 	return dispatch => {
 		dispatch(updateStart());
-		axios.put()
+		axios.put(`users/${userId}/${key}/categories.json?auth=${token}`, datas)
 			.then(response => console.info(response))
 			.catch(error => {
 				console.error(error)
 				dispatch(updateFail(error.response.data.error));
 			})
+	}
+}
+
+export const isDatasVerified = (isVerified) => {
+	return dispatch => {
+		dispatch(datasVerified(isVerified))
 	}
 }

@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export const updateObject = (oldObject, updatedProps) => {
 	return {
 		...oldObject,
@@ -39,14 +41,9 @@ export const formCheckValidity = (value, rules) => {
 }
 
 export const getDate = () => {
-	const locale = 'en-us';
-	const formatterMonth = new Intl.DateTimeFormat(locale, {
-		month: 'long'
-	});
-	const currentDate = new Date();
-	const currentYear = currentDate.getFullYear();
-	const currentMonth = formatterMonth.format(currentDate);
-	
+	const currentDate = moment();
+	const currentYear = currentDate.format('YYYY');
+	const currentMonth = currentDate.format('MMMM');
 	return {
 		currentDate,
 		currentYear,

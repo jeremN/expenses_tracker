@@ -95,7 +95,6 @@ class AddExpense extends Component {
 		const { category, date, type, values } = this.state.controls;
 		const { userId, token, currentKey } = this.props;
 		const actualDate = getDate()
-		
 		if (!this.props.currentExpenses) {
 			datas = {
 				[actualDate.currentYear]: {
@@ -104,6 +103,10 @@ class AddExpense extends Component {
 			};
 		} else {
 			datas = this.props.currentExpenses;
+		}
+
+		if (!Array.isArray(datas[actualDate.currentYear][actualDate.currentMonth])) {
+			datas[actualDate.currentYear][actualDate.currentMonth] = []
 		}
 
 		datas[actualDate.currentYear][actualDate.currentMonth].push({

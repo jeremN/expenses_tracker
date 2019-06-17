@@ -10,4 +10,6 @@ export {
 	getUserData,
 	updateCurrentExpenses,
 	updateExpenses,
+	updateCategories,
+	isDatasVerified,
 } from './payload';

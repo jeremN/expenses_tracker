@@ -10,6 +10,13 @@ const initialState = {
 	error: null,
 	loading: false,
 	loadType: null,
+	canVerifyDatas: false,
+}
+
+const datasVerified = (state, action) => {
+	return updateObject(state, {
+		canVerifyDatas: action.canVerifyDatas,
+	});
 }
 
 const getUserDataStart = (state, action) => {
@@ -29,6 +36,7 @@ const getUserDataSuccess = (state, action) => {
 		categories: action.categories,
 		loading: false,
 		loadType: null,
+		canVerifyDatas: true,
 	});
 }
 
@@ -88,6 +96,14 @@ const updateExpenseSuccess = (state, action) => {
 	});
 }
 
+const updateCategoriesSuccess = (state, action) => {
+	return updateObject(state, {
+		categories: action.categories,
+		loading: false,
+		loadType: null,
+	});
+}
+
 const updateFail = (state, action) => {
 	return updateObject(state, {
 		error: action.error,
@@ -98,6 +114,7 @@ const updateFail = (state, action) => {
 
 const reducer = (state = initialState, action) => {
 	switch(action.type) {
+		case actionTypes.DATAS_VERIFIED: return datasVerified(state, action);
 		case actionTypes.GET_USER_DATA_START: return getUserDataStart(state, action);
 		case actionTypes.GET_USER_DATA_FAIL: return getUserDataFail(state, action);
 		case actionTypes.GET_USER_DATA_SUCCESS: return getUserDataSuccess(state, action);
@@ -107,6 +124,7 @@ const reducer = (state = initialState, action) => {
 		case actionTypes.UPDATE_START: return updateStart(state, action);
 		case actionTypes.UPDATE_CURRENT_EXPENSE_SUCCESS: return updateCurrentExpenseSuccess(state, action);
 		case actionTypes.UPDATE_EXPENSE_SUCCESS: return updateExpenseSuccess(state, action);
+		case actionTypes.UPDATE_CATEGORIES_SUCCESS: return updateCategoriesSuccess(state, action);
 		case actionTypes.UPDATE_FAIL: return updateFail(state, action);
 		default:
 			return state;

@@ -111,29 +111,89 @@ class Home extends Component {
 	componentDidMount() {
 		if (this.props.isAuth) {		
 			this.props.getUserDatas(this.props.userId, this.props.token);
-			console.info(this.props.expenses)
-			this.verifyDates();
+			console.info(this.props.currentExpenses)
 		}
 	}
 
 	componentDidUpdate(prevProps) {
+		if (this.props.canVerifyDatas !== prevProps.canVerifyDatas && this.props.canVerifyDatas) {
+			this.verifyDates();
+		}
 		if (this.props.currentExpenses !== prevProps.currentExpenses) {
 			this.switchDataMode(this.props.currentExpenses);
 		}
 	}
 
 	verifyDates = () => {
-		const userInfo = {
-			userId: this.props.userId,
-			token: this.props.token,
-			key: this.props.key,
-		}
+		const dates = getDate();
+		const { userId, token, currentKey } = this.props
 		const data = {
 			categories: this.props.categories,
 			currentExpenses: this.props.currentExpenses,
 			expenses: this.props.expenses
 		}
-		hasDatesChanged(data);	
+		const { 
+			expenses: formattedExp, 
+			categories: formattedCat 
+		} = hasDatesChanged(data);	
+
+
+		if (formattedExp) {		
+			const currentExp = {
+				[dates.currentYear]: {
+					[dates.currentMonth]: ' '
+				}
+			};
+			const updatedExp = this.hasExistingEntries(formattedExp)
+			console.info(updatedExp, formattedExp, formattedCat)
+			// this.props.onUpdateExpenses(userId, token, currentKey, formattedExp);
+			// this.props.onUpdateCurrentExpense(userId, token, currentKey, currentExp);
+			// this.props.onUpdateCategories(userId, token, currentKey, formattedCat);
+		}
+		this.props.verifyDatesHandler(false);
+	}
+
+	hasExistingEntries = (newProps) => {
+		const currentProps = this.props.expenses;
+		const props = newProps;
+		let summedProps;
+		
+		if (Object.keys(currentProps).length) {
+			summedProps = Object.keys(currentProps).forEach(year => {
+				return Object.keys(currentProps[year]).forEach(month => {
+					if (Object.keys(props).includes(year) && Object.keys(props[year]).includes(month)) {
+						const { 
+							income: newIncome, 
+							diff: newDiff, 
+							saved: newSaved, 
+							outcome: newOutcome, 
+							categories: newCat, 
+						} = props[year][month];
+						const { 
+							income: oldIncome, 
+							diff: oldDiff, 
+							saved: oldSaved, 
+							outcome: oldOutcome, 
+							categories: oldCat, 
+						} = currentProps[year][month];
+
+						return {
+							income: oldIncome + newIncome,
+							outcome: oldOutcome + newOutcome,
+							diff: oldDiff + newDiff,
+							saved: oldSaved + newSaved,
+							categories: this.sumCategories(oldCat, newCat),
+						}
+					}
+				});
+			});
+		}
+	}
+
+	sumCategories = (oldCat, newCat) => {
+		const mergedCat = [...oldCat, ...newCat];
+		const updatedCat = mergeCat.
+		console.info(mergedCat)
 	}
 
 	updateControls = (name, val, touch = false) => {
@@ -284,23 +344,26 @@ class Home extends Component {
 				return Object.keys(data[expense]).map(current => data[expense][current]);
 			});
 
-			arr[0][0].forEach((key, index) => {
-				tBody.push([
-					key.category,
-					key.type,
-					key.date,
-					key.value,
-					btnsGroup
-				]);
-			});
-		}
-
-		this.setState({
-			table: {
-				headings: this.state.table.headings,
-				body: tBody
+			if (arr[0][0].length && arr[0][0] !== ' ') {
+				arr[0][0].forEach((key, index) => {
+					tBody.push([
+						key.category,
+						key.type,
+						key.date,
+						key.value,
+						btnsGroup
+					]);
+				});
 			}
-		});
+
+			this.setState({
+				table: {
+					headings: this.state.table.headings,
+					body: tBody
+				}
+			});
+			}
+
 	}
 
 	saveTableRow = (event) => {
@@ -323,7 +386,7 @@ class Home extends Component {
 				[dates.currentMonth]: updatedArray
 			}
 		};
-		this.props.onUpdateExpense(userId, token, currentKey, updatedExpenses);
+		this.props.onUpdateCurrentExpense(userId, token, currentKey, updatedExpenses);
 	}
 
 	cancelEditRow = (event) => {
@@ -411,6 +474,7 @@ const mapStateToProps = state => {
 		currentKey: state.payload.currentKey,
 		expenses: state.payload.expenses,
 		categories: state.payload.categories,
+		canVerifyDatas: state.payload.canVerifyDatas,
 	}
 }
 
@@ -418,7 +482,9 @@ const mapDispatchToProps = dispatch => {
 	return {
 		getUserDatas: (userId, token) => dispatch(actions.getUserData(userId, token)),
 		onUpdateCurrentExpense: (userId, token, key, datas) => dispatch(actions.updateCurrentExpenses(userId, token, key, datas)),
-		onUpdateExpenses: (userId, token, key, datas, year) => dispatch(actions.updateExpenses(userId, token, key, datas, year)),
+		onUpdateExpenses: (userId, token, key, datas) => dispatch(actions.updateExpenses(userId, token, key, datas)),
+		onUpdateCategories: (userId, token, key, datas) => dispatch(actions.updateCategories(userId, token, key, datas)),
+		verifyDatesHandler: (verified) => dispatch(actions.isDatasVerified(verified)),
 	}
 }
 

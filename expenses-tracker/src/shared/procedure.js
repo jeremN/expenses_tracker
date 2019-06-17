@@ -3,40 +3,71 @@ import moment from 'moment';
 import { sumArray } from './utility';
 
 export const hasDatesChanged = (data) => {
+	if (!data) return;
 	const currentDate = moment();
 	const currentYear = currentDate.format('YYYY');
-	const currentMonth = 'June'//currentDate.format('MMMM');
-	const { expenses: prevExpenses, currentExpenses: prevMonthExpenses, categories } = data
+	const currentMonth = 'July'//currentDate.format('MMMM');
+	const { currentExpenses: prevMonthExpenses, /* expenses: prevExpenses,*/ categories } = data
 	const savedMonth = Object.keys(prevMonthExpenses[currentYear]);
 	const savedYear = Object.keys(prevMonthExpenses);
-	
-	if (savedYear[0] !== currentYear) {
-
+	const updatedDatas = {
+		expenses: '',
+		categories: '',
 	}
 
-	if (savedMonth[0] !== currentMonth) {
-		return monthHasChanged(prevMonthExpenses[currentYear][savedMonth[0]], savedMonth[0]);
+	if (savedMonth[0] !== currentMonth || savedYear[0] !== currentYear) {
+		return {
+			categories: formatCategories(prevMonthExpenses[savedYear[0]][savedMonth[0]], categories),
+			expenses: formatExpenses(prevMonthExpenses[savedYear[0]][savedMonth[0]], savedMonth[0], savedYear[0])
+		}
 	}
+
+	return false;
 }
 
-export const monthHasChanged = (currentExpenses, monthName) => {
-	const anotherMonth = [];
-	const prevMonthDatas = [];
+export const formatCategories = (currentExpenses, categories) => {
+	const updatedCategories = [...categories];
+	const currentCategories = [];
 
-	currentExpenses.forEach((expense, index) => {
-		const dateMonthName = moment(expense.date, 'YYYY-MM-DD').format('MMMM')
-		if (dateMonthName !== monthName) {
-			anotherMonth.push(expense);
-		} else {
-			prevMonthDatas.push(expense);
+	currentExpenses.filter(exp => currentCategories.push(exp.category));
+	const uniqCat = [...new Set(currentCategories)];
+	return uniqCat;
+}
+
+export const formatExpenses = (currentExpenses, monthName, year) => {
+	const data = {}
+	const years = []
+
+	if (!currentExpenses || currentExpenses === ' ') return {
+		[year]: {
+			[monthName]: ' '
 		}
+	}
+
+	currentExpenses.filter(exp => years.push(moment(exp.date, 'YYYY-MM-DD').format('YYYY')));
+	const uniqYears = [...new Set(years)]; 
+	uniqYears.forEach(year => data[year] = {});
+
+	currentExpenses.forEach((expense) => {
+		const dateMonthName = moment(expense.date, 'YYYY-MM-DD').format('MMMM');
+		const dateYear = moment(expense.date, 'YYYY-MM-DD').format('YYYY');
+		
+		if (!Object.keys(data[dateYear]).includes(dateMonthName)) {
+			data[dateYear][dateMonthName] = []
+		}
+
+		data[dateYear][dateMonthName].push(expense);
 	});
 
-	const formatedData = formatData(prevMonthDatas);
-	const extractedDataKeys = extractDatasKeys(formatedData);
-	const datas = processMonth(extractedDataKeys);
+	Object.keys(data).forEach(year => {
+		Object.keys(data[year]).forEach(month => {
+			const formatedData = formatData(data[year][month]);
+			const extractedDataKeys = extractDatasKeys(formatedData);
+			data[year][month] = processMonth(extractedDataKeys); 
+		})
+	})
 
-	return datas
+	return data
 }
 
 export const formatData = (array) => {
@@ -54,9 +85,9 @@ export const processMonth = (reducedArray) => {
 	const month = {
 		categories: [],
 		saved: 0,
-		income: '',
-		outcome: '',
-		diff: ''
+		income: 0,
+		outcome: 0,
+		diff: 0
 	}
 
 	Object.keys(reducedArray).forEach((key) => {
