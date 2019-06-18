@@ -157,10 +157,10 @@ class Home extends Component {
 		const currentProps = this.props.expenses;
 		const props = newProps;
 		let summedProps;
-		
+
 		if (Object.keys(currentProps).length) {
-			summedProps = Object.keys(currentProps).forEach(year => {
-				return Object.keys(currentProps[year]).forEach(month => {
+			Object.keys(currentProps).forEach(year => {
+				Object.keys(currentProps[year]).forEach(month => {
 					if (Object.keys(props).includes(year) && Object.keys(props[year]).includes(month)) {
 						const { 
 							income: newIncome, 
@@ -187,13 +187,19 @@ class Home extends Component {
 					}
 				});
 			});
+			return currentProps;
 		}
 	}
 
 	sumCategories = (oldCat, newCat) => {
 		const mergedCat = [...oldCat, ...newCat];
-		const updatedCat = mergeCat.
-		console.info(mergedCat)
+		const updatedCat = mergedCat.reduce((item, next, currentIndex) => {
+			const index = item.findIndex(cat => cat.name === next.name)
+			index < 0 ? item.push(next) : item[index].value += next.value
+			return item;
+		}, []);
+
+		return updatedCat;
 	}
 
 	updateControls = (name, val, touch = false) => {
