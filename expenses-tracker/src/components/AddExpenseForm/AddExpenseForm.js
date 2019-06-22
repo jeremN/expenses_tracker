@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux';
 
 import Input from '../UI/Input/Input';
@@ -169,13 +169,16 @@ class AddExpense extends Component {
 		});
 
 		return (
-			<form id="addExpense" className={ addExpense }>
-				{ form }
-				<Button 
-					btnType="button__blue"
-					typeBtn="submit"
-					clicked={ this.submitExpenseHandler }>Ajouter</Button>
-			</form>
+			<Fragment>
+				<h2 className="isLike__h4">Ajouter une dépense ou un revenu</h2>
+				<form id="addExpense" className={ addExpense }>
+					{ form }
+					<Button 
+						btnType="button__blue"
+						typeBtn="submit"
+						clicked={ this.submitExpenseHandler }>Ajouter</Button>
+				</form>
+			</Fragment>
 		);
 	}
 }

@@ -38,12 +38,18 @@ a {
 }
 
 /* Headings */
-h1 { @extend %isH1; }
-h2 { @extend %isH2; }
-h3 { @extend %isH3; }
-h4 { @extend %isH4; }
-h5 { @extend %isH5; }
-h6 { @extend %isH6; }
+h1,
+.isLike__h1 { @extend %isH1; }
+h2,
+.isLike__h2 { @extend %isH2; }
+h3,
+.isLike__h3 { @extend %isH3; }
+h4,
+.isLike__h4 { @extend %isH4; }
+h5,
+.isLike__h5 { @extend %isH5; }
+h6,
+.isLike__h6 { @extend %isH6; }
 
 /* Max values */
 img,

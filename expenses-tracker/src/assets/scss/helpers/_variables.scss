@@ -6,7 +6,7 @@ $lightGrey: hsl(217°, 17%, 36%);
 $sLightGrey: hsl(228°, 33%, 97%);
 $grey: hsl(230°, 17%, 93%);
 $blue: hsl(221°, 100%, 41%);
-$green: hsl(160°, 68%, 84%);
+$green: hsl(160°, 68%, 48%);
 $red: hsl(356°, 99%, 66%);
 $yellow: hsl(45°, 100%, 51%);
 $greyDarker: hsl(230°, 18%, 39%);
@@ -34,3 +34,6 @@ $lineHeightBase: 1.5 !default;
 /* Links */
 $linkBaseColor: $grey !default;
 $linkBaseActiveColor: $blue !default;
+
+/* Titles */
+$titleColor: $blueDark;

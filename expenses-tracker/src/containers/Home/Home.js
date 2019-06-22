@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
+import moment from 'moment';
 
 import AddExpense from '../../components/AddExpenseForm/AddExpenseForm';
 import Indicators from '../../components/Indicators/Indicators';
@@ -21,20 +22,16 @@ class Home extends Component {
 				title: 'Revenus du mois',
 				value: 0.00,
 				progression: '+5.2%',
-				progressClass: 'is__positive'
+				progressClass: 'is__positive',
+				type: 'income',
 			},
 			{
 				title: 'Dépense du mois',
 				value: 0.00,
 				progression: '-5.2%',
-				progressClass: 'is__negative'
-			},
-			{
-				title: 'Dépense du jour',
-				value: 0.00,
-				progression: '=',
-				progressClass: 'is__stable'
-			},
+				progressClass: 'is__negative',
+				type: 'outcome',
+			},		
 		],
 		table: {
 			headings: [
@@ -111,7 +108,6 @@ class Home extends Component {
 	componentDidMount() {
 		if (this.props.isAuth) {		
 			this.props.getUserDatas(this.props.userId, this.props.token);
-			console.info(this.props.currentExpenses)
 		}
 	}
 
@@ -121,11 +117,11 @@ class Home extends Component {
 		}
 		if (this.props.currentExpenses !== prevProps.currentExpenses) {
 			this.switchDataMode(this.props.currentExpenses);
+			this.calculateTotals()
 		}
 	}
 
 	verifyDates = () => {
-		const dates = getDate();
 		const { userId, token, currentKey } = this.props
 		const data = {
 			categories: this.props.categories,
@@ -133,73 +129,19 @@ class Home extends Component {
 			expenses: this.props.expenses
 		}
 		const { 
-			expenses: formattedExp, 
-			categories: formattedCat 
+			currentExp, 
+			formattedExp, 
+			formattedCat,
 		} = hasDatesChanged(data);	
 
 
 		if (formattedExp) {		
-			const currentExp = {
-				[dates.currentYear]: {
-					[dates.currentMonth]: ' '
-				}
-			};
-			const updatedExp = this.hasExistingEntries(formattedExp)
-			console.info(updatedExp, formattedExp, formattedCat)
-			// this.props.onUpdateExpenses(userId, token, currentKey, formattedExp);
-			// this.props.onUpdateCurrentExpense(userId, token, currentKey, currentExp);
-			// this.props.onUpdateCategories(userId, token, currentKey, formattedCat);
+			this.props.onUpdateExpenses(userId, token, currentKey, formattedExp);
+			this.props.onUpdateCurrentExpense(userId, token, currentKey, currentExp);
+			this.props.onUpdateCategories(userId, token, currentKey, formattedCat);
 		}
+
 		this.props.verifyDatesHandler(false);
-	}
-
-	hasExistingEntries = (newProps) => {
-		const currentProps = this.props.expenses;
-		const props = newProps;
-		let summedProps;
-
-		if (Object.keys(currentProps).length) {
-			Object.keys(currentProps).forEach(year => {
-				Object.keys(currentProps[year]).forEach(month => {
-					if (Object.keys(props).includes(year) && Object.keys(props[year]).includes(month)) {
-						const { 
-							income: newIncome, 
-							diff: newDiff, 
-							saved: newSaved, 
-							outcome: newOutcome, 
-							categories: newCat, 
-						} = props[year][month];
-						const { 
-							income: oldIncome, 
-							diff: oldDiff, 
-							saved: oldSaved, 
-							outcome: oldOutcome, 
-							categories: oldCat, 
-						} = currentProps[year][month];
-
-						return {
-							income: oldIncome + newIncome,
-							outcome: oldOutcome + newOutcome,
-							diff: oldDiff + newDiff,
-							saved: oldSaved + newSaved,
-							categories: this.sumCategories(oldCat, newCat),
-						}
-					}
-				});
-			});
-			return currentProps;
-		}
-	}
-
-	sumCategories = (oldCat, newCat) => {
-		const mergedCat = [...oldCat, ...newCat];
-		const updatedCat = mergedCat.reduce((item, next, currentIndex) => {
-			const index = item.findIndex(cat => cat.name === next.name)
-			index < 0 ? item.push(next) : item[index].value += next.value
-			return item;
-		}, []);
-
-		return updatedCat;
 	}
 
 	updateControls = (name, val, touch = false) => {
@@ -368,8 +310,7 @@ class Home extends Component {
 					body: tBody
 				}
 			});
-			}
-
+		}
 	}
 
 	saveTableRow = (event) => {
@@ -419,6 +360,64 @@ class Home extends Component {
 			}
 		};
 		this.props.onUpdateCurrentExpense(userId, token, currentKey, updatesExpenses);
+	}
+
+	calculateTotals = () => {
+		const dates = getDate()
+		const currentExp = this.props.currentExpenses[dates.currentYear][dates.currentMonth]
+		const updatedTotal = {
+			income: 0,
+			outcome: 0,
+		}
+
+		currentExp.forEach(exp => updatedTotal[exp.type] += +exp.value)
+		this.updateIndicators(updatedTotal)
+	}
+
+	updateIndicators = (total) => {
+		const currentIndicators = [...this.state.indicators];
+		const lastMonth = moment().subtract(1, 'months').format('MMMM');
+		const currentExpYear = Object.keys(this.props.currentExpenses)
+		const lastMonthExpense = this.props.expenses[currentExpYear][lastMonth]
+
+		const updatedIndicators = currentIndicators.map((indicator) => {
+			const currentVal = parseFloat(total[indicator.type]).toFixed(2);
+			const prevVal = parseFloat(lastMonthExpense[indicator.type]).toFixed(2);
+			const percentage = parseFloat(this.getVariation(prevVal, currentVal)).toFixed(2);
+			const variation = Math.sign(percentage);
+
+			indicator.value = currentVal;
+			indicator.progression = `${percentage}%`;
+			indicator.progressClass = this.getVariationClasse(indicator.type, variation);
+
+			return indicator;
+		});
+
+		this.setState({ indicators: updatedIndicators });
+	}
+
+	getVariationClasse = (type, variation) => {
+		let variationClasse = 'is__stable'
+
+		if (type === 'income') {
+			variationClasse = variation === -1 
+				? 'is__negative'
+				: variation === 1
+				? 'is__positive'
+				: 'is__stable';
+		} else if (type === 'outcome') {
+			variationClasse = variation === -1 
+				? 'is__positive'
+				: variation === 1
+				? 'is__negative'
+				: 'is__stable';
+		}
+		
+		return variationClasse
+	}
+
+	getVariation = (firstVal, secondVal) => {
+		return (secondVal - firstVal) / firstVal * 100
 	}
 
 	render() {

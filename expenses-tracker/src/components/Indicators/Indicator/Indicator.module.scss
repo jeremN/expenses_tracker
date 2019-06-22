@@ -23,11 +23,12 @@
 			font-size: 1.4rem;
 			margin-left: 0.75rem;
 			
-			.is {
-				&__positive { color: $green; }
-				&__negative { color: $red; }
-				&__stable { color: $blue; }
-			}
 		}
 	}
+}
+
+.is {
+	&__positive { color: $green; }
+	&__negative { color: $red; }
+	&__stable { color: $blue; }
 }
