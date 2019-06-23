@@ -9,7 +9,7 @@ const navigationItem = (props) => (
 			to={ props.link }
 			exact={ props.exact }
 			activeClassName={ Link__active }
-			className={ Link, props.itemClass }>
+			className={ [Link, props.itemClass].join(' ') }>
 			{ props.children }
 		</NavLink>
 	</li>

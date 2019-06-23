@@ -11,7 +11,7 @@ const header = (props) => {
 			<NavigationItem link="/logout" itemClass={ Header__item }>Logout</NavigationItem>
 		</Fragment>
 	);
-	
+
 	const registerMenu = (
 		<NavigationItem link="/auth" itemClass={ Header__item }>Login</NavigationItem>
 	);
@@ -21,7 +21,7 @@ const header = (props) => {
 			<ul className={ Header__list }>
 				<NavigationItem itemClass={ Header__item } link="/" exact>Home</NavigationItem> 
 				{ !props.isAuth 
-					?  <NavigationItem link="/auth" itemClass={ Header__item }>Login</NavigationItem> 
+					?  registerMenu 
 					:  loggedMenu
 				}
 			</ul>
