@@ -1,0 +1,29 @@
+@import '../../assets/scss/helpers/_variables.scss';
+
+.statistic {
+	.form--inline {
+		flex-direction: row;
+		max-width: 100%;
+	}
+}
+
+.filters {
+	border-color: $inputBorder;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-evenly;
+	border: 1px solid $inputBorder;
+	padding: 1rem;
+
+	> div {
+		&:first-of-type { margin: 1rem 0; }
+
+		width: 140px;
+		flex-basis: auto !important;
+		flex-flow: row nowrap !important;
+		flex-grow: 0 !important;
+		align-items: center !important;
+		justify-content: center !important;
+		position: relative;
+	}
+}

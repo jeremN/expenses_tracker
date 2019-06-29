@@ -54,14 +54,15 @@ const input = (props) => {
 			<label
 				htmlFor={ props.inputId } 
 				className={ classes.form__label }>
-				{ props.labelValue } { labelSmall }
+				{ props.labelValue } { props.labelSmall ? labelSmall : null }
 			</label>
 			) : null;
 
 	return (
 		<div className={ classes.form__group }>
-			{ label }
+			{ !props.labelAfter ? label : null }
 			{ inputElement }
+			{ props.labelAfter ? label : null }
 			<div className={ classes.form__errorMsg }>
 				{ props.errorMsg }
 			</div>
