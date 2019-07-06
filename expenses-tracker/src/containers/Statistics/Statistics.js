@@ -4,6 +4,7 @@ import * as d3 from 'd3';
 
 import Chart from '../../components/Charts/Chart';
 import Input from '../../components/UI/Input/Input';
+import Table from '../../components/UI/Table/Table';
 
 import * as actions from '../../store/actions';
 import { updateObject, getDate, formCheckValidity } from '../../shared/utility';
@@ -34,7 +35,8 @@ class Statistics extends Component {
 				elementConfig: {
 					type: 'radio',
 					placeholder: 'Années',
-					name: 'typesFilter'
+					name: 'typesFilter',
+					checked: true,
 				},
 				label: 'Années',
 				value: 'years',
@@ -46,13 +48,35 @@ class Statistics extends Component {
 				touched: false
 			},
 		},
+		table: {
+			headings: null,
+			body: null,
+		},
+		headings: {
+			first: ['Month', 'Outcome', 'Income', 'Saving'],
+			second: ['Category', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+		},
+		selected: {
+			year: '',
+			type: '',
+			display: ''
+		}
 	}
 
 	componentDidMount() {
-		this.getFiltersYears(this.props.expenses);
+		if (this.props.isAuth) {
+			this.getFiltersYears(this.props.expenses);
+		}
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (this.state.selected !== prevState.selected) {
+			this.displayTable(this.props.expenses, this.state.selected.year);
+		}
 	}
 
 	getFiltersYears = (expenses) => {
+		if (!expenses || !Object.keys(expenses).length) return;
 		const years = Object.keys(expenses).map(expense => expense);
 		const updatedFilters = this.state.filtersControls;
 
@@ -63,6 +87,7 @@ class Statistics extends Component {
 					type: 'radio',
 					placeholder: year,
 					name: 'yearsFilter',
+					checked: year === getDate().currentYear ? true : false,
 				},
 				label: year,
 				labelAfter: true,
@@ -75,12 +100,23 @@ class Statistics extends Component {
 			}
 		});
 
-		this.setState({ filtersControls: updatedFilters });
-		console.info(this.state.filtersControls)
+		this.setState({ 
+			filtersControls: updatedFilters,
+			selected: {
+				year: getDate().currentYear,
+				type: 'year',
+				display: 'table',
+			} 
+		});
 	}
 
 	inputChangedHandler = (event, controlName) => {
 		const { target } = event;
+		const filtered = {
+			typesFilter: 'type',
+			yearsFilter: 'year',
+		}
+
 		const updatedControls = updateObject(this.state.filtersControls, {
 			[controlName]: updateObject(this.state.filtersControls[controlName], {
 				...this.state.filtersControls[controlName],
@@ -89,7 +125,43 @@ class Statistics extends Component {
 				touched: true,
 			})
 		});
-		this.setState({ filtersControls: updatedControls });
+
+		const updatedSelected = updateObject(this.state.selected, {
+			[filtered[target.name]]: target.value
+		});
+
+		this.setState({ 
+			filtersControls: updatedControls,
+			selected: updatedSelected, 
+		});
+	}
+
+	displayTable = (expenses, year) => {
+		if (!expenses || !Object.keys(expenses).length) return;
+		let tBody = []; 
+		let tHead = null;
+
+		if (this.state.selected.type === 'year') {
+			tHead = this.state.headings.first;
+
+			Object.keys(expenses[year]).forEach(expense => {
+				tBody.push([
+					expense,
+					expenses[year][expense].outcome ? expenses[year][expense].outcome : 0,
+					expenses[year][expense].income ? expenses[year][expense].income : 0,
+					expenses[year][expense].saved ? expenses[year][expense].saved : 0,
+				]);
+			});
+		} else {
+
+		}
+
+		const updatedTable = {
+			headings: tHead,
+			body: tBody
+		}
+
+		this.setState({ table: updatedTable });
 	}
 
 	render() {
@@ -131,6 +203,11 @@ class Statistics extends Component {
 			)
 		});
 
+		const chart = <Chart />
+		const table = <Table
+								headings={ this.state.table.headings } 
+								rows={ this.state.table.body } />
+
 
 		const statContent = (
 			<div className={ statistic }>
@@ -150,7 +227,7 @@ class Statistics extends Component {
 				</div>
 				<div className="row">
 					<div className="col-12 card">
-						<Chart />
+						{ table }
 					</div>
 				</div>
 			</div>

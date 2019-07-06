@@ -117,7 +117,7 @@ class Home extends Component {
 		}
 		if (this.props.currentExpenses !== prevProps.currentExpenses) {
 			this.switchDataMode(this.props.currentExpenses);
-			this.calculateTotals()
+			this.calculateTotals(this.props.currentExpenses);
 		}
 	}
 
@@ -362,16 +362,15 @@ class Home extends Component {
 		this.props.onUpdateCurrentExpense(userId, token, currentKey, updatesExpenses);
 	}
 
-	calculateTotals = () => {
+	calculateTotals = (currentExpenses) => {
 		const dates = getDate()
-		const currentExp = this.props.currentExpenses[dates.currentYear][dates.currentMonth]
+		const currentExp = currentExpenses[dates.currentYear][dates.currentMonth];
 		const updatedTotal = {
 			income: 0,
 			outcome: 0,
 		}
-
-		currentExp.forEach(exp => updatedTotal[exp.type] += +exp.value)
-		this.updateIndicators(updatedTotal)
+		if (Array.isArray(currentExp)) currentExp.forEach(exp => updatedTotal[exp.type] += +exp.value);
+		this.updateIndicators(updatedTotal);
 	}
 
 	updateIndicators = (total) => {

@@ -94,10 +94,10 @@ const processMonth = (reducedArray) => {
 	Object.keys(reducedArray).forEach((key) => {
 		switch(key) {
 			case 'income':
-				month.income = parseFloat(sumArray(reducedArray[key]).toFixed(2))
+				month.income = reducedArray[key] ? parseFloat(sumArray(reducedArray[key]).toFixed(2)) : 0
 				break;
 			case 'outcome':
-				month.outcome = parseFloat(sumArray(reducedArray[key]).toFixed(2))
+				month.outcome = reducedArray[key] ? parseFloat(sumArray(reducedArray[key]).toFixed(2)) : 0
 				break;
 			default: 
 				month.categories.push({
