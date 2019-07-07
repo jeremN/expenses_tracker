@@ -51,10 +51,11 @@ class Statistics extends Component {
 		table: {
 			headings: null,
 			body: null,
+			footer: null
 		},
 		headings: {
-			first: ['Month', 'Outcome', 'Income', 'Saving'],
-			second: ['Category', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+			first: ['Month', 'Outcome', 'Income', 'Diff', 'Saving'],
+			second: ['Category', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 		},
 		selected: {
 			year: '',
@@ -120,12 +121,15 @@ class Statistics extends Component {
 		const updatedControls = updateObject(this.state.filtersControls, {
 			[controlName]: updateObject(this.state.filtersControls[controlName], {
 				...this.state.filtersControls[controlName],
+				elementConfig: {
+					...this.state.filtersControls[controlName].elementConfig,
+					checked: true,
+				},
 				value: target.value,
 				valid: formCheckValidity(target.value, this.state.filtersControls[controlName]),
 				touched: true,
 			})
 		});
-
 		const updatedSelected = updateObject(this.state.selected, {
 			[filtered[target.name]]: target.value
 		});
@@ -134,32 +138,113 @@ class Statistics extends Component {
 			filtersControls: updatedControls,
 			selected: updatedSelected, 
 		});
+
+		this.displayTable(this.props.expenses, this.state.selected.year);
+	}
+
+	monthCategoryOutput = (array, string) => {
+    let val = 0;
+    for( let key in array ) {
+      if( string === array[key].month ) {
+          val = array[key].value;
+      }
+    }
+    return val;
+	}
+
+	setCategoriesArray = (expenses, year) => {
+		const categories = [];
+
+		Object.keys(expenses[year]).forEach(expense => {
+			categories.push({
+				cats: expenses[year][expense].categories,
+				month: expense,
+			})
+		});
+
+		return categories;
+	}
+
+	setSortedByCategories = (array) => {
+    return array.reduce( (item, next) => {
+      let cat = '';
+      let value = '';
+
+      for( let key in next.cats ) {
+        cat = next.cats[key].name;
+        value = next.cats[key].value;
+
+        if( !item[cat] ) {
+            item[cat] = [];
+        }
+        item[cat].push({
+            month: next.month,
+            value: value
+        })
+      }
+      return item;
+    }, {}); 
+	}
+
+	filterByCategories = (expenses, year) => {
+		const filteredCategories = {
+			headings: [...this.state.headings.second],
+			body: [],
+		}
+		const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		const categories = this.setCategoriesArray(expenses, year);
+		const items = this.setSortedByCategories(categories);
+
+    Object.keys(items).forEach(item => {
+    	const val = months.map(month => this.monthCategoryOutput(items[item], month));
+    	filteredCategories.body.push([
+    		item,
+    		...val
+    	]);
+    });
+
+		return filteredCategories;	
+  }
+
+	filterByYears = (expenses, year) => {
+		const filteredYear = {
+			headings: [...this.state.headings.first],
+			body: [],
+			footer: []
+		}
+
+		const months = Object.keys(expenses[year]);
+		const firstEntry = expenses[year][months[0]];
+		const lastEntry = expenses[year][months[months.length - 1]];
+		const totalSaved = +lastEntry.saved - +firstEntry.saved;
+		let totalIncome = 0;
+		let totalOutcome = 0;
+
+		Object.keys(expenses[year]).forEach(expense => {
+			totalIncome += +expenses[year][expense].income;
+			totalOutcome += +expenses[year][expense].outcome;
+
+			filteredYear.body.push([
+				expense,
+				expenses[year][expense].outcome ? expenses[year][expense].outcome : 0,
+				expenses[year][expense].income ? expenses[year][expense].income : 0,
+				+expenses[year][expense].income - +expenses[year][expense].outcome,
+				expenses[year][expense].saved ? expenses[year][expense].saved : 0,
+			]);
+		});
+
+		filteredYear.footer = [ '', totalOutcome, totalIncome, '', totalSaved];
+		return filteredYear;	
 	}
 
 	displayTable = (expenses, year) => {
 		if (!expenses || !Object.keys(expenses).length) return;
-		let tBody = []; 
-		let tHead = null;
-
-		if (this.state.selected.type === 'year') {
-			tHead = this.state.headings.first;
-
-			Object.keys(expenses[year]).forEach(expense => {
-				tBody.push([
-					expense,
-					expenses[year][expense].outcome ? expenses[year][expense].outcome : 0,
-					expenses[year][expense].income ? expenses[year][expense].income : 0,
-					expenses[year][expense].saved ? expenses[year][expense].saved : 0,
-				]);
-			});
-		} else {
-
+		const filtered = {
+			year: this.filterByYears(expenses, year),
+			categories: this.filterByCategories(expenses, year)
 		}
-
-		const updatedTable = {
-			headings: tHead,
-			body: tBody
-		}
+		const updatedTable = filtered[this.state.selected.type];
+		console.info(filtered[this.state.selected.type])
 
 		this.setState({ table: updatedTable });
 	}
@@ -206,8 +291,8 @@ class Statistics extends Component {
 		const chart = <Chart />
 		const table = <Table
 								headings={ this.state.table.headings } 
-								rows={ this.state.table.body } />
-
+								rows={ this.state.table.body } 
+								footer={ this.state.table.footer } />
 
 		const statContent = (
 			<div className={ statistic }>

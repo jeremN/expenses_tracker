@@ -6,7 +6,7 @@ import './Table.module.scss';
 const table = (props) => {
 	const { headings, rows, footer } = props;
 
-	let head = headings ? (
+	let head = headings && headings.length ? (
 		<thead>
 			<tr>
 				{ headings.map((heading, index) => <Cell
@@ -17,7 +17,7 @@ const table = (props) => {
 		</thead>
 	) : null ;
 
-	let body = rows ? (
+	let body = rows && rows.length ? (
 		<tbody>
 			{ rows.map((row, rowIndex) => <tr id={ rowIndex } key={ `row-${rowIndex}` }>
 					{ row.map((content, cellIndex) => <Cell 
@@ -28,9 +28,16 @@ const table = (props) => {
 		</tbody>
 	) : null ;
 
-	let foot = footer ? (
-		<tfooter>
-		</tfooter>
+	let foot = footer && footer.length ? (
+		<tfoot>
+			<tr>
+				{ footer.map((foots, index) => <Cell
+					key={ `tfoot-${index}` }
+					type={ 'foot' }>{ foots }</Cell>
+				)}
+			</tr>
+
+		</tfoot>
 	) : null ;
 
 	return (		
