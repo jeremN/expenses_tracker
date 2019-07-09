@@ -36,6 +36,16 @@ const input = (props) => {
 			</select>;
 			break;
 
+		case ('check'):
+			inputElement = <input
+				id={ props.inputId }
+				className={ form__field }
+				{ ...props.elementConfig }
+				value={ props.value }
+				checked={ props.checked }
+				onChange={ props.changed } />; 
+			break;
+
 		default:
 			inputElement = <input
 				id={ props.inputId }

@@ -15,11 +15,11 @@ class Statistics extends Component {
 	state = {
 		filtersControls: {
 			category: {
-				elementType: 'input',
+				elementType: 'check',
 				elementConfig: {
 					type: 'radio',
 					placeholder: 'Categories',
-					name: 'typesFilter'
+					name: 'types',
 				},
 				label: 'Categories',
 				value: 'categories',
@@ -31,12 +31,11 @@ class Statistics extends Component {
 				touched: false
 			},
 			years: {
-				elementType: 'input',
+				elementType: 'check',
 				elementConfig: {
 					type: 'radio',
 					placeholder: 'Années',
-					name: 'typesFilter',
-					checked: true,
+					name: 'types',
 				},
 				label: 'Années',
 				value: 'years',
@@ -58,9 +57,9 @@ class Statistics extends Component {
 			second: ['Category', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 		},
 		selected: {
-			year: '',
-			type: '',
-			display: ''
+			years: getDate().currentYear,
+			types: 'years',
+			display: 'table',
 		}
 	}
 
@@ -72,7 +71,7 @@ class Statistics extends Component {
 
 	componentDidUpdate(prevProps, prevState) {
 		if (this.state.selected !== prevState.selected) {
-			this.displayTable(this.props.expenses, this.state.selected.year);
+			this.displayTable(this.props.expenses, this.state.selected.years);
 		}
 	}
 
@@ -83,12 +82,11 @@ class Statistics extends Component {
 
 		years.forEach((year) => {
 			updatedFilters[year] = {
-				elementType: 'input',
+				elementType: 'check',
 				elementConfig: {
 					type: 'radio',
 					placeholder: year,
-					name: 'yearsFilter',
-					checked: year === getDate().currentYear ? true : false,
+					name: 'years',
 				},
 				label: year,
 				labelAfter: true,
@@ -101,45 +99,30 @@ class Statistics extends Component {
 			}
 		});
 
-		this.setState({ 
-			filtersControls: updatedFilters,
-			selected: {
-				year: getDate().currentYear,
-				type: 'year',
-				display: 'table',
-			} 
-		});
+		this.setState({ filtersControls: updatedFilters });
+		this.displayTable(this.props.expenses, this.state.selected.years);
 	}
 
 	inputChangedHandler = (event, controlName) => {
 		const { target } = event;
-		const filtered = {
-			typesFilter: 'type',
-			yearsFilter: 'year',
-		}
 
 		const updatedControls = updateObject(this.state.filtersControls, {
 			[controlName]: updateObject(this.state.filtersControls[controlName], {
 				...this.state.filtersControls[controlName],
-				elementConfig: {
-					...this.state.filtersControls[controlName].elementConfig,
-					checked: true,
-				},
 				value: target.value,
 				valid: formCheckValidity(target.value, this.state.filtersControls[controlName]),
 				touched: true,
 			})
 		});
+
 		const updatedSelected = updateObject(this.state.selected, {
-			[filtered[target.name]]: target.value
+			[target.name]: target.value
 		});
 
 		this.setState({ 
-			filtersControls: updatedControls,
 			selected: updatedSelected, 
+			filtersControls: updatedControls,
 		});
-
-		this.displayTable(this.props.expenses, this.state.selected.year);
 	}
 
 	monthCategoryOutput = (array, string) => {
@@ -240,11 +223,10 @@ class Statistics extends Component {
 	displayTable = (expenses, year) => {
 		if (!expenses || !Object.keys(expenses).length) return;
 		const filtered = {
-			year: this.filterByYears(expenses, year),
+			years: this.filterByYears(expenses, year),
 			categories: this.filterByCategories(expenses, year)
 		}
-		const updatedTable = filtered[this.state.selected.type];
-		console.info(filtered[this.state.selected.type])
+		const updatedTable = filtered[this.state.selected.types];
 
 		this.setState({ table: updatedTable });
 	}
@@ -270,6 +252,7 @@ class Statistics extends Component {
 				label,
 				labelSmall,
 				labelAfter,
+				isChecked,
 			} = formElement.config
 
 			return (
@@ -284,6 +267,7 @@ class Statistics extends Component {
 					shouldValidate={ validation }
 					labelAfter= { labelAfter }
 					touched={ touched }
+					checked={ this.state.selected[elementConfig.name] === value }
 					changed={ (event) => this.inputChangedHandler(event, formElement.id) } />
 			)
 		});
