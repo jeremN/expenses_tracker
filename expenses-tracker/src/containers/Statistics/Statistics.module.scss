@@ -27,3 +27,19 @@
 		position: relative;
 	}
 }
+
+.displays {
+	@extend .filters;
+	border: none;
+
+	> div { 
+		width: 100%; 
+	}
+
+	button {
+		height: auto;
+		line-height: 1.8;
+		padding: 0.5rem;
+
+	}
+}

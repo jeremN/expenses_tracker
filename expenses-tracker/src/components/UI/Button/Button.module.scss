@@ -1,9 +1,11 @@
 @import '../../../assets/scss/helpers/_variables.scss';
 
-$btnBlueBgColor: $blue;
-$btnBlueBorderColor: $blue;
-$btnBlueTextColor: $white;
-$btnTransparentHoverColor: $blue;
+$btnBlueBgColor: $blue !default;
+$btnBlueBorderColor: $blue !default;
+$btnBlueTextColor: $white !default;
+$btnTransparentHoverColor: $blue !default;
+$btnGreyBorderColor: $grey !default;
+$btnGreyTextColor: $blueDark !default;
 
 .button {
 	background: none;
@@ -32,6 +34,23 @@ $btnTransparentHoverColor: $blue;
 		width: auto;
 
 		&:hover { color: $btnTransparentHoverColor; }
+	}
+
+	&__grey {
+		font-size: 1.4rem;
+		font-weight: 700;
+		border: 1px solid $btnGreyBorderColor;
+		color: $btnGreyTextColor;
+
+		&:hover { 
+			color: $white;
+			background-color: $btnGreyTextColor; 
+		}
+
+		&.is__selected {
+			color: $white;
+			background-color: $btnGreyTextColor; 
+		}
 	}
 
 	&--td {

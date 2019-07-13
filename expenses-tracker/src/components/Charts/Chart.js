@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import * as d3 from 'd3';
 
 import Axes from './Axes';
@@ -6,45 +7,15 @@ import Bars from './Bar';
 
 class Chart extends Component {
 	state = {
-		datas: [
-			{
-				x: 'Janvier',
-				y: 160,
-			}, {
-				x: 'Février',
-				y: 1000,
-			}, {
-				x: 'Mars',
-				y: 16,
-			}, {
-				x: 'Avril',
-				y: 568,
-			}, {
-				x: 'Mai',
-				y: 1789,
-			}, {
-				x: 'Juin',
-				y: 346,
-			}, {
-				x: 'Juillet',
-				y: 24,
-			}, {
-				x: 'Août',
-				y: 754,
-			}, {
-				x: 'Septembre',
-				y: 839,
-			}, {
-				x: 'Octobre',
-				y: 210,
-			}, {
-				x: 'Novembre',
-				y: 365,
-			}, {
-				x: 'Décembre',
-				y: 869,
-			},
-		],
+		datas: [],
+	}
+
+	componentDidMount() {
+		this.setState({ datas: this.props.datas });
+	}
+
+	getSvgProps = () => {
+		console.info(this)
 	}
 
 	render() {
@@ -56,8 +27,9 @@ class Chart extends Component {
 			left: 50,
 		}
 		const maxValue = Math.max(...datas.map(d => d.y));
-		const width = 800;
-		const height = 400;
+		const parentContainer = document.querySelector(this.props.container);
+		const width = parentContainer ? parentContainer.offsetWidth : this.props.chartSize[0];
+		const height = parentContainer ? parentContainer.offsetHeight : this.props.chartSize[1];
 
 		const sWidth = width - margins.left - margins.right;
 		const sHeight = height - margins.top - margins.bottom;

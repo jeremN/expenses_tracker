@@ -5,11 +5,12 @@ import * as d3 from 'd3';
 import Chart from '../../components/Charts/Chart';
 import Input from '../../components/UI/Input/Input';
 import Table from '../../components/UI/Table/Table';
+import Button from '../../components/UI/Button/Button';
 
 import * as actions from '../../store/actions';
 import { updateObject, getDate, formCheckValidity } from '../../shared/utility';
 
-import { statistic, filters } from './Statistics.module.scss';
+import { statistic, filters, displays } from './Statistics.module.scss';
 
 class Statistics extends Component {
 	state = {
@@ -52,6 +53,69 @@ class Statistics extends Component {
 			body: null,
 			footer: null
 		},
+		chartDatas: [
+			{ 
+				x: 'January', 
+			  y: 0,
+			  y2: 0,
+			},
+			{ 
+				x: 'February', 
+			  y: 0,
+			  y2: 0,
+			},
+			{ 
+				x: 'March', 
+			  y: 0,
+			  y2: 0,
+			},
+			{ 
+				x: 'April', 
+			  y: 0,
+			  y2: 0,
+			},
+			{ 
+				x: 'May', 
+			  y: 0,
+			  y2: 0,
+			},
+			{ 
+				x: 'June', 
+			  y: 0,
+			  y2: 0,
+			},
+			{ 
+				x: 'July', 
+			  y: 0,
+			  y2: 0,
+			},
+			{ 
+				x: 'August', 
+			  y: 0,
+			  y2: 0,
+			},
+			{ 
+				x: 'September', 
+			  y: 0,
+			  y2: 0,
+			},
+			{ 
+				x: 'October', 
+			  y: 0,
+			  y2: 0,
+			},
+			{ 
+				x: 'November', 
+			  y: 0,
+			  y2: 0,
+			},
+			{ 
+				x: 'December', 
+			  y: 0,
+			  y2: 0,
+			},
+		]
+,
 		headings: {
 			first: ['Month', 'Outcome', 'Income', 'Diff', 'Saving'],
 			second: ['Category', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -71,7 +135,7 @@ class Statistics extends Component {
 
 	componentDidUpdate(prevProps, prevState) {
 		if (this.state.selected !== prevState.selected) {
-			this.displayTable(this.props.expenses, this.state.selected.years);
+			this.setDatasAndTable(this.props.expenses, this.state.selected.years);
 		}
 	}
 
@@ -100,7 +164,7 @@ class Statistics extends Component {
 		});
 
 		this.setState({ filtersControls: updatedFilters });
-		this.displayTable(this.props.expenses, this.state.selected.years);
+		this.setDatasAndTable(this.props.expenses, this.state.selected.years);
 	}
 
 	inputChangedHandler = (event, controlName) => {
@@ -220,15 +284,41 @@ class Statistics extends Component {
 		return filteredYear;	
 	}
 
-	displayTable = (expenses, year) => {
+	setDatasAndTable = (expenses, year) => {
 		if (!expenses || !Object.keys(expenses).length) return;
 		const filtered = {
 			years: this.filterByYears(expenses, year),
 			categories: this.filterByCategories(expenses, year)
 		}
 		const updatedTable = filtered[this.state.selected.types];
+		const updatedDatas = this.state.chartDatas.map(item => {
+			let item2 = filtered.years.body.find(i2 => item.x === i2[0])
+			return item2 ? { 
+				x: item.x,
+				y: item2[2],
+				y2: item2[1],
+			} : item
+		})
 
-		this.setState({ table: updatedTable });
+		this.setState({ 
+			table: updatedTable,
+			chartDatas: updatedDatas,
+		});
+	}
+
+	displayModeHandler = (event, displayName) => {
+		if (this.state.selected.display === displayName) return;
+
+		const displayed = updateObject(this.state.selected, {
+			display: displayName
+		});
+
+		const isDisplayChart = displayName === 'chart'
+		document.querySelectorAll('input[name="types"]').forEach(input => {
+			isDisplayChart ? input.setAttribute('disabled', '') : input.removeAttribute('disabled')
+		})
+
+		this.setState({ selected: displayed });
 	}
 
 	render() {
@@ -252,7 +342,6 @@ class Statistics extends Component {
 				label,
 				labelSmall,
 				labelAfter,
-				isChecked,
 			} = formElement.config
 
 			return (
@@ -272,11 +361,12 @@ class Statistics extends Component {
 			)
 		});
 
-		const chart = <Chart />
+		const chart = <Chart datas={ this.state.chartDatas } container={ "#chartContainer" } />
 		const table = <Table
 								headings={ this.state.table.headings } 
 								rows={ this.state.table.body } 
 								footer={ this.state.table.footer } />
+		const display = this.state.selected.display === 'table' ? table : chart;
 
 		const statContent = (
 			<div className={ statistic }>
@@ -290,13 +380,25 @@ class Statistics extends Component {
 							{ form }
 						</div>
 					</div>
-					<div className="col-4 card card--transparent">
-						
+					<div className="col-3 col-margin-1 card card--transparent">
+						<div className={ displays }>
+							<div>Affichage:</div>
+							<Button
+								btnType="button__grey"
+								typeBtn="button"
+								isActive={ this.state.selected.display === 'table' ? 'is__selected' : null }
+								clicked={ (event) => this.displayModeHandler(event, 'table') }>Table</Button>
+							<Button 
+								isActive={ this.state.selected.display === 'chart' ? 'is__selected' : null } 
+								btnType="button__grey"
+								typeBtn="button"
+								clicked={ (event) => this.displayModeHandler(event, 'chart') }>Chart</Button>
+						</div>
 					</div>
 				</div>
 				<div className="row">
-					<div className="col-12 card">
-						{ table }
+					<div id="chartContainer" className="col-12 card">
+						{ display }
 					</div>
 				</div>
 			</div>
