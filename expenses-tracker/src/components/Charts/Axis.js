@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import * as d3 from 'd3';
 
 import './Axis.module.scss';
@@ -17,7 +17,7 @@ class Axis extends Component {
 		const axis = d3[`axis${this.props.orient}`]()
 			.scale(this.props.scale)
 			.tickSize(-this.props.tickSize)
-			.ticks([4]);
+			.ticks(6);
 
 		d3.select(this.axisElement).call(axis);
 	}
@@ -25,10 +25,12 @@ class Axis extends Component {
 	render() {
 
 		return (
-			<g 
-				className={ `chart__axis chart__axis__${this.props.orient}` } 
-				ref={ (el) => { this.axisElement = el; } }
-				transform={ this.props.translate } />
+			<Fragment>
+				<g 
+					className={ `chart__axis chart__axis__${this.props.orient}` } 
+					ref={ (el) => { this.axisElement = el; } }
+					transform={ this.props.translate } />
+			</Fragment>
 		);
 	}
 }

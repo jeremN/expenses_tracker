@@ -6,7 +6,6 @@ class Bars extends Component {
 		const { 
 			scales, 
 			margins,
-			height,
 			data,
 		} = this.props;
 		const { xScale, yScale } = scales;

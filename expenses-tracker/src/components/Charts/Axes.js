@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import * as d3 from 'd3';
 
 import Axis from './Axis';
@@ -26,10 +26,10 @@ const Axes = (props) => {
 	}
 
 	return (
-		<g transform={ `translate(${margins.left}, ${margins.top})` }>
+		<Fragment>
 			<Axis {...xProps} />
 			<Axis {...yProps} />
-		</g>
+		</Fragment>
 	);
 }
 

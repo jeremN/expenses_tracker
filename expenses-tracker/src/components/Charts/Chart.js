@@ -1,21 +1,39 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import * as d3 from 'd3';
 
 import Axes from './Axes';
 import Bars from './Bar';
+import SvgContainer from './Svg';
+import GroupedBars from './GroupedBar';
 
 class Chart extends Component {
 	state = {
 		datas: [],
+		dimension: [],
+		scales: {
+			xScale: null,
+			yScale: null,
+		},
 	}
 
 	componentDidMount() {
 		this.setState({ datas: this.props.datas });
 	}
 
+	componentDidUpdate(prevProps, prevState) {
+		if (this.state.datas !== prevState.datas) {
+
+		}
+	}
+
 	getSvgProps = () => {
-		console.info(this)
+		
+	}
+
+	getScales = () => {}
+
+	getMaxY = (array) => {
+
 	}
 
 	render() {
@@ -26,38 +44,42 @@ class Chart extends Component {
 			bottom: 50,
 			left: 50,
 		}
-		const maxValue = Math.max(...datas.map(d => d.y));
 		const parentContainer = document.querySelector(this.props.container);
-		const width = parentContainer ? parentContainer.offsetWidth : this.props.chartSize[0];
-		const height = parentContainer ? parentContainer.offsetHeight : this.props.chartSize[1];
-
-		const sWidth = width - margins.left - margins.right;
-		const sHeight = height - margins.top - margins.bottom;
+		const width = this.props.chartSize[0] || parentContainer.offsetWidth;
+		const height = this.props.chartSize[1] || parentContainer.offsetHeigh;
+		const sWidth = +width - margins.left - margins.right;
+		const sHeight = +height - margins.top - margins.bottom;
 
 		const xScale = d3.scaleBand()
-			.padding(0.5)
-			.domain(datas.map(d => d.x))
-			.range([0, sWidth]);
+			.domain(datas.map(({ x }) => x))
+			.range([0, sWidth])
+			.padding(0.1);
+
+		const xScaleB = d3.scaleBand()
+			.domain(datas.map(({ x }) => x))
+			.rangeRound([0, xScale.bandwidth()])
+			.padding(0.05);
+
 
 		const yScale = d3.scaleLinear()
-			.domain([0, maxValue])
-			.range([sHeight, 0])
+			.rangeRound([sHeight, 0])
+			.domain([0, d3.max(datas.map(({ y }) => y).flat())])
 			.nice();
-		
+
 		return (
-			<svg width={ width } height={ height }>
+			<SvgContainer width={ width } height={ height } left={ margins.left } top={ margins.top }>
 				<Axes 
 					scales={ { xScale, yScale } }
 					margins={ margins } 
 					width={ sWidth } 
 					height={ sHeight } />
-				<Bars
-					scales={ { xScale, yScale } }
-					data={ this.state.datas } 
-					margins={ margins } 
-					maxValue={ maxValue } 
-					height={ height } />
-			</svg>
+				<GroupedBars 
+					data={ this.state.datas }
+					width={ xScale.bandwidth() }
+					height={ sHeight } 
+					margins={ margins }
+					scales={ { xScale, yScale, xScaleB } } />
+			</SvgContainer>
 		);
 	}
 

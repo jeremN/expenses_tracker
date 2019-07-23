@@ -56,66 +56,53 @@ class Statistics extends Component {
 		chartDatas: [
 			{ 
 				x: 'January', 
-			  y: 0,
-			  y2: 0,
+			  y: [0, 0],
 			},
 			{ 
 				x: 'February', 
-			  y: 0,
-			  y2: 0,
+			  y: [0, 0],
 			},
 			{ 
 				x: 'March', 
-			  y: 0,
-			  y2: 0,
+			  y: [0, 0],
 			},
 			{ 
 				x: 'April', 
-			  y: 0,
-			  y2: 0,
+			  y: [0, 0],
 			},
 			{ 
 				x: 'May', 
-			  y: 0,
-			  y2: 0,
+			  y: [0, 0],
 			},
 			{ 
 				x: 'June', 
-			  y: 0,
-			  y2: 0,
+			  y: [0, 0],
 			},
 			{ 
 				x: 'July', 
-			  y: 0,
-			  y2: 0,
+			  y: [0, 0],
 			},
 			{ 
 				x: 'August', 
-			  y: 0,
-			  y2: 0,
+			  y: [0, 0],
 			},
 			{ 
 				x: 'September', 
-			  y: 0,
-			  y2: 0,
+			  y: [0, 0],
 			},
 			{ 
 				x: 'October', 
-			  y: 0,
-			  y2: 0,
+			  y: [0, 0],
 			},
 			{ 
 				x: 'November', 
-			  y: 0,
-			  y2: 0,
+			  y: [0, 0],
 			},
 			{ 
 				x: 'December', 
-			  y: 0,
-			  y2: 0,
+			  y: [0, 0],
 			},
-		]
-,
+		],
 		headings: {
 			first: ['Month', 'Outcome', 'Income', 'Diff', 'Saving'],
 			second: ['Category', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -295,8 +282,7 @@ class Statistics extends Component {
 			let item2 = filtered.years.body.find(i2 => item.x === i2[0])
 			return item2 ? { 
 				x: item.x,
-				y: item2[2],
-				y2: item2[1],
+				y: [item2[2], item2[1]],
 			} : item
 		})
 
@@ -361,7 +347,7 @@ class Statistics extends Component {
 			)
 		});
 
-		const chart = <Chart datas={ this.state.chartDatas } container={ "#chartContainer" } />
+		const chart = <Chart datas={ this.state.chartDatas } container={ "#chartContainer" } chartSize={ [null, 400] } />
 		const table = <Table
 								headings={ this.state.table.headings } 
 								rows={ this.state.table.body } 
