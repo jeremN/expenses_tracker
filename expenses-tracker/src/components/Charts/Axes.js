@@ -15,7 +15,7 @@ const Axes = (props) => {
 		orient: 'Bottom',
 		scale: scales.xScale,
 		translate: `translate(0, ${height})`,
-		tickSize: height,
+		tickSize: 4,
 	}
 
 	const yProps = {

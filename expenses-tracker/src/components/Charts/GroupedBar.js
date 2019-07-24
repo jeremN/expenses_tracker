@@ -13,7 +13,8 @@ const GroupedBar = (props) => {
 			left,
 			top,
 		},
-		data, 
+		data,
+		hovered, 
 	} = props
 
 	const colors = ['#78e08f', '#e55039'];
@@ -27,11 +28,15 @@ const GroupedBar = (props) => {
 				{ y.map((value, index) => 
 						<rect
 							key={ `${x}-${index === 0 ? 'income' : 'outcome'}` }
-							x={ xScaleB(x) + index * 10 }
+							x={ xScaleB(x) + index * xScaleB.bandwidth() - 6}
 							y={ yScale(value) }
 							height={ height - yScale(value) }
 							width={ xScaleB.bandwidth() }
-							fill={ colors[index] } />
+							fill={ colors[index] } 
+							onMouseOver={ hovered }
+							data-x={ x }
+							data-inc={ y[0] }
+							data-out={ y[1] }/>
 					)
 				}
 			</g>

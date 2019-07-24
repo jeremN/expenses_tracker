@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import * as d3 from 'd3';
 
 import Axes from './Axes';
-import Bars from './Bar';
 import SvgContainer from './Svg';
 import GroupedBars from './GroupedBar';
+import Tooltip from './Tooltip';
 
 class Chart extends Component {
 	state = {
@@ -14,7 +14,14 @@ class Chart extends Component {
 			xScale: null,
 			yScale: null,
 		},
-	}
+		tooltip: {
+			pos: [],
+			title: '',
+			income: 0,
+			outcome: 0,   
+			unit: '€',
+		},
+	} 
 
 	componentDidMount() {
 		this.setState({ datas: this.props.datas });
@@ -26,18 +33,22 @@ class Chart extends Component {
 		}
 	}
 
-	getSvgProps = () => {
-		
-	}
+	hoverRect = (event) => {
+		const { target, clientX, clientY } = event;
+		const { x, inc, out } = target.dataset; 
+		const updatedTooltip = { 
+			...this.state.tooltip,
+			pos: [clientX, clientY],
+			title: x,
+			income: inc,
+			outcome: out,
+		};
 
-	getScales = () => {}
-
-	getMaxY = (array) => {
-
+		this.setState({ tooltip: updatedTooltip });
 	}
 
 	render() {
-		const { datas } = this.state
+		const { datas, tooltip } = this.state
 		const margins = {
 			top: 50,
 			right: 50,
@@ -66,7 +77,9 @@ class Chart extends Component {
 			.domain([0, d3.max(datas.map(({ y }) => y).flat())])
 			.nice();
 
+
 		return (
+			<Fragment>
 			<SvgContainer width={ width } height={ height } left={ margins.left } top={ margins.top }>
 				<Axes 
 					scales={ { xScale, yScale } }
@@ -78,8 +91,11 @@ class Chart extends Component {
 					width={ xScale.bandwidth() }
 					height={ sHeight } 
 					margins={ margins }
-					scales={ { xScale, yScale, xScaleB } } />
+					scales={ { xScale, yScale, xScaleB } } 
+					hovered={ (event) => this.hoverRect(event) } />
 			</SvgContainer>
+			<Tooltip pos={ tooltip.pos } title={ tooltip.title } income={ tooltip.income } outcome={ tooltip.outcome } unit={ tooltip.unit } />
+			</Fragment>
 		);
 	}
 

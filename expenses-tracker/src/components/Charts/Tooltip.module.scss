@@ -1,0 +1,21 @@
+@import '../../assets/scss/helpers/_variables.scss';
+
+$tooltipBgColor: $white !default;
+
+.tooltip {
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: $tooltipBgColor;
+	border-radius: 4px;
+	box-shadow: 0 4px 24px -1px rgba(0,0,0,0.1);
+	padding: 1em;
+	font-size: 14px;
+
+	&__title {
+		text-transform: capitalize;
+		font-weight: 700;
+	}
+
+	li { list-style: none; }
+}

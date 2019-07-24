@@ -1,8 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import * as d3 from 'd3';
 
-import './Axis.module.scss';
-
 class Axis extends Component {
 	componentDidMount() {
 		this.renderAxis();
@@ -13,7 +11,6 @@ class Axis extends Component {
 	}
 
 	renderAxis = () => {
-		const axisType = `axis${this.props.orient}`;
 		const axis = d3[`axis${this.props.orient}`]()
 			.scale(this.props.scale)
 			.tickSize(-this.props.tickSize)
