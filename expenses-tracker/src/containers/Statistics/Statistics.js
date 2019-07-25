@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
-import * as d3 from 'd3';
 
 import Chart from '../../components/Charts/Chart';
 import Input from '../../components/UI/Input/Input';

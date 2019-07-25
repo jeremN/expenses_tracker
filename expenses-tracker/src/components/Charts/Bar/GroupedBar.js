@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 
 const GroupedBar = (props) => {
 
@@ -11,10 +11,10 @@ const GroupedBar = (props) => {
 		},
 		margins: {
 			left,
-			top,
 		},
 		data,
-		hovered, 
+		mouseOver,
+		mouseOut, 
 	} = props
 
 	const colors = ['#78e08f', '#e55039'];
@@ -33,7 +33,8 @@ const GroupedBar = (props) => {
 							height={ height - yScale(value) }
 							width={ xScaleB.bandwidth() }
 							fill={ colors[index] } 
-							onMouseOver={ hovered }
+							onMouseOver={ mouseOver }
+							onMouseOut={ mouseOut }
 							data-x={ x }
 							data-inc={ y[0] }
 							data-out={ y[1] }/>

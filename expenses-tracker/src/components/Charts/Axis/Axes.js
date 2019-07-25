@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import * as d3 from 'd3';
 
 import Axis from './Axis';
 
@@ -8,7 +7,6 @@ const Axes = (props) => {
 		height,
 		width,
 		scales, 
-		margins,
 	} = props;
 
 	const xProps = {

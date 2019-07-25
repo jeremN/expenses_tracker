@@ -1,10 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import * as d3 from 'd3';
 
-import Axes from './Axes';
-import SvgContainer from './Svg';
-import GroupedBars from './GroupedBar';
-import Tooltip from './Tooltip';
+import Axes from './Axis/Axes';
+import SvgContainer from './Svg/Svg';
+import GroupedBars from './Bar/GroupedBar';
+import Tooltip from './Tooltip/Tooltip';
 
 class Chart extends Component {
 	state = {
@@ -20,6 +20,7 @@ class Chart extends Component {
 			income: 0,
 			outcome: 0,   
 			unit: '€',
+			visible: false,
 		},
 	} 
 
@@ -42,9 +43,19 @@ class Chart extends Component {
 			title: x,
 			income: inc,
 			outcome: out,
+			visible: true,
 		};
 
 		this.setState({ tooltip: updatedTooltip });
+	}
+
+	outRect = () => {
+		const updatedTooltip = { 
+			...this.state.tooltip,
+			visible: false,
+		};
+
+		this.setState({ tooltip: updatedTooltip});
 	}
 
 	render() {
@@ -92,9 +103,16 @@ class Chart extends Component {
 					height={ sHeight } 
 					margins={ margins }
 					scales={ { xScale, yScale, xScaleB } } 
-					hovered={ (event) => this.hoverRect(event) } />
+					mouseOver={ (event) => this.hoverRect(event) } 
+					mouseOut={ (event) => this.outRect(event) }/>
 			</SvgContainer>
-			<Tooltip pos={ tooltip.pos } title={ tooltip.title } income={ tooltip.income } outcome={ tooltip.outcome } unit={ tooltip.unit } />
+			<Tooltip 
+				isVisible={ tooltip.visible } 
+				pos={ tooltip.pos }
+				title={ tooltip.title } 
+				income={ tooltip.income } 
+				outcome={ tooltip.outcome } 
+				unit={ tooltip.unit } />
 			</Fragment>
 		);
 	}

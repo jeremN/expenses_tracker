@@ -7,7 +7,7 @@ const header = (props) => {
 	const loggedMenu = (
 		<Fragment>
 			<NavigationItem link="/stats" itemClass={ Header__item }>Stats</NavigationItem>
-			<NavigationItem link="/profile" itemClass={ Header__item }>Profil</NavigationItem>
+			<NavigationItem link="/profil" itemClass={ Header__item }>Profil</NavigationItem>
 			<NavigationItem link="/logout" itemClass={ Header__item }>Logout</NavigationItem>
 		</Fragment>
 	);
