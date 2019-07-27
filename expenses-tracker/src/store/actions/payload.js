@@ -48,24 +48,31 @@ export const setNewUserDataFail = (error) => {
 	}
 }
 
-export const updateCurrentExpenseSuccess = (data) => {
+export const updateCurrentExpenseSuccess = ({ data }) => {
 	return {
 		currentExpenses: data,
 		type: actionTypes.UPDATE_CURRENT_EXPENSE_SUCCESS
 	}
 }
 
-export const updateExpenseSuccess = (data) => {
+export const updateExpenseSuccess = ({ data }) => {
 	return {
 		expenses: data,
 		type: actionTypes.UPDATE_EXPENSE_SUCCESS,
 	}
 }
 
-export const updateCategoriesSuccess = (data) => {
+export const updateCategoriesSuccess = ({ data }) => {
 	return {
 		categories: data, 
 		type: actionTypes.UPDATE_CATEGORIES_SUCCESS,
+	}
+}
+
+export const updateProfileSuccess = ({ data }) => {
+	return {
+		profile: data,
+		type: actionTypes.UPDATE_PROFILE_SUCCESS,
 	}
 }
 
@@ -92,13 +99,14 @@ export const updateFail = (error) => {
 	}
 }
 
-export const setNewUserData = (userId, token) => {
+export const setNewUserData = (userId, token, email) => {
 	return dispatch => {	
 		dispatch(setUserDataStart())
 		const currentDate = moment();
 		const currentYear = currentDate.format('YYYY');
 		const newUserData = {
 			profile: {
+				email: email,
 				created: currentDate,
 				name: '',
 				verified: false,
@@ -141,7 +149,7 @@ export const updateCurrentExpenses = (userId, token, key, datas) => {
 		dispatch(updateStart('currentExpenses'));
 		axios.put(`users/${userId}/${key}/currentExpenses.json?auth=${token}`, datas)
 			.then(response => {
-				dispatch(updateCurrentExpenseSuccess(response.data));
+				dispatch(updateCurrentExpenseSuccess(response));
 			})
 			.catch(error => {
 				console.error(error);
@@ -151,13 +159,11 @@ export const updateCurrentExpenses = (userId, token, key, datas) => {
 }
 
 export const updateExpenses = (userId, token, key, datas) => {
-	console.info(userId, token, key, datas)
 	return dispatch => {	
 		dispatch(updateStart('expenses'));
 		axios.put(`users/${userId}/${key}/expenses.json?auth=${token}`, datas)
 			.then(response => {
-				dispatch(updateExpenseSuccess(response.data));
-				console.info(response.data)
+				dispatch(updateExpenseSuccess(response));
 			})
 			.catch(error => {
 				console.error(error);
@@ -170,9 +176,27 @@ export const updateCategories = (userId, token, key, datas) => {
 	return dispatch => {
 		dispatch(updateStart());
 		axios.put(`users/${userId}/${key}/categories.json?auth=${token}`, datas)
-			.then(response => console.info(response))
+			.then(response => {
+				dispatch(updateCategoriesSuccess(response));
+				console.info(response.data)
+			})
 			.catch(error => {
 				console.error(error)
+				dispatch(updateFail(error.response.data.error));
+			})
+	}
+}
+
+export const updateProfile = (userId, token, key, datas) => {
+	return dispatch => {
+		dispatch(updateStart());
+		axios.put(`users/${userId}/${key}/profile.json?auth=${token}`, datas)
+			.then(response => {
+				dispatch(updateProfileSuccess(response));
+				console.info(response)
+			})
+			.catch(error => {
+				console.error(error);
 				dispatch(updateFail(error.response.data.error));
 			})
 	}

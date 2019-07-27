@@ -104,6 +104,14 @@ const updateCategoriesSuccess = (state, action) => {
 	});
 }
 
+const updateProfileSuccess = (state, action) => {
+	return updateObject(state, {
+		profile: action.profile,
+		loading: false,
+		loadType: null,
+	})
+}
+
 const updateFail = (state, action) => {
 	return updateObject(state, {
 		error: action.error,
@@ -125,6 +133,7 @@ const reducer = (state = initialState, action) => {
 		case actionTypes.UPDATE_CURRENT_EXPENSE_SUCCESS: return updateCurrentExpenseSuccess(state, action);
 		case actionTypes.UPDATE_EXPENSE_SUCCESS: return updateExpenseSuccess(state, action);
 		case actionTypes.UPDATE_CATEGORIES_SUCCESS: return updateCategoriesSuccess(state, action);
+		case actionTypes.UPDATE_PROFILE_SUCCESS: return updateProfileSuccess(state, action);
 		case actionTypes.UPDATE_FAIL: return updateFail(state, action);
 		default:
 			return state;

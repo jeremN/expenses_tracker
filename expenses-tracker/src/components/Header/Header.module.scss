@@ -2,6 +2,7 @@
 	padding: 0.625rem 1rem;
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	background-color: white;
 	grid-column-start: 1;
 	grid-row-start: 1;
@@ -12,10 +13,12 @@
 		display: flex;
 		align-items: center;
 		justify-content: flex-start;
-		margin-right: auto;
 		flex-grow: 1;
-		max-width: 30%;
 		list-style: none;
+
+		&:last-of-type {
+			justify-content: flex-end;
+		}
 	}
 
 	&__item {

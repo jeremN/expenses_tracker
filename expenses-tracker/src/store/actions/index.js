@@ -11,5 +11,6 @@ export {
 	updateCurrentExpenses,
 	updateExpenses,
 	updateCategories,
+	updateProfile,
 	isDatasVerified,
 } from './payload';
