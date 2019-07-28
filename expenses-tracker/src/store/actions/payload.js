@@ -124,7 +124,7 @@ export const setNewUserData = (userId, token, email) => {
 				dispatch(setNewUserDataSuccess(response));
 			})
 			.catch(error => {
-				console.log(error)
+				console.error(error)
 				dispatch(setNewUserDataFail(error.response.data.error));
 			})
 	}
@@ -178,7 +178,6 @@ export const updateCategories = (userId, token, key, datas) => {
 		axios.put(`users/${userId}/${key}/categories.json?auth=${token}`, datas)
 			.then(response => {
 				dispatch(updateCategoriesSuccess(response));
-				console.info(response.data)
 			})
 			.catch(error => {
 				console.error(error)
@@ -193,7 +192,43 @@ export const updateProfile = (userId, token, key, datas) => {
 		axios.put(`users/${userId}/${key}/profile.json?auth=${token}`, datas)
 			.then(response => {
 				dispatch(updateProfileSuccess(response));
-				console.info(response)
+			})
+			.catch(error => {
+				console.error(error);
+				dispatch(updateFail(error.response.data.error));
+			})
+	}
+}
+
+export const updateUserEmail = (userId, token, key, newEmail, datas) => {
+	return dispatch => {
+		dispatch(updateStart());
+		axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:update?key=${process.env.REACT_APP_FIREBASE_KEY}`, {
+			'idToken': token,
+			'email': newEmail,
+			'returnSecureToken': true,
+		})
+			.then(response => {
+				dispatch(updateProfile(userId, token, key, datas))
+			})
+			.catch(error => {
+				console.error(error);
+				dispatch(updateFail(error.response.data.error));
+			})
+	}
+}
+
+export const updateUserPassword = (userId, token, key, newPassword, datas) => {
+	return dispatch => {
+		dispatch(updateStart());
+		axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:update?key=${process.env.REACT_APP_FIREBASE_KEY}`, {
+			'idToken': token,
+			'password': newPassword,
+			'returnSecureToken': true,
+		})
+			.then(response => {
+				dispatch(updateProfile(userId, token, key, datas))
+				console.info(response);
 			})
 			.catch(error => {
 				console.error(error);

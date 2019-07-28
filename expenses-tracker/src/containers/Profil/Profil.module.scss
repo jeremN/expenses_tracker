@@ -1,5 +1,8 @@
 .profil {
 	&__form {
 		flex-direction: column;
+
+		form { width: 100%; }
+		button { margin-top: 3rem; }
 	}
 }

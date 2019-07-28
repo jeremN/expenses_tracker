@@ -12,5 +12,7 @@ export {
 	updateExpenses,
 	updateCategories,
 	updateProfile,
+	updateUserEmail,
+	updateUserPassword,
 	isDatasVerified,
 } from './payload';

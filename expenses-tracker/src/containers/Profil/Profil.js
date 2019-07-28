@@ -6,7 +6,7 @@ import Card from '../../components/UI/Card/Card';
 import Button from '../../components/UI/Button/Button';
 
 import * as actions from '../../store/actions';
-import { updateObject, getDate, formCheckValidity } from '../../shared/utility';
+import { updateObject, formCheckValidity } from '../../shared/utility';
 import { profil__form } from './Profil.module.scss';
 
 class Profile extends Component {
@@ -28,15 +28,15 @@ class Profile extends Component {
 				elementType: 'input',
 				elementConfig: {
 					type: 'email',
-					placeholder: 'Your email'
+					placeholder: this.props.profile.email
 				},
 				label: 'Your email',
-				value: '',
+				value: this.props.profile.email,
 				labelSmall: '',
 				valid: false,
 				touched: false
 			},			
-			password: {
+			/* password: {
 				elementType: 'input',
 				elementConfig: {
 					type: 'password',
@@ -47,7 +47,7 @@ class Profile extends Component {
 				labelSmall: '',
 				valid: false,
 				touched: false
-			},			
+			}, */	
 			newPassword: {
 				elementType: 'input',
 				elementConfig: {
@@ -81,20 +81,15 @@ class Profile extends Component {
 					]
 				},
 				label: 'Devise',
-				value: '',
+				value: this.props.profile.currency,
 				touched: false
 			},		
 		}
 	}
 
-	componentDidMount() {
-		if (this.props.isAuth) {		
-			this.props.getUserDatas(this.props.userId, this.props.token);
-		}
-	}
-
-	componentDidUpdate(prevProps) {
+	componentDidUpdate(prevProps, prevState) {
 		if (this.props.profile !== prevProps.profile) {
+			this.setState({ controls: this.state.controls });
 		}
 	}
 
@@ -115,19 +110,42 @@ class Profile extends Component {
 
 	submitFormHandler = (event) => {
 		event.preventDefault();
-		const { name } = this.state.controls;
+		const { name, email, newPassword, devise } = this.state.controls;
 		const { userId, token, currentKey, profile } = this.props;
-		let datas = { ...profile,
-			name: name.value,
-		};
-		this.props.onUpdateProfile(userId, token, currentKey, datas);
+		const datas = { ...profile };
+		let isUpdatedEmail = false;
+		let isUpdatedPassword = false;
+
+		if (name.value !== profile.name) datas.name = name.value;
+		if (email.value !== profile.email) { 
+			datas.email = email.value;
+			isUpdatedEmail = true;
+		}
+		if (newPassword.value !== '') isUpdatedPassword = true;
+		if (devise.value !== profile.currency) datas.currency = devise.value;
+
+		if (isUpdatedEmail) {
+			this.props.onUpdateEmail(userId, token, currentKey, email.value, datas);
+			isUpdatedEmail = false;
+		} else if (isUpdatedPassword) {
+			this.props.onUpdatePassword(userId, token, currentKey, newPassword.value, datas);
+			isUpdatedPassword = false;
+			this.setState({ 
+				controls: {
+					newPassword: {
+						value: ''
+					}
+				},
+			})
+		} else {
+			this.props.onUpdateProfile(userId, token, currentKey, datas);
+		}
 	}
 
 	cancelSubmitFormHandler = (event) => {}
 
 	render() {
 		const formElementsArray = [];
-		console.info(this.props.profile)
 
 		for (let key in this.state.controls) {
 			formElementsArray.push({
@@ -166,19 +184,28 @@ class Profile extends Component {
 		});
 
 		const profil = (
-		<div className="row">
-			<div className="col-6 col-margin-3">
-				<Card classes={ profil__form }>
-					{ form }
-					<div className="row">
-						<Button 
-							btnType="button__blue"
-							typeBtn="submit"
-							clicked={ this.submitFormHandler }>Changer</Button>
+			<Fragment>
+				<div className="row">
+					<h1 className="content__title">Your informations</h1>
+				</div>
+				<div className="row">
+					<div className="col-6 col-margin-3">
+						<Card classes={ profil__form }>
+							<form>
+							<h2 className="isLike__h5">Edit my informations</h2>
+								{ form }
+								<div className="row">
+									<Button 
+										btnType="button__blue"
+										typeBtn="submit"
+										clicked={ this.submitFormHandler }>Changer</Button>
+								</div>
+							</form>
+						</Card>
 					</div>
-				</Card>
-			</div>
-		</div>);
+				</div>
+			</Fragment>
+		);
 
 		return (
 			<Fragment>{ profil }</Fragment>
@@ -199,8 +226,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		getUserDatas: (userId, token) => dispatch(actions.getUserData(userId, token)),
 		onUpdateProfile: (userId, token, key, datas) => dispatch(actions.updateProfile(userId, token, key, datas)),
+		onUpdateEmail: (userId, token, key, newEmail, datas) => dispatch(actions.updateUserEmail(userId, token, key, newEmail, datas)),
+		onUpdatePassword: (userId, token, key, newPassword, datas) => dispatch(actions.updateUserPassword(userId, token, key, newPassword, datas)),
 	}
 }
 

@@ -234,7 +234,7 @@ class Home extends Component {
 		const toEditRow = [...this.state.table.body[+rowId]];
 		const updatedControls = this.state.editControls;
 		const btnsGroup = this.switchBtnsGroups(true);
-		let editForm = []
+		let editForm = [];
 
 		Object.keys(this.state.editControls).forEach((key, index) => {
 			editForm.push({

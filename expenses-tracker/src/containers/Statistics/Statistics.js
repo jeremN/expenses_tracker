@@ -47,6 +47,18 @@ class Statistics extends Component {
 				touched: false
 			},
 		},
+		editControls: {
+			amount: {
+				elementType: 'input',
+				elementConfig: {
+					type: 'number',
+					placeholder: '',
+					step: '0.01',
+				},
+				value: '',
+				touched: false
+			}
+		},
 		table: {
 			headings: null,
 			body: null,
@@ -175,6 +187,22 @@ class Statistics extends Component {
 		});
 	}
 
+	editSavingHandler = (event, controlName) => {
+		const { target } = event;
+
+		const updatedControls = updateObject(this.state.editControls, {
+			[controlName]: updateObject(this.state.editControls[controlName], {
+				...this.state.editControls[controlName],
+				value: target.value,
+				touched: true,
+			})
+		});
+
+		this.setState({ 
+			editControls: updatedControls,
+		});
+	}
+
 	monthCategoryOutput = (array, string) => {
     let val = 0;
     for( let key in array ) {
@@ -246,6 +274,8 @@ class Statistics extends Component {
 			footer: []
 		}
 
+		const btnsGroup = this.switchBtnsGroups(false);
+
 		const months = Object.keys(expenses[year]);
 		const firstEntry = expenses[year][months[0]];
 		const lastEntry = expenses[year][months[months.length - 1]];
@@ -262,12 +292,105 @@ class Statistics extends Component {
 				expenses[year][expense].outcome ? expenses[year][expense].outcome : 0,
 				expenses[year][expense].income ? expenses[year][expense].income : 0,
 				+expenses[year][expense].income - +expenses[year][expense].outcome,
-				expenses[year][expense].saved ? expenses[year][expense].saved : 0,
+				<span>{ expenses[year][expense].saved ? expenses[year][expense].saved : 0 } { btnsGroup }</span>,
 			]);
 		});
-
+		console.info(filteredYear.body)
 		filteredYear.footer = [ '', totalOutcome, totalIncome, '', totalSaved];
 		return filteredYear;	
+	}
+
+	saveTableCell = (event) => {
+		event.preventDefault();
+		// this.props.onUpdateExpenses(userId, token, currentKey, updatedExpenses);
+	}
+
+	cancelEditCell = (event) => {
+		this.setDatasAndTable(this.props.expenses, this.state.selected.years);
+	}
+
+	editTableCell = (event) => {
+		const { target } = event;
+		const rowId = target.closest('tr').id;
+		this.switchEditMode(rowId);
+	}
+
+	switchEditMode = (rowId) => {
+		const editedArray = [...this.state.table.body];
+		const toEditRow = [...this.state.table.body[+rowId]];
+		const updatedControls = this.state.editControls;
+		const btnsGroup = this.switchBtnsGroups(true);
+		let editForm = [];
+
+		Object.keys(this.state.editControls).forEach((key) => {
+			editForm.push({
+				id: key,
+				config: {
+					...this.state.editControls[key],
+					value: toEditRow[4],
+				}
+			});
+			updatedControls[key] = {
+				...this.state.editControls[key],
+				value: toEditRow[4],
+			}
+		});
+
+		let editedRow = editForm.map((editElement, index) => {
+			const { 
+				elementType, 
+				elementConfig, 
+				touched, 
+				value 
+			} = editElement.config;
+
+			return (
+				<Fragment key="editSaving">
+					<Input 
+						key={ editElement.id } 
+						inputId={ editElement.id } 
+						elementType={ elementType }
+						elementConfig={ elementConfig }
+						value={ value } 
+						touched={ touched }
+						changed={ (event) => this.editSavingHandler(event, editElement.id, index) } />
+					{ btnsGroup }
+				</Fragment>
+			);
+		});
+
+		toEditRow.splice(4, 1, editedRow);
+		editedArray.splice(+rowId, 1, toEditRow);
+
+		this.setState({
+			table: {
+				headings: this.state.table.headings,
+				body: editedArray
+			},
+			editControls: updatedControls,
+		});
+	}
+
+	switchBtnsGroups = (edit = false) => {
+		return (
+			<span>
+				<Button
+					cssStyle={{ display: edit ? 'flex' : 'none' }} 
+					btnType="button--td"
+					attributes={ {'data-type': 'save'} } 
+					clicked={ this.saveTableCell }>Save</Button>
+				<Button
+					cssStyle={{ display: edit ? 'flex' : 'none' }} 
+					btnType="button--td"
+					attributes={ {'data-type': 'cancel'} } 
+					clicked={ this.cancelEditCell }>Cancel</Button>
+				<Button
+					cssStyle={{ display: !edit ? 'flex' : 'none' }} 
+					btnType="button--td"
+					attributes={ {'data-type': 'edit'} } 
+					clicked={ this.editTableCell }>Edit</Button>
+			</span>
+		);
 	}
 
 	setDatasAndTable = (expenses, year) => {
@@ -411,7 +534,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		getUserDatas: (userId, token) => dispatch(actions.getUserData(userId, token)),
+		onUpdateExpenses:(userId, token, key, datas) => dispatch(actions.updateExpenses(userId, token, key, datas)),
 	}
 }
 
