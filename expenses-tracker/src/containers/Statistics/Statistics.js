@@ -115,7 +115,7 @@ class Statistics extends Component {
 			},
 		],
 		headings: {
-			first: ['Month', 'Outcome', 'Income', 'Diff', 'Saving'],
+			first: ['Month', 'Outcome', 'Income', 'Diff', 'Saving', 'Actions'],
 			second: ['Category', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 		},
 		selected: {
@@ -133,6 +133,8 @@ class Statistics extends Component {
 
 	componentDidUpdate(prevProps, prevState) {
 		if (this.state.selected !== prevState.selected) {
+			this.setDatasAndTable(this.props.expenses, this.state.selected.years);
+		} else if (this.props.expenses !== prevProps.expenses) {
 			this.setDatasAndTable(this.props.expenses, this.state.selected.years);
 		}
 	}
@@ -165,6 +167,15 @@ class Statistics extends Component {
 		this.setDatasAndTable(this.props.expenses, this.state.selected.years);
 	}
 
+	sortMonths = (months) => {
+		const defaultMonthOrder = [...this.state.headings.second].splice(1, this.state.headings.second.length - 1);
+		return Object.keys(months)
+			.sort((a, b) => defaultMonthOrder.indexOf(a) - defaultMonthOrder.indexOf(b))
+			.reduce((acc, monthName) => {
+				return {...acc, [monthName]: months[monthName]}
+			}, {});
+	}
+
 	inputChangedHandler = (event, controlName) => {
 		const { target } = event;
 
@@ -187,20 +198,67 @@ class Statistics extends Component {
 		});
 	}
 
-	editSavingHandler = (event, controlName) => {
-		const { target } = event;
-
+	updateControls = (name, val, touch = false) => {
 		const updatedControls = updateObject(this.state.editControls, {
-			[controlName]: updateObject(this.state.editControls[controlName], {
-				...this.state.editControls[controlName],
-				value: target.value,
-				touched: true,
+			[name]: updateObject(this.state.editControls[name], {
+				...this.state.editControls[name],
+				value: val,
+				touched: touch,
 			})
 		});
+		this.setState({ editControls: updatedControls });
+	}
 
-		this.setState({ 
-			editControls: updatedControls,
+	editSavingHandler = (event, controlName, currentIndex) => {
+		const { target } = event;
+		const rowId = target.closest('tr').id;
+		const btnsGroup = this.switchBtnsGroups(true);
+		const editedArray = [...this.state.table.body];
+		const toEditRow = [...this.state.table.body[+rowId]];
+		const { value: currentVal } = target;
+		const editForm = [
+			{
+				id: controlName,
+				config: {
+					...this.state.editControls[controlName],
+					value: currentVal
+				}
+			}
+		];
+
+		let editedRow = editForm.map((editElement) => {
+			const { 
+				elementType, 
+				elementConfig, 
+				touched, 
+				value 
+			} = editElement.config;
+
+			return (
+				<span key="editSaving">
+					<Input 
+						key={ editElement.id } 
+						inputId={ editElement.id } 
+						elementType={ elementType }
+						elementConfig={ elementConfig }
+						value={ value } 
+						touched={ touched }
+						changed={ (event) => this.editSavingHandler(event, editElement.id, currentIndex) } />
+					{ btnsGroup }
+				</span>
+			);
 		});
+
+		toEditRow.splice(4, 1, editedRow);
+		editedArray.splice(+rowId, 1, toEditRow);
+
+		this.setState({
+			table: {
+				headings: this.state.table.headings,
+				body: editedArray
+			}
+		});
+		this.updateControls(controlName, currentVal, false)
 	}
 
 	monthCategoryOutput = (array, string) => {
@@ -273,17 +331,16 @@ class Statistics extends Component {
 			body: [],
 			footer: []
 		}
-
 		const btnsGroup = this.switchBtnsGroups(false);
-
-		const months = Object.keys(expenses[year]);
-		const firstEntry = expenses[year][months[0]];
-		const lastEntry = expenses[year][months[months.length - 1]];
-		const totalSaved = +lastEntry.saved - +firstEntry.saved;
+		const sortedMonths = this.sortMonths(expenses[year])
+		const months = Object.keys(sortedMonths);
+		const firstEntry = sortedMonths[months[0]];
+		const lastEntry = sortedMonths[months[months.length - 1]];
+		const totalSaved = +lastEntry.saved === 0 ? +firstEntry.saved : +lastEntry.saved - +firstEntry.saved;
 		let totalIncome = 0;
 		let totalOutcome = 0;
 
-		Object.keys(expenses[year]).forEach(expense => {
+		Object.keys(sortedMonths).forEach(expense => {
 			totalIncome += +expenses[year][expense].income;
 			totalOutcome += +expenses[year][expense].outcome;
 
@@ -292,17 +349,42 @@ class Statistics extends Component {
 				expenses[year][expense].outcome ? expenses[year][expense].outcome : 0,
 				expenses[year][expense].income ? expenses[year][expense].income : 0,
 				+expenses[year][expense].income - +expenses[year][expense].outcome,
-				<span>{ expenses[year][expense].saved ? expenses[year][expense].saved : 0 } { btnsGroup }</span>,
+				expenses[year][expense].saved ? expenses[year][expense].saved : 0,
+				btnsGroup
 			]);
 		});
-		console.info(filteredYear.body)
-		filteredYear.footer = [ '', totalOutcome, totalIncome, '', totalSaved];
+
+		filteredYear.footer = [ '', parseFloat(totalOutcome).toFixed(2), parseFloat(totalIncome).toFixed(2), '', totalSaved, ''];
 		return filteredYear;	
 	}
 
 	saveTableCell = (event) => {
 		event.preventDefault();
-		// this.props.onUpdateExpenses(userId, token, currentKey, updatedExpenses);
+		const { target } = event;
+		const rowId = target.closest('tr').id;
+		const { userId, token, currentKey, expenses } = this.props;
+		const { 
+			selected: {
+				years,
+			},
+			editControls: {
+				amount,
+			}, 
+			table: {
+				body,
+			},
+		} = this.state;
+		const monthName = body[rowId][0];
+		const updatedExpenses = updateObject(expenses, {
+			[years]: updateObject(expenses[years], {
+				[monthName]: updateObject(expenses[years][monthName], {				
+					...expenses[years][monthName],
+					saved: +amount.value
+				})
+			})
+		})
+
+		this.props.onUpdateExpenses(userId, token, currentKey, updatedExpenses);
 	}
 
 	cancelEditCell = (event) => {
@@ -345,7 +427,7 @@ class Statistics extends Component {
 			} = editElement.config;
 
 			return (
-				<Fragment key="editSaving">
+				<span key="editSaving">
 					<Input 
 						key={ editElement.id } 
 						inputId={ editElement.id } 
@@ -354,12 +436,12 @@ class Statistics extends Component {
 						value={ value } 
 						touched={ touched }
 						changed={ (event) => this.editSavingHandler(event, editElement.id, index) } />
-					{ btnsGroup }
-				</Fragment>
+				</span>
 			);
 		});
 
 		toEditRow.splice(4, 1, editedRow);
+		toEditRow.splice(5, 1, btnsGroup);
 		editedArray.splice(+rowId, 1, toEditRow);
 
 		this.setState({

@@ -5,6 +5,24 @@
 		flex-direction: row;
 		max-width: 100%;
 	}
+
+	table {
+		td {
+
+			span {
+				> div {
+					width: 60%;
+					flex-basis: 60%;
+					margin: 0;
+				}
+
+				> span {
+					display: flex;
+					justify-content: space-evenly;
+				}
+			}
+		}
+	}
 }
 
 .filters {
