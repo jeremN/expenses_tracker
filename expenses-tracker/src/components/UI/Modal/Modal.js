@@ -5,12 +5,12 @@ import { modal, modal__container, modal__header, modal__content, modal__footer }
 
 class Modal extends Component {
 	state = {
-		hidden: true,
+		hidden: !this.props.show,
 	}
 
 	componentDidUpdate(prevProps) {
 		if (this.props.show !== prevProps.show) {
-			this.setState({ hidden: this.props.show });
+			this.setState({ hidden: !this.props.show });
 		}
 	}
 

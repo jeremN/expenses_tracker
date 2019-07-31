@@ -1,10 +1,27 @@
 import React from 'react';
 
 import Cell from './Cell/Cell';
-import './Table.module.scss';
+import { loading__span__shimmer, loading__span__empty } from './Table.module.scss';
 
 const table = (props) => {
-	const { headings, rows, footer } = props;
+	let { headings, rows, footer } = props;
+
+	if (props.isLoading) {
+		headings = [];
+		rows = [];
+		footer = [];
+
+		for(let i = 0; i < 5; i += 1) {
+			headings.push(<span className={ loading__span__shimmer }></span>);
+			rows.push([
+				<span className={ loading__span__empty }></span>, 
+				<span className={ loading__span__empty }></span>, 
+				<span className={ loading__span__empty }></span>, 
+				<span className={ loading__span__empty }></span>, 
+				<span className={ loading__span__empty }></span>,
+			]);
+		}
+	}
 
 	let head = headings && headings.length ? (
 		<thead>

@@ -419,12 +419,28 @@ class Home extends Component {
 		return (secondVal - firstVal) / firstVal * 100
 	}
 
+	handleErrors = (error) => {
+
+	}
+
 	render() {
 		let dashboardContent = (
 			<Fragment>
 				<p>Loading...</p>
 			</Fragment>
-		)
+		);
+
+		let modal = (
+			<Modal 
+				show={ this.state.modal.show } 
+				modalTitle={ this.state.modal.title }
+				content={ this.state.modal.content }
+				footer={ this.state.modal.footer }> 
+			  <p>Test</p> 
+			</Modal>
+		);
+
+		let loader = null;
 
 		if (!this.props.isAuth) {
 			dashboardContent = (
@@ -432,9 +448,11 @@ class Home extends Component {
 					Please login / register
 				</Fragment>
 			)
+
+			modal = null;
 		}
 
-		if (!this.props.loading && this.props.isAuth) {
+		if (this.props.isAuth) {
 			dashboardContent = (
 				<Fragment>
 					<div className="row">
@@ -451,6 +469,7 @@ class Home extends Component {
 						</div>
 						<div className="col-9">
 							<Table
+							  isLoading={ this.props.loading }
 								headings={ this.state.table.headings } 
 								rows={ this.state.table.body } />
 						</div>
@@ -461,7 +480,7 @@ class Home extends Component {
 
 		return (
 			<Fragment>
-				<Modal show={ !this.state.modal.show } modalTitle={ this.state.modal.title } />
+				{ modal }
 				{ dashboardContent }
 			</Fragment>
 		)
@@ -479,6 +498,7 @@ const mapStateToProps = state => {
 		expenses: state.payload.expenses,
 		categories: state.payload.categories,
 		canVerifyDatas: state.payload.canVerifyDatas,
+		loadType: state.payload.loadType,
 	}
 }
 

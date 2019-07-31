@@ -132,9 +132,7 @@ class Statistics extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		if (this.state.selected !== prevState.selected) {
-			this.setDatasAndTable(this.props.expenses, this.state.selected.years);
-		} else if (this.props.expenses !== prevProps.expenses) {
+		if (this.state.selected !== prevState.selected || this.props.expenses !== prevProps.expenses) {
 			this.setDatasAndTable(this.props.expenses, this.state.selected.years);
 		}
 	}
@@ -255,7 +253,8 @@ class Statistics extends Component {
 		this.setState({
 			table: {
 				headings: this.state.table.headings,
-				body: editedArray
+				body: editedArray,
+				footer: this.state.table.footer
 			}
 		});
 		this.updateControls(controlName, currentVal, false)
