@@ -1,0 +1,65 @@
+@import '../../../assets/scss/helpers/_variables.scss';
+
+$colors: $red, $yellow, $green, $blue !default;
+$loaderBgColor: $white;
+$d: 175 !default;
+$loaderStrokeWidth: 40px !default;
+$loaderStrokeHeight: 40px !default;
+
+.spinningLoader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba($white, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > div {
+    width: $loaderStrokeWidth;
+    height: $loaderStrokeHeight;
+    animation: contanim 2s linear infinite;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+    transform: rotate(-90deg);
+
+    @for $i from 1 through 4 {
+      &:nth-child(#{$i}) circle {
+        stroke: nth($colors, $i);
+        stroke-dasharray: 1, 300;
+        stroke-dashoffset: 0;
+        animation: strokeanim 3s calc(.2s * (#{$i})) ease infinite;
+        transform-origin: center center;
+      }
+    }
+  }
+}
+
+@keyframes strokeanim {
+  0% {
+    stroke-dasharray: 1, 300;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 120, 300;
+    stroke-dashoffset: -$d / 3;
+  }
+  100% {
+    stroke-dasharray: 120, 300;
+    stroke-dashoffset: -$d;
+  }
+}
+
+@keyframes contanim {
+  100% {
+    transform: rotate(360deg)
+  }
+}

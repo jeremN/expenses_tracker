@@ -115,7 +115,19 @@ class AddExpense extends Component {
 			value: values.value,
 			date: date.value
 		});
+
 		this.props.onAddNewExpense(userId, token, currentKey, datas);
+		const resetControlsValues = {} 
+		Object.keys(this.state.controls).forEach(controlName => {
+			resetControlsValues[controlName] = {
+				...this.state.controls[controlName],
+				value: '',
+				valid: false,
+				touched: false,
+			}
+		});
+
+		this.setState({ controls: resetControlsValues });
 	}
 
 	inputChangedHandler = (event, controlName) => {

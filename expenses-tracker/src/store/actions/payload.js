@@ -18,6 +18,7 @@ export const getUserDataSuccess = (data, userInfo) => {
 		currentExpenses,
 		categories,
 		currentKey: dataKey,
+		loadType: 'general',
 		type: actionTypes.GET_USER_DATA_SUCCESS
 	}
 }

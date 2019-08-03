@@ -1,13 +1,15 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
+import axios from 'axios';
 import moment from 'moment';
 
+import ErrorHandler from '../../hoc/ErrorHandler/ErrorHandler';
 import AddExpense from '../../components/AddExpenseForm/AddExpenseForm';
 import Indicators from '../../components/Indicators/Indicators';
 import Table from '../../components/UI/Table/Table';
 import Button from '../../components/UI/Button/Button';
 import Input from '../../components/UI/Input/Input';
-import Modal from '../../components/UI/Modal/Modal';
+import Loader from '../../components/UI/Loader/Loader';
 
 import * as actions from '../../store/actions';
 import { updateObject, getDate } from '../../shared/utility';
@@ -98,8 +100,8 @@ class Home extends Component {
 			}
 		},
 		modal: {
-			show: true,
-			title: 'Test modal',
+			show: false,
+			title: '',
 			content: '',
 			footer: '',
 		},
@@ -396,23 +398,13 @@ class Home extends Component {
 	}
 
 	getVariationClasse = (type, variation) => {
-		let variationClasse = 'is__stable'
-
-		if (type === 'income') {
-			variationClasse = variation === -1 
-				? 'is__negative'
-				: variation === 1
-				? 'is__positive'
-				: 'is__stable';
-		} else if (type === 'outcome') {
-			variationClasse = variation === -1 
-				? 'is__positive'
-				: variation === 1
-				? 'is__negative'
-				: 'is__stable';
+		const variationClasses = {
+			'-1': 'is__negative',
+			'1': 'is__positive',
+			'0': 'is__stable',
 		}
-		
-		return variationClasse
+
+		return variationClasses[type === 'income' ? variation : -(variation)]
 	}
 
 	getVariation = (firstVal, secondVal) => {
@@ -426,21 +418,9 @@ class Home extends Component {
 	render() {
 		let dashboardContent = (
 			<Fragment>
-				<p>Loading...</p>
+				<Loader />
 			</Fragment>
 		);
-
-		let modal = (
-			<Modal 
-				show={ this.state.modal.show } 
-				modalTitle={ this.state.modal.title }
-				content={ this.state.modal.content }
-				footer={ this.state.modal.footer }> 
-			  <p>Test</p> 
-			</Modal>
-		);
-
-		let loader = null;
 
 		if (!this.props.isAuth) {
 			dashboardContent = (
@@ -448,11 +428,9 @@ class Home extends Component {
 					Please login / register
 				</Fragment>
 			)
-
-			modal = null;
 		}
 
-		if (this.props.isAuth) {
+		if (this.props.isAuth && this.props.currentExpenses) {
 			dashboardContent = (
 				<Fragment>
 					<div className="row">
@@ -480,7 +458,6 @@ class Home extends Component {
 
 		return (
 			<Fragment>
-				{ modal }
 				{ dashboardContent }
 			</Fragment>
 		)
@@ -512,4 +489,4 @@ const mapDispatchToProps = dispatch => {
 	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default connect(mapStateToProps, mapDispatchToProps)(ErrorHandler(Home, axios));

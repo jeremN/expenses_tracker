@@ -1,6 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
+import axios from 'axios';
 
+import ErrorHandler from '../../hoc/ErrorHandler/ErrorHandler';
 import Chart from '../../components/Charts/Chart';
 import Input from '../../components/UI/Input/Input';
 import Table from '../../components/UI/Table/Table';
@@ -210,7 +212,6 @@ class Statistics extends Component {
 	editSavingHandler = (event, controlName, currentIndex) => {
 		const { target } = event;
 		const rowId = target.closest('tr').id;
-		const btnsGroup = this.switchBtnsGroups(true);
 		const editedArray = [...this.state.table.body];
 		const toEditRow = [...this.state.table.body[+rowId]];
 		const { value: currentVal } = target;
@@ -242,7 +243,6 @@ class Statistics extends Component {
 						value={ value } 
 						touched={ touched }
 						changed={ (event) => this.editSavingHandler(event, editElement.id, currentIndex) } />
-					{ btnsGroup }
 				</span>
 			);
 		});
@@ -469,7 +469,7 @@ class Statistics extends Component {
 					cssStyle={{ display: !edit ? 'flex' : 'none' }} 
 					btnType="button--td"
 					attributes={ {'data-type': 'edit'} } 
-					clicked={ this.editTableCell }>Edit</Button>
+					clicked={ this.editTableCell }>Edit saving</Button>
 			</span>
 		);
 	}
@@ -619,4 +619,4 @@ const mapDispatchToProps = dispatch => {
 	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Statistics);
+export default connect(mapStateToProps, mapDispatchToProps)(ErrorHandler(Statistics, axios));

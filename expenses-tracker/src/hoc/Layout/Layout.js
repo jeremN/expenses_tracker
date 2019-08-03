@@ -1,6 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
+import axios from 'axios';
 
+import ErrorHandler from '../ErrorHandler/ErrorHandler';
 import Header from '../../components/Header/Header';
 import { dashboard__content } from './Layout.module.css';
 
@@ -23,4 +25,4 @@ const mapStateToProps = state => {
 	}
 }
 
-export default connect(mapStateToProps)(Layout);
+export default connect(mapStateToProps)(ErrorHandler(Layout, axios));
