@@ -65,14 +65,12 @@ export const auth = (email, password, isSignUp) => {
 				localStorage.setItem('expensesTracker', JSON.stringify(localStorageDatas))
 				if (isSignUp) {
 					dispatch(setNewUserData(data.localId, data.idToken, email));
-				} /* else {
-					dispatch(getUserData(data.localId, data.idToken));
-				} */
+				}
 				dispatch(authSuccess(data.idToken, data.localId));
 				dispatch(checkAuthTimeout(data.expiresIn));
 			})
 			.catch(error => {
-				console.debug(error)
+				console.debug(error.response)
 				dispatch(authFail(error.response.data.error))
 			});
 	}

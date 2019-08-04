@@ -1,13 +1,35 @@
 @import '../../assets/scss/helpers/_variables.scss';
 
 .Login {
-	margin: 5rem auto;
-	width: 300px;
-	background-color: $white;
+	position: absolute;
+	top: 13%;
+	left: calc(50% - 8rem);
+	width: 320px;
+	/* background-color: $white;
 	border: 1px solid $grey;
-	box-shadow: 0 0 1.6rem 4px $grey;
+	box-shadow: 0 0 1.6rem 4px $grey; */
 
-	form { width: 100%; }
-	button[type="submit"] { margin-top: 5rem; }
+	form { 
+		width: 100%; 
+		max-width: 320px;
+	}
+	button {
+		&[type="submit"] { margin-top: 5rem; }
+		&[type="button"] { color: $white !important; }
+	}
 	h1 {  color: $blueDark; }
+	label { color: $white; }
+}
+
+.Authenticate {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	max-height: calc(100% - 14rem);
+
+	svg { 
+		margin: auto;
+		width: 55%;
+		height: auto;
+	}
 }

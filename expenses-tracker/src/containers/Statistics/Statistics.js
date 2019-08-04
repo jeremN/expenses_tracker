@@ -124,6 +124,10 @@ class Statistics extends Component {
 			years: getDate().currentYear,
 			types: 'years',
 			display: 'table',
+		}, 
+		currencies: {
+			'euros': '€',
+			'dollars': '$',
 		}
 	}
 
@@ -306,12 +310,20 @@ class Statistics extends Component {
 
 	filterByCategories = (expenses, year) => {
 		const filteredCategories = {
-			headings: [...this.state.headings.second],
+			headings: [],
 			body: [],
 		}
+
 		const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 		const categories = this.setCategoriesArray(expenses, year);
 		const items = this.setSortedByCategories(categories);
+
+		filteredCategories.headings = this.state.headings.second.map((heading, index) => {
+			if (index !== 0) {
+				return `${heading} (${this.state.currencies[this.props.profile.currency]})`
+			}
+			return heading
+		});
 
     Object.keys(items).forEach(item => {
     	const val = months.map(month => this.monthCategoryOutput(items[item], month));
@@ -326,10 +338,11 @@ class Statistics extends Component {
 
 	filterByYears = (expenses, year) => {
 		const filteredYear = {
-			headings: [...this.state.headings.first],
+			headings: [],
 			body: [],
 			footer: []
 		}
+
 		const btnsGroup = this.switchBtnsGroups(false);
 		const sortedMonths = this.sortMonths(expenses[year])
 		const months = Object.keys(sortedMonths);
@@ -338,6 +351,8 @@ class Statistics extends Component {
 		const totalSaved = +lastEntry.saved === 0 ? +firstEntry.saved : +lastEntry.saved - +firstEntry.saved;
 		let totalIncome = 0;
 		let totalOutcome = 0;
+
+		filteredYear.headings = this.state.headings.first.map(heading => `${heading} (in ${this.state.currencies[this.props.profile.currency]})`);
 
 		Object.keys(sortedMonths).forEach(expense => {
 			totalIncome += +expenses[year][expense].income;
@@ -552,9 +567,10 @@ class Statistics extends Component {
 
 		const chart = <Chart datas={ this.state.chartDatas } container={ "#chartContainer" } chartSize={ [null, 400] } />
 		const table = <Table
-								headings={ this.state.table.headings } 
-								rows={ this.state.table.body } 
-								footer={ this.state.table.footer } />
+			headings={ this.state.table.headings } 
+			rows={ this.state.table.body } 
+			footer={ this.state.table.footer } 
+			isLoading={ this.props.loading }/>
 		const display = this.state.selected.display === 'table' ? table : chart;
 
 		const statContent = (
@@ -610,6 +626,7 @@ const mapStateToProps = state => {
 		expenses: state.payload.expenses,
 		categories: state.payload.categories,
 		canVerifyDatas: state.payload.canVerifyDatas,
+		profile: state.payload.profile,
 	}
 }
 

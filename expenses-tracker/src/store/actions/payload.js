@@ -96,7 +96,6 @@ export const showAlert = (show = false) => {}
 export const updateFail = (error) => {
 	return {
 		type: actionTypes.UPDATE_FAIL,
-		error: error
 	}
 }
 
@@ -125,8 +124,8 @@ export const setNewUserData = (userId, token, email) => {
 				dispatch(setNewUserDataSuccess(response));
 			})
 			.catch(error => {
-				console.error(error)
-				dispatch(setNewUserDataFail(error.response.data.error));
+				console.error(error.response)
+				dispatch(setNewUserDataFail());
 			})
 	}
 }
@@ -139,8 +138,8 @@ export const getUserData = (userId, token) => {
 				dispatch(getUserDataSuccess(response.data, { userId: userId, token: token }));
 			})
 			.catch(error => {
-				console.log(error)
-				dispatch(getUserDataFail(error.response.data.error));
+				console.log(error.response)
+				dispatch(getUserDataFail());
 			})
 	}
 }
@@ -153,8 +152,8 @@ export const updateCurrentExpenses = (userId, token, key, datas) => {
 				dispatch(updateCurrentExpenseSuccess(response));
 			})
 			.catch(error => {
-				console.error(error);
-				dispatch(updateFail(error.response.data.error));
+				console.error(error.response);
+				dispatch(updateFail());
 			})
 	}
 }
@@ -167,8 +166,8 @@ export const updateExpenses = (userId, token, key, datas) => {
 				dispatch(updateExpenseSuccess(response));
 			})
 			.catch(error => {
-				console.error(error);
-				dispatch(updateFail(error.response.data.error));
+				console.error(error.response);
+				dispatch(updateFail());
 			})
 	}
 }
@@ -181,8 +180,8 @@ export const updateCategories = (userId, token, key, datas) => {
 				dispatch(updateCategoriesSuccess(response));
 			})
 			.catch(error => {
-				console.error(error)
-				dispatch(updateFail(error.response.data.error));
+				console.error(error.response)
+				dispatch(updateFail());
 			})
 	}
 }
@@ -195,8 +194,8 @@ export const updateProfile = (userId, token, key, datas) => {
 				dispatch(updateProfileSuccess(response));
 			})
 			.catch(error => {
-				console.error(error);
-				dispatch(updateFail(error.response.data.error));
+				console.error(error.response);
+				dispatch(updateFail());
 			})
 	}
 }

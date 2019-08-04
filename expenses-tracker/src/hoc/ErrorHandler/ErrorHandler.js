@@ -17,7 +17,13 @@ const ErrorHandler = (WrappedComponent, axios) => {
         return req;
       });
       this.resInterceptor = axios.interceptors.response.use(res => res, error => {
-        this.setState({ error: error });
+      	console.error(error, error.response)
+        this.setState({ 
+        	error: true,
+        	title: error.response.data.error,
+        	content: error.response.data.code,
+        });
+        return Promise.reject(error);
       });
     }
 
@@ -27,7 +33,12 @@ const ErrorHandler = (WrappedComponent, axios) => {
     }
 
     errorConfirmedHandler = () => {
-      this.setState({ error: null });
+      this.setState({ 
+      	error: false,
+      	title: '',
+      	content: '',
+      	footer: '',
+      });
     }
 
     render () {
@@ -35,7 +46,7 @@ const ErrorHandler = (WrappedComponent, axios) => {
         <Fragment>
           <Modal
             show={ this.state.error }
-            // modalClosed={ this.errorConfirmedHandler }
+            onModalClosed={ () => this.errorConfirmedHandler() }
             title={ this.state.title }
             content={ this.state.content }
             footer={ this.state.footer } />

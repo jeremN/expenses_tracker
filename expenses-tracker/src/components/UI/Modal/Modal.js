@@ -15,6 +15,7 @@ class Modal extends Component {
 	}
 
 	closeModal = (event) => {
+		this.props.onModalClosed();
 		this.setState({ hidden: true });
 	}
 
@@ -51,12 +52,16 @@ class Modal extends Component {
 							</svg>
 						</Button>	
 					</div>
+					{ this.props.content ? 
 					<div className={ modal__content }>
 						{ this.props.content }
 					</div>
-					<div className={ modal__footer }>
-						{ this.props.footer }
-					</div>
+					: '' }
+					{ this.props.footer ? 
+						<div className={ modal__footer }>
+							{ this.props.footer }
+						</div>
+						: '' }
 				</div>
 			</div>
 		);

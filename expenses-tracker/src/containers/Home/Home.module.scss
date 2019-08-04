@@ -1,3 +1,5 @@
+@import '../../assets/scss/helpers/_variables.scss';
+
 table {
 	td {
 		span {
@@ -6,4 +8,15 @@ table {
 			align-items: center;
 		}
 	}
+}
+
+h1 { 
+	color: $blueDark;
+	text-align: center;
+}
+
+svg {
+	margin: auto;
+	width: 45%;
+	height: auto;
 }
