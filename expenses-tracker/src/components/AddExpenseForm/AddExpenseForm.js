@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux';
+import { withTranslation } from 'react-i18next';
 
 import Input from '../UI/Input/Input';
 import Button from '../UI/Button/Button';
@@ -15,11 +16,11 @@ class AddExpense extends Component {
 				elementType: 'input',
 				elementConfig: {
 					type: 'text',
-					placeholder: 'Categorie'
+					placeholder: 'Category'
 				},
-				label: 'Categorie',
+				label: 'Category',
 				value: '',
-				labelSmall: 'requis',
+				labelSmall: 'Required',
 				validation: {
 					required: true,
 				},
@@ -33,7 +34,7 @@ class AddExpense extends Component {
 					placeholder: ''
 				},
 				label: 'Date',
-				labelSmall: 'requis',
+				labelSmall: 'Required',
 				value: '',
 				validation: {
 					required: true,
@@ -53,17 +54,17 @@ class AddExpense extends Component {
 						},
 						{
 							value: 'outcome',
-							displayValue: 'Dépense'
+							displayValue: 'Expense'
 						},
 						{
 							value: 'income',
-							displayValue: 'Revenu'
+							displayValue: 'Income'
 						}
 					]
 				},
 				label: 'Type',
 				value: '',
-				labelSmall: 'requis',
+				labelSmall: 'Required',
 				validation: {
 					required: true,
 				},
@@ -77,9 +78,9 @@ class AddExpense extends Component {
 					placeholder: '',
 					step: '0.01',
 				},
-				label: 'Montant',
+				label: 'Amount',
 				value: '',
-				labelSmall: 'requis',
+				labelSmall: 'Required',
 				validation: {
 					required: true,
 				},
@@ -145,6 +146,7 @@ class AddExpense extends Component {
 
 	render() {
 		const formElementsArray = [];
+		const { t } = this.props;
 
 		for (let key in this.state.controls) {
 			formElementsArray.push({
@@ -171,8 +173,8 @@ class AddExpense extends Component {
 					elementType={ elementType }
 					elementConfig={ elementConfig }
 					value={ value }
-					labelValue={ label }
-					labelSmall={ labelSmall }
+					labelValue={ t(label) }
+					labelSmall={ t(labelSmall) }
 					invalid={ !valid }
 					shouldValidate={ validation }
 					touched={ touched }
@@ -182,13 +184,13 @@ class AddExpense extends Component {
 
 		return (
 			<Fragment>
-				<h2 className="isLike__h4">Ajouter une dépense ou un revenu</h2>
+				<h2 className="isLike__h4">{ t('HOME_HomeH2') }</h2>
 				<form id="addExpense" className={ addExpense }>
 					{ form }
 					<Button 
 						btnType="button__blue"
 						typeBtn="submit"
-						clicked={ this.submitExpenseHandler }>Ajouter</Button>
+						clicked={ this.submitExpenseHandler }>{ t('Add') }</Button>
 				</form>
 			</Fragment>
 		);
@@ -211,4 +213,4 @@ const mapDispatchToProps = dispatch => {
 	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddExpense);
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(AddExpense));

@@ -5,10 +5,20 @@ import Header from '../../components/Header/Header';
 import { dashboard__content } from './Layout.module.css';
 
 class Layout extends Component {
+	state = {
+		username: ''
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (this.props.profile !== prevProps.profile && this.props.profile !== null) {
+			this.setState({ username: this.props.profile.name });
+		}
+	}
+
 	render() {		
 		return (
 			<Fragment>
-				<Header isAuth={this.props.isAuth} />
+				<Header isAuth={ this.props.isAuth } userName={ this.state.username } />
 				<main className={ dashboard__content }>
 					{ this.props.children }
 				</main>
@@ -19,7 +29,8 @@ class Layout extends Component {
 
 const mapStateToProps = state => {
 	return {
-		isAuth: state.auth.token !== null
+		isAuth: state.auth.token !== null,
+		profile: state.payload.profile
 	}
 }
 

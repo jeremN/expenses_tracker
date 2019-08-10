@@ -8,6 +8,7 @@ import Logout from './containers/Auth/Logout/Logout';
 import Home from './containers/Home/Home';
 import Stats from './containers/Statistics/Statistics';
 import Profile from './containers/Profil/Profil';
+import NotFound from './components/NotFound/NotFound';
 
 import * as actions from './store/actions';
 import './App.scss';
@@ -22,6 +23,7 @@ class App extends Component {
       <Switch>
         <Route path="/auth" component={ Auth } />
         <Route path="/" exact component={ Home } />
+        <Route path="" component={ NotFound } />
         <Redirect to="/" />
       </Switch>
     );
@@ -30,13 +32,13 @@ class App extends Component {
       routes = (
         <Switch>
           <Route path="/logout" component={ Logout } />
-          <Route path="/auth" component={ Auth } />
           <Route path="/" exact component={ Home } />
           <Route path="/stats" exact component={ Stats } />
           <Route path="/profil" exact component={ Profile } />
+          <Route path="" component={ NotFound } />
           <Redirect to="/" />
         </Switch>
-      )
+      );
     }
 
     return (

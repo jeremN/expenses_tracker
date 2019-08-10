@@ -1,8 +1,21 @@
+@import '../../assets/scss/helpers/_variables.scss';
+@import '../../assets/scss/helpers/_mixins.scss';
+@import '../../assets/scss/helpers/_placeholder.scss';
+
 .profil {
 	&__form {
 		flex-direction: column;
 
 		form { width: 100%; }
 		button { margin-top: 3rem; }
+	}
+
+	&__row {
+		@extend %row;
+		justify-content: space-evenly;
+
+		svg { 
+			margin: 0;
+		}
 	}
 }

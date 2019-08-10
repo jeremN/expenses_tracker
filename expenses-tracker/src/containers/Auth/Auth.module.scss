@@ -1,35 +1,50 @@
 @import '../../assets/scss/helpers/_variables.scss';
 
 .Login {
-	position: absolute;
-	top: 13%;
-	left: calc(50% - 8rem);
 	width: 320px;
-	/* background-color: $white;
+	height: 400px;
+	margin-right: 10rem;
+	background-color: $white;
 	border: 1px solid $grey;
-	box-shadow: 0 0 1.6rem 4px $grey; */
+	box-shadow: 0 0 1.6rem 4px $grey;
 
 	form { 
 		width: 100%; 
 		max-width: 320px;
+
+		> div:first-of-type {
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
 	}
-	button {
-		&[type="submit"] { margin-top: 5rem; }
-		&[type="button"] { color: $white !important; }
+
+	button{
+		&[type="submit"] { margin-top: 5.5rem; }
+		&[type="button"] { 
+			margin: 0; 
+			width: auto;
+			flex-basis: 40%;
+			justify-content: flex-end;
+		}
 	}
-	h1 {  color: $blueDark; }
-	label { color: $white; }
+
+	h1 { 
+		color: $blueDark; 
+		margin: 0;
+	}
 }
 
 .Authenticate {
-	position: relative;
 	display: flex;
-	justify-content: center;
+	align-items: center;
+	justify-content: space-evenly;
 	max-height: calc(100% - 14rem);
 
 	svg { 
-		margin: auto;
-		width: 55%;
+		margin: 0;
+		width: 50%;
 		height: auto;
 	}
 }

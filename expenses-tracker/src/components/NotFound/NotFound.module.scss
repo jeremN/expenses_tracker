@@ -1,0 +1,16 @@
+@import '../../assets/scss/helpers/_variables.scss';
+
+.NotFound {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	p { display: flex; }
+	li { list-style:  none; }
+
+	&__link {
+		color: $blueDark;
+		text-decoration: underline;
+	}
+}
