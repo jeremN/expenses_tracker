@@ -22,14 +22,14 @@ class Home extends Component {
 	state = {
 		indicators: [
 			{
-				title: 'Revenus du mois',
+				title: 'HOME_kpiIncomeTitle',
 				value: 0.00,
 				progression: '+5.2%',
 				progressClass: 'is__positive',
 				type: 'income',
 			},
 			{
-				title: 'Dépense du mois',
+				title: 'HOME_kpiExpenseTitle',
 				value: 0.00,
 				progression: '-5.2%',
 				progressClass: 'is__negative',
@@ -37,13 +37,7 @@ class Home extends Component {
 			},		
 		],
 		table: {
-			headings: [
-				'Catégorie',
-				'Type',
-				'Date',
-				'Montant',
-				'Actions'
-			],
+			headings: [],
 			body: null,
 			footer: [], 
 		},
@@ -69,11 +63,11 @@ class Home extends Component {
 						},
 						{
 							value: 'outcome',
-							displayValue: 'Dépense'
+							displayValue: 'Expense'
 						},
 						{
 							value: 'income',
-							displayValue: 'Revenu'
+							displayValue: 'Income'
 						}
 					]
 				},
@@ -159,6 +153,7 @@ class Home extends Component {
 	}
 
 	inputChangedHandler = (event, name, currentIndex) => {
+		const { t } = this.props; 
 		const { target } = event;
 		const rowId = target.closest('tr').id
 		const editedArray = [...this.state.table.body[rowId]];
@@ -198,7 +193,7 @@ class Home extends Component {
 
 		this.setState({
 			table: {
-				headings: this.state.table.headings,
+				headings: [...t('HOME_tHeading', { returnObjects: true })],
 				body: updatedArray
 		 	}
 		});
@@ -206,33 +201,35 @@ class Home extends Component {
 	}
 
 	switchBtnsGroups = (edit = false) => {
+		const { t } = this.props;
 		return (
 			<span>
 				<Button
 					cssStyle={{ display: edit ? 'flex' : 'none' }} 
 					btnType="button--td"
 					attributes={ {'data-type': 'save'} } 
-					clicked={ this.saveTableRow }>Save</Button>
+					clicked={ this.saveTableRow }>{ t('Save') }</Button>
 				<Button
 					cssStyle={{ display: edit ? 'flex' : 'none' }} 
 					btnType="button--td"
 					attributes={ {'data-type': 'cancel'} } 
-					clicked={ this.cancelEditRow }>Cancel</Button>
+					clicked={ this.cancelEditRow }>{ t('Cancel') }</Button>
 				<Button
 					cssStyle={{ display: !edit ? 'flex' : 'none' }} 
 					btnType="button--td"
 					attributes={ {'data-type': 'edit'} } 
-					clicked={ this.editTableRow }>Edit</Button>
+					clicked={ this.editTableRow }>{ t('Edit') }</Button>
 				<Button
 					cssStyle={{ display: !edit ? 'flex' : 'none' }} 
 					btnType="button--td"
 					attributes={ {'data-type': 'delete'} } 
-					clicked={ this.deleteTableRow }>Delete</Button>
+					clicked={ this.deleteTableRow }>{ t('Delete') }</Button>
 			</span>
 		);
 	}
 
 	switchEditMode = (rowId) => {
+		const { t } = this.props;
 		const editedArray = [...this.state.table.body];
 		const toEditRow = [...this.state.table.body[+rowId]];
 		const updatedControls = this.state.editControls;
@@ -278,7 +275,7 @@ class Home extends Component {
 
 		this.setState({
 			table: {
-				headings: this.state.table.headings,
+				headings: [...t('HOME_tHeading', { returnObjects: true })],
 				body: editedArray
 			},
 			editControls: updatedControls,
@@ -286,6 +283,7 @@ class Home extends Component {
 	}
 
 	switchDataMode = (data) => {
+		const { t } = this.props; 
 		let tBody = [];
 
 		if (data) {
@@ -309,7 +307,7 @@ class Home extends Component {
 
 			this.setState({
 				table: {
-					headings: this.state.table.headings,
+					headings: [...t('HOME_tHeading', { returnObjects: true })],
 					body: tBody
 				}
 			});

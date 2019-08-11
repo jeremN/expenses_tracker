@@ -1,13 +1,15 @@
 import React, { Fragment } from 'react';
+import { withTranslation } from 'react-i18next';
 
 import Indicator from './Indicator/Indicator';
 
 const indicators = (props) => {
+	const { t } = props;
 	let indicatorsElements = props.kpis.map((kpi, index) => {
 		return (			
 			<Indicator 
 				key={ `kpi-${index}` }
-				title={ kpi.title }
+				title={ t(kpi.title) }
 			  value={ kpi.value }
 			  currency="€"
 			  progression={ kpi.progression }
@@ -22,4 +24,4 @@ const indicators = (props) => {
 	); 
 }
 
-export default indicators;
+export default withTranslation()(indicators);

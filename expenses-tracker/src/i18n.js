@@ -19,7 +19,7 @@ i18n
 		resources,
 		debug: true,
 		fallbackLng: 'en',
-		lng: 'fr',
+		lng: 'en',
 		keySeparator: false,
 		interpolation: {
 			escapeValue: false
