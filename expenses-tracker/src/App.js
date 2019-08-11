@@ -23,7 +23,6 @@ class App extends Component {
       <Switch>
         <Route path="/auth" component={ Auth } />
         <Route path="/" exact component={ Home } />
-        <Route path="" component={ NotFound } />
         <Redirect to="/" />
       </Switch>
     );
@@ -31,6 +30,7 @@ class App extends Component {
     if (this.props.isAuth) {
       routes = (
         <Switch>
+          <Route path="/auth" component={ Auth } />
           <Route path="/logout" component={ Logout } />
           <Route path="/" exact component={ Home } />
           <Route path="/stats" exact component={ Stats } />

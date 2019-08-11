@@ -114,7 +114,6 @@ class Profile extends Component {
 	}
 
 	componentDidMount() {
-		console.info(this.props.profile, this.props.isAuth)
 		if (this.props.isAuth && !this.props.profile) {		
 			this.props.getUserDatas(this.props.userId, this.props.token);
 		}
@@ -284,7 +283,7 @@ class Profile extends Component {
 				<div className="row">
 					<h1 className="content__title">{ t('PROFIL_ProfilH1') }</h1>
 				</div>
-				<div className={"row", profil__row}>
+				<div className={ `row ${profil__row}` }>
 					<div className="col-3">
 						<Card classes={ profil__form }>
 							<form>

@@ -12,7 +12,7 @@
 
 	&__row {
 		@extend %row;
-		justify-content: space-evenly;
+		justify-content: space-evenly !important;
 
 		svg { 
 			margin: 0;

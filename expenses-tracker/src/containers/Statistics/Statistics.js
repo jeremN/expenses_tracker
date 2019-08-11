@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
+import { withTranslation } from 'react-i18next';
 
 import ErrorHandler from '../../hoc/ErrorHandler/ErrorHandler';
 import Chart from '../../components/Charts/Chart';
@@ -20,10 +21,10 @@ class Statistics extends Component {
 				elementType: 'check',
 				elementConfig: {
 					type: 'radio',
-					placeholder: 'Categories',
+					placeholder: 'STATS_FilterCat',
 					name: 'types',
 				},
-				label: 'Categories',
+				label: 'STATS_FilterCat',
 				value: 'categories',
 				labelAfter: true,
 				validation: {
@@ -36,10 +37,10 @@ class Statistics extends Component {
 				elementType: 'check',
 				elementConfig: {
 					type: 'radio',
-					placeholder: 'Années',
+					placeholder: 'STATS_FilterYear',
 					name: 'types',
 				},
-				label: 'Années',
+				label: 'STATS_FilterYear',
 				value: 'years',
 				labelAfter: true,
 				validation: {
@@ -117,8 +118,8 @@ class Statistics extends Component {
 			},
 		],
 		headings: {
-			first: ['Month', 'Outcome', 'Income', 'Diff', 'Saving', 'Actions'],
-			second: ['Category', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+			first: 'STATS_ByYearTHead',
+			second: 'STATS_ByCatTHead'
 		},
 		selected: {
 			years: getDate().currentYear,
@@ -128,7 +129,9 @@ class Statistics extends Component {
 		currencies: {
 			'euros': '€',
 			'dollars': '$',
-		}
+		},
+		monthOrder: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+		sortedMonths: [],
 	}
 
 	componentDidMount() {
@@ -172,7 +175,8 @@ class Statistics extends Component {
 	}
 
 	sortMonths = (months) => {
-		const defaultMonthOrder = [...this.state.headings.second].splice(1, this.state.headings.second.length - 1);
+		const defaultMonthOrder = [...this.state.monthOrder];
+
 		return Object.keys(months)
 			.sort((a, b) => defaultMonthOrder.indexOf(a) - defaultMonthOrder.indexOf(b))
 			.reduce((acc, monthName) => {
@@ -280,7 +284,7 @@ class Statistics extends Component {
 		Object.keys(expenses[year]).forEach(expense => {
 			categories.push({
 				cats: expenses[year][expense].categories,
-				month: expense,
+				month: expense
 			})
 		});
 
@@ -309,16 +313,16 @@ class Statistics extends Component {
 	}
 
 	filterByCategories = (expenses, year) => {
+		const { t } = this.props;
 		const filteredCategories = {
 			headings: [],
 			body: [],
 		}
-
-		const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		const months = [...this.state.monthOrder];
 		const categories = this.setCategoriesArray(expenses, year);
 		const items = this.setSortedByCategories(categories);
 
-		filteredCategories.headings = this.state.headings.second.map((heading, index) => {
+		filteredCategories.headings = [...t(this.state.headings.second, { returnObjects: true })].map((heading, index) => {
 			if (index !== 0) {
 				return `${heading} (${this.state.currencies[this.props.profile.currency]})`
 			}
@@ -337,6 +341,7 @@ class Statistics extends Component {
   }
 
 	filterByYears = (expenses, year) => {
+		const { t } = this.props;
 		const filteredYear = {
 			headings: [],
 			body: [],
@@ -344,26 +349,30 @@ class Statistics extends Component {
 		}
 
 		const btnsGroup = this.switchBtnsGroups(false);
-		const sortedMonths = this.sortMonths(expenses[year])
+		const sortedMonths = this.sortMonths(expenses[year]);
+
+		this.setState({ sortedMonths: sortedMonths });
+
 		const months = Object.keys(sortedMonths);
 		const firstEntry = sortedMonths[months[0]];
 		const lastEntry = sortedMonths[months[months.length - 1]];
 		const totalSaved = +lastEntry.saved === 0 ? +firstEntry.saved : +lastEntry.saved - +firstEntry.saved;
 		let totalIncome = 0;
 		let totalOutcome = 0;
-
-		filteredYear.headings = this.state.headings.first.map(heading => `${heading} (in ${this.state.currencies[this.props.profile.currency]})`);
+		filteredYear.headings = [...t(this.state.headings.first, { returnObjects: true })].map(heading => `${heading} (${this.state.currencies[this.props.profile.currency]})`);
 
 		Object.keys(sortedMonths).forEach(expense => {
-			totalIncome += +expenses[year][expense].income;
-			totalOutcome += +expenses[year][expense].outcome;
-
+			const income = +expenses[year][expense].income || 0
+			const outcome = +expenses[year][expense].outcome || 0
+			totalIncome += income;
+			totalOutcome += outcome;
+			
 			filteredYear.body.push([
-				expense,
-				expenses[year][expense].outcome ? expenses[year][expense].outcome : 0,
-				expenses[year][expense].income ? expenses[year][expense].income : 0,
-				+expenses[year][expense].income - +expenses[year][expense].outcome,
-				expenses[year][expense].saved ? expenses[year][expense].saved : 0,
+				t(expense),
+				outcome,
+				income,
+				+income - +outcome,
+				expenses[year][expense].saved || 0,
 				btnsGroup
 			]);
 		});
@@ -384,11 +393,9 @@ class Statistics extends Component {
 			editControls: {
 				amount,
 			}, 
-			table: {
-				body,
-			},
 		} = this.state;
-		const monthName = body[rowId][0];
+
+		const monthName = Object.keys(this.state.sortedMonths)[rowId];
 		const updatedExpenses = updateObject(expenses, {
 			[years]: updateObject(expenses[years], {
 				[monthName]: updateObject(expenses[years][monthName], {				
@@ -468,23 +475,24 @@ class Statistics extends Component {
 	}
 
 	switchBtnsGroups = (edit = false) => {
+		const { t } = this.props; 
 		return (
 			<span>
 				<Button
 					cssStyle={{ display: edit ? 'flex' : 'none' }} 
 					btnType="button--td"
 					attributes={ {'data-type': 'save'} } 
-					clicked={ this.saveTableCell }>Save</Button>
+					clicked={ this.saveTableCell }>{ t('Save') }</Button>
 				<Button
 					cssStyle={{ display: edit ? 'flex' : 'none' }} 
 					btnType="button--td"
 					attributes={ {'data-type': 'cancel'} } 
-					clicked={ this.cancelEditCell }>Cancel</Button>
+					clicked={ this.cancelEditCell }>{ t('Cancel') }</Button>
 				<Button
 					cssStyle={{ display: !edit ? 'flex' : 'none' }} 
 					btnType="button--td"
 					attributes={ {'data-type': 'edit'} } 
-					clicked={ this.editTableCell }>Edit saving</Button>
+					clicked={ this.editTableCell }>{ t('STATS_EditSaving') }</Button>
 			</span>
 		);
 	}
@@ -526,6 +534,7 @@ class Statistics extends Component {
 	}
 
 	render() {
+		const { t } = this.props;
 		const formElementsArray = [];
 
 		for (let key in this.state.filtersControls) {
@@ -554,7 +563,7 @@ class Statistics extends Component {
 					elementType={ elementType }
 					elementConfig={ elementConfig }
 					value={ value }
-					labelValue={ label }
+					labelValue={ t(label) }
 					labelSmall={ labelSmall }
 					invalid={ !valid }
 					shouldValidate={ validation }
@@ -576,28 +585,28 @@ class Statistics extends Component {
 		const statContent = (
 			<div className={ statistic }>
 				<div className="row">
-					<h1 className="content__title">Statistics</h1>
+					<h1 className="content__title">{ t('STATS_StatsH1') }</h1>
 				</div>
 				<div className="row">
 					<div className="col-8 form--inline card card--transparent">
 						<div className={ filters }>
-							<div>Trier par:</div>
+							<div>{ t('STATS_Filter') }:</div>
 							{ form }
 						</div>
 					</div>
 					<div className="col-3 col-margin-1 card card--transparent">
 						<div className={ displays }>
-							<div>Affichage:</div>
+							<div>{ t('STATS_Display') }:</div>
 							<Button
 								btnType="button__grey"
 								typeBtn="button"
 								isActive={ this.state.selected.display === 'table' ? 'is__selected' : null }
-								clicked={ (event) => this.displayModeHandler(event, 'table') }>Table</Button>
+								clicked={ (event) => this.displayModeHandler(event, 'table') }>{ t('STATS_DisplayTable') }</Button>
 							<Button 
 								isActive={ this.state.selected.display === 'chart' ? 'is__selected' : null } 
 								btnType="button__grey"
 								typeBtn="button"
-								clicked={ (event) => this.displayModeHandler(event, 'chart') }>Chart</Button>
+								clicked={ (event) => this.displayModeHandler(event, 'chart') }>{ t('STATS_DisplayChart') }</Button>
 						</div>
 					</div>
 				</div>
@@ -636,4 +645,4 @@ const mapDispatchToProps = dispatch => {
 	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ErrorHandler(Statistics, axios));
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(ErrorHandler(Statistics, axios)));
