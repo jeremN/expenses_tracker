@@ -30,9 +30,9 @@ class Profile extends Component {
 				elementType: 'input',
 				elementConfig: {
 					type: 'email',
-					placeholder: 'PROFIL_Email'
+					placeholder: 'Email'
 				},
-				label: 'PROFIL_Email',
+				label: 'Email',
 				value: this.props.profile.email,
 				labelSmall: '',
 				valid: false,
@@ -161,6 +161,7 @@ class Profile extends Component {
 		if (language.value !== profile.lang) {
 			datas.lang = language.value;
 			i18n.changeLanguage(language.value);
+			localStorage.setItem('expensesTracker__Lang', JSON.stringify({ lang: language.value }));
 		}
 		if (newPassword.value !== '') isUpdatedPassword = true;
 		if (devise.value !== profile.currency) datas.currency = devise.value;

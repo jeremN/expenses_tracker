@@ -40,7 +40,7 @@ const header = (props) => {
 		);
 	}
 
-	const registerMenu = (<NavigationItem link="/auth" itemClass={ Header__item }>{ t('Login') }</NavigationItem>);
+	const registerMenu = (<NavigationItem link="/auth" itemClass={ Header__item }>{ t('LogSign') }</NavigationItem>);
 
 	return (
 		<header className={ Header }>

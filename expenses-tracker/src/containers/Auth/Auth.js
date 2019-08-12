@@ -1,11 +1,13 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
+import { withTranslation } from 'react-i18next';
+import { CSSTransition } from 'react-transition-group';
 
 import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
 
-import { Login, Authenticate } from './Auth.module.scss';
+import { Login, Authenticate, onShowCard, onHideCard } from './Auth.module.scss';
 
 import * as actions from '../../store/actions'
 import { updateObject, formCheckValidity } from '../../shared/utility';
@@ -32,9 +34,9 @@ class Auth extends Component {
 				elementType: 'input',
 				elementConfig: {
 					type: 'password',
-					placeholder: 'Mot de passe'
+					placeholder: 'Password'
 				},
-				label: 'Mot de passe',
+				label: 'Password',
 				value: '',
 				validation: {
 					required: true,
@@ -79,6 +81,11 @@ class Auth extends Component {
 	}
 
 	render() {
+		const { t } = this.props;
+		const animationTiming = {
+			enter: 450,
+			exit: 450,
+		};
 		const formElementsArray = [];
 		for (let key in this.state.controls) {
 			formElementsArray.push({
@@ -104,7 +111,7 @@ class Auth extends Component {
 					elementType={ elementType }
 					elementConfig={ elementConfig }
 					value={ value }
-					labelValue={ label }
+					labelValue={ t(label) }
 					invalid={ !valid }
 					shouldValidate={ validation }
 					touched={ touched }
@@ -270,19 +277,32 @@ class Auth extends Component {
 				{ illustration }
 				<div id="auth" className={ Login }>
 					{ authRedirect }
+			    <CSSTransition 
+		        mountOnEnter 
+		        unmountOnExit 
+		        in={ true }
+		        timeout={animationTiming}
+		        classNames={{
+		            enter: '',
+		            enterActive: 'onShowCard',
+		            exit: '',
+		            exitActive: 'onHideCard'
+		        }}
+		        appear>						
 					<form className="form" onSubmit={ this.submitHandler }>
 						<div className="form__title">					
-							<h1>{ !this.state.isSignUp ? 'Se connecter' : 'Inscription' }</h1>
+							<h1>{ !this.state.isSignUp ? t('Login') : t('Signin') }</h1>
 							<Button 
 								btnType="button__transparent" 
-								clicked={ this.switchAuthModeHandler }>{ !this.state.isSignUp ? 'Créer un compte' : 'Se connecter' }</Button>
+								clicked={ this.switchAuthModeHandler }>{ !this.state.isSignUp ? t('Signin') : t('Login')}</Button>
 						</div>
-						{ form }
+        		{ form }
 						<Button 
 							btnType="button__blue"
-							typeBtn="submit">Envoyer</Button>
+							typeBtn="submit">{ t('Send') }</Button>
 						{ errorMessage }
 					</form>
+					</CSSTransition>
 				</div>
 			</div>
 		);
@@ -305,4 +325,4 @@ const mapDispatchToProps = dispatch => {
 	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Auth);
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(Auth));

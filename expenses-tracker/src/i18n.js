@@ -13,13 +13,19 @@ const resources = {
 	}
 }
 
+const storedLang = () => {
+	const hasLangStored = localStorage.getItem('expensesTracker__Lang');
+	if (hasLangStored) return JSON.parse(hasLangStored);
+	return null;
+}
+
 i18n
 	.use(initReactI18next )
 	.init({
 		resources,
 		debug: true,
 		fallbackLng: 'en',
-		lng: 'en',
+		lng: storedLang().lang || 'en',
 		keySeparator: false,
 		interpolation: {
 			escapeValue: false
