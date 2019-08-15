@@ -39,6 +39,7 @@ const translationFR = {
 	'October': 'Octobre',
 	'November': 'Novembre',
 	'December': 'Decembre',
+	'HOME_EmptyTable': 'Vous n\'avez pas encore ajouté de dépense',
 	'HOME_HomeH2': 'Ajouter une dépense ou un revenu',
 	'HOME_kpiIncomeTitle': 'Revenus mensuel',
 	'HOME_kpiExpenseTitle': 'Dépenses mensuelles',

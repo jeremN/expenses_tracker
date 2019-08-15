@@ -27,6 +27,16 @@ $defaultAxisStrokeColor: $greyDarker !default;
 		font-weight: 700;
 		color: $blueDark;
 	}
+	&__emptyTable {
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		
+		h2 { 
+			font-size: 1.8rem; 
+			color: $blueDark;
+		}
+	}
 }
 
 .isLike__h1,

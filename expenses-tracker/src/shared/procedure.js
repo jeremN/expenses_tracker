@@ -6,6 +6,8 @@ export const hasDatesChanged = (data) => {
 	if (!data) return;
 	const dates = getDate()
 	const { notif: currentNotif, currentExpenses: prevMonthExpenses, expenses: prevExpenses, categories } = data
+
+	if (!prevMonthExpenses) return
 	const savedMonth = Object.keys(prevMonthExpenses[dates.currentYear]);
 	const savedYear = Object.keys(prevMonthExpenses);
 
