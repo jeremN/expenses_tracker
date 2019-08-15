@@ -11,6 +11,7 @@ import Button from '../../components/UI/Button/Button';
 
 import * as actions from '../../store/actions';
 import { updateObject, getDate, formCheckValidity } from '../../shared/utility';
+import { renderButtonGroup } from '../../shared/functions';
 
 import { statistic, filters, displays } from './Statistics.module.scss';
 
@@ -132,6 +133,27 @@ class Statistics extends Component {
 		},
 		monthOrder: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
 		sortedMonths: [],
+		btnGroup: [
+			{
+				styles: 'onEdit',
+				type: 'button--td',
+				attr: {'data-type': 'save'},
+				onClick: null,
+				content: 'Save',
+			}, {
+				styles: 'onEdit',
+				type: 'button--td',
+				attr: {'data-type': 'cancel'},
+				onClick: null,
+				content: 'Cancel',
+			}, {
+				styles: 'notEdit',
+				type: 'button--td',
+				attr: {'data-type': 'edit'},
+				onClick: null,
+				content: 'STATS_EditSaving',
+			},
+		]
 	}
 
 	componentDidMount() {
@@ -347,8 +369,13 @@ class Statistics extends Component {
 			body: [],
 			footer: []
 		}
+		const clikedProps = {
+			Save: this.saveTableCell,
+			Cancel: this.cancelEditCell,
+			STATS_EditSaving: this.editTableCell,
+		}
 
-		const btnsGroup = this.switchBtnsGroups(false);
+		const btnsGroup = renderButtonGroup(clikedProps, this.state.btnGroup, false);
 		const sortedMonths = this.sortMonths(expenses[year]);
 
 		this.setState({ sortedMonths: sortedMonths });
@@ -422,7 +449,12 @@ class Statistics extends Component {
 		const editedArray = [...this.state.table.body];
 		const toEditRow = [...this.state.table.body[+rowId]];
 		const updatedControls = this.state.editControls;
-		const btnsGroup = this.switchBtnsGroups(true);
+		const clikedProps = {
+			Save: this.saveTableCell,
+			Cancel: this.cancelEditCell,
+			STATS_EditSaving: this.editTableCell,
+		}
+		const btnsGroup = renderButtonGroup(clikedProps, this.state.btnGroup, true);
 		let editForm = [];
 
 		Object.keys(this.state.editControls).forEach((key) => {
@@ -472,29 +504,6 @@ class Statistics extends Component {
 			},
 			editControls: updatedControls,
 		});
-	}
-
-	switchBtnsGroups = (edit = false) => {
-		const { t } = this.props; 
-		return (
-			<span>
-				<Button
-					cssStyle={{ display: edit ? 'flex' : 'none' }} 
-					btnType="button--td"
-					attributes={ {'data-type': 'save'} } 
-					clicked={ this.saveTableCell }>{ t('Save') }</Button>
-				<Button
-					cssStyle={{ display: edit ? 'flex' : 'none' }} 
-					btnType="button--td"
-					attributes={ {'data-type': 'cancel'} } 
-					clicked={ this.cancelEditCell }>{ t('Cancel') }</Button>
-				<Button
-					cssStyle={{ display: !edit ? 'flex' : 'none' }} 
-					btnType="button--td"
-					attributes={ {'data-type': 'edit'} } 
-					clicked={ this.editTableCell }>{ t('STATS_EditSaving') }</Button>
-			</span>
-		);
 	}
 
 	setDatasAndTable = (expenses, year) => {
@@ -578,8 +587,7 @@ class Statistics extends Component {
 		const table = <Table
 			headings={ this.state.table.headings } 
 			rows={ this.state.table.body } 
-			footer={ this.state.table.footer } 
-			isLoading={ this.props.loading }/>
+			footer={ this.state.table.footer } />
 		const display = this.state.selected.display === 'table' ? table : chart;
 
 		const statContent = (

@@ -14,5 +14,6 @@ export {
 	updateProfile,
 	updateUserEmail,
 	updateUserPassword,
+	updateNotifications,
 	isDatasVerified,
 } from './payload';

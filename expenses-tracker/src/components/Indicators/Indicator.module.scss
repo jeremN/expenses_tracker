@@ -1,0 +1,17 @@
+.indicator {
+	&Enter,
+	&Appear { opacity: 0; }
+
+	&EnterActive,
+	&AppearActive {
+		opacity: 1;
+		transition: opacity 0.3s ease-in;
+	}
+
+	&Exit { opacity: 1; }
+
+	&ExitActive {
+		opacity: 0;
+		transition: opacity 0.3s ease-in;	
+	}
+}

@@ -1,12 +1,13 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux';
 import { withTranslation } from 'react-i18next';
+import { CSSTransition } from 'react-transition-group';
 
 import Input from '../UI/Input/Input';
 import Button from '../UI/Button/Button';
 
 import * as actions from '../../store/actions';
-import { addExpense } from './AddExpenseForm.module.scss';
+import classes from './AddExpenseForm.module.scss';
 import { updateObject, formCheckValidity, getDate } from '../../shared/utility';
 
 class AddExpense extends Component {
@@ -145,8 +146,8 @@ class AddExpense extends Component {
 	}
 
 	render() {
-		const formElementsArray = [];
 		const { t } = this.props;
+		const formElementsArray = [];
 
 		for (let key in this.state.controls) {
 			formElementsArray.push({
@@ -184,14 +185,44 @@ class AddExpense extends Component {
 
 		return (
 			<Fragment>
-				<h2 className="isLike__h4">{ t('HOME_HomeH2') }</h2>
-				<form id="addExpense" className={ addExpense }>
-					{ form }
-					<Button 
-						btnType="button__blue"
-						typeBtn="submit"
-						clicked={ this.submitExpenseHandler }>{ t('Add') }</Button>
-				</form>
+				<CSSTransition
+					mountOnEnter
+					in={ true }
+					classNames={{
+						appear: classes.titleAppear,
+						appearActive: classes.titleAppearActive,
+            enter: classes.titleEnter,
+            enterActive: classes.titleEnterActive,
+            exit: classes.titleExit,
+            exitActive: classes.titleExitActive
+	        }}					
+	        timeout={ 250 }
+					appear
+					unmountOnExit>
+					<h2 className="isLike__h4">{ t('HOME_HomeH2') }</h2>
+				</CSSTransition>
+				<CSSTransition
+					mountOnEnter
+					in={ true }
+	        timeout={ 450 }
+					classNames={{
+						appear: classes.cardAppear,
+						appearActive: classes.cardAppearActive,
+            enter: classes.cardEnter,
+            enterActive: classes.cardEnterActive,
+            exit: classes.cardExit,
+            exitActive: classes.cardExitActive
+	        }}					
+					appear
+					unmountOnExit>
+					<form id="addExpense" className={ classes.addExpense }>
+						{ form }
+						<Button 
+							btnType="button__blue"
+							typeBtn="submit"
+							clicked={ this.submitExpenseHandler }>{ t('Add') }</Button>
+					</form>
+				</CSSTransition>
 			</Fragment>
 		);
 	}

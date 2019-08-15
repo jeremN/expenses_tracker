@@ -18,3 +18,46 @@
 		font-size: 1.4rem;
 	}
 }
+
+.title {
+	&Enter, 
+	&Appear {
+		opacity: 0;
+		transform: translateY(10%);
+	}
+	&EnterActive,
+	&AppearActive {
+		opacity: 1;
+		transition: all 0.25s linear;
+	}
+	&Leave {
+		opacity: 1;
+	}
+	&LeaveActive {
+		opacity: 0;
+		transition: all 0.25s linear;
+	}
+}
+
+.card {
+	&Enter, 
+	&Appear {
+		opacity: 0;
+		transform: translateY(10%);
+	}
+	&EnterActive,
+	&AppearActive {
+		opacity: 1;
+		transform: translateY(0);
+		transition: all 0.45s ease-in-out;
+	}
+	&Leave {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	&LeaveActive {
+		opacity: 0;
+		transform: translateY(10%);
+		transition: all 0.45s ease-in-out;
+	}
+}

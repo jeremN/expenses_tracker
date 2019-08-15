@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { withTranslation } from 'react-i18next';
 import i18n from '../../i18n';
+import { CSSTransition } from 'react-transition-group';
 
 import Input from '../../components/UI/Input/Input';
 import Card from '../../components/UI/Card/Card';
@@ -9,7 +10,7 @@ import Button from '../../components/UI/Button/Button';
 
 import * as actions from '../../store/actions';
 import { updateObject, formCheckValidity } from '../../shared/utility';
-import { profil__form, profil__row } from './Profil.module.scss';
+import classes from './Profil.module.scss';
 
 class Profile extends Component {
 	state = {
@@ -284,22 +285,52 @@ class Profile extends Component {
 				<div className="row">
 					<h1 className="content__title">{ t('PROFIL_ProfilH1') }</h1>
 				</div>
-				<div className={ `row ${profil__row}` }>
+				<div className={ `row ${classes.profil__row}` }>
 					<div className="col-3">
-						<Card classes={ profil__form }>
-							<form>
-							<h2 className="isLike__h5">{ t('PROFIL_ProfilH2') }</h2>
-								{ form }
-								<div className="row">
-									<Button 
-										btnType="button__blue"
-										typeBtn="submit"
-										clicked={ this.submitFormHandler }>{ t('PROFIL_Confirm') }</Button>
-								</div>
-							</form>
-						</Card>
+						<CSSTransition
+							in={ true }
+			        timeout={ 350 }
+							classNames={{
+								appear: classes.formAppear,
+								appearActive: classes.formAppearActive,
+		            enter: classes.formEnter,
+		            enterActive: classes.formEnterActive,
+		            exit: classes.formExit,
+		            exitActive: classes.formExitActive
+			        }} 
+			        mountOnEnter
+			        unmountOnExit
+			        appear>
+							<Card classes={ classes.profil__form }>
+								<form>
+								<h2 className="isLike__h5">{ t('PROFIL_ProfilH2') }</h2>
+									{ form }
+									<div className="row">
+										<Button 
+											btnType="button__blue"
+											typeBtn="submit"
+											clicked={ this.submitFormHandler }>{ t('PROFIL_Confirm') }</Button>
+									</div>
+								</form>
+							</Card>
+						</CSSTransition>
 					</div>
-					{ illustration }
+					<CSSTransition
+							in={ true }
+			        timeout={ 250 }
+							classNames={{
+								appear: classes.imgAppear,
+								appearActive: classes.imgAppearActive,
+		            enter: classes.imgEnter,
+		            enterActive: classes.imgEnterActive,
+		            exit: classes.imgExit,
+		            exitActive: classes.imgExitActive
+			        }} 
+			        mountOnEnter
+			        unmountOnExit
+			        appear>
+						{ illustration }
+					</CSSTransition>
 				</div>
 			</Fragment>
 		);

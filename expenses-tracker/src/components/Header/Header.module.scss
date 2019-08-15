@@ -1,3 +1,5 @@
+@import '../../assets/scss/helpers/_variables.scss';
+
 .Header {
 	padding: 0.625rem 1rem;
 	display: flex;
@@ -7,7 +9,7 @@
 	grid-column-start: 1;
 	grid-row-start: 1;
 	grid-column-end: 2;
-	box-shadow: 0 2px 12px -1px hsl(240°, 13%, 94%); 
+	box-shadow: 0 2px 6px -1px hsl(240°, 13%, 88%); 
 
 	&__list {
 		display: flex;
@@ -21,9 +23,30 @@
 		}
 	}
 
-	&__item {
+	&__list__item {
 		color: hsl(217°, 17%, 36%);
 		margin-right: 3rem;
 		position: relative;
 	} 
+
+	&__item__withBubble {
+		position: relative;
+	}
+
+	&__bubble {
+		position: absolute;
+		top: 0.5rem;
+		left: 2rem;
+		width: 1.6rem;
+		height: 1.6rem;
+		text-align: center;
+		background-color: $blue;
+		color: $white;
+		font-size: 1rem;
+		border-radius: 50%;
+	}
+
+	&__subList {
+
+	}
 }

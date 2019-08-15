@@ -7,7 +7,7 @@ import { CSSTransition } from 'react-transition-group';
 import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
 
-import { Login, Authenticate, onShowCard, onHideCard } from './Auth.module.scss';
+import * as classes from './Auth.module.scss';
 
 import * as actions from '../../store/actions'
 import { updateObject, formCheckValidity } from '../../shared/utility';
@@ -46,7 +46,7 @@ class Auth extends Component {
 				touched: false
 			}
 		},
-		isSignUp: true
+		isSignUp: true,
 	}
 
 	componentDidMount() {
@@ -83,8 +83,9 @@ class Auth extends Component {
 	render() {
 		const { t } = this.props;
 		const animationTiming = {
-			enter: 450,
-			exit: 450,
+			appear: 350,
+			enter: 350,
+			exit: 350,
 		};
 		const formElementsArray = [];
 		for (let key in this.state.controls) {
@@ -273,37 +274,54 @@ class Auth extends Component {
   	}
 
 		return (
-			<div className={ Authenticate }>
-				{ illustration }
-				<div id="auth" className={ Login }>
-					{ authRedirect }
-			    <CSSTransition 
-		        mountOnEnter 
-		        unmountOnExit 
-		        in={ true }
-		        timeout={animationTiming}
-		        classNames={{
-		            enter: '',
-		            enterActive: 'onShowCard',
-		            exit: '',
-		            exitActive: 'onHideCard'
-		        }}
-		        appear>						
-					<form className="form" onSubmit={ this.submitHandler }>
-						<div className="form__title">					
-							<h1>{ !this.state.isSignUp ? t('Login') : t('Signin') }</h1>
+			<div className={ classes.Authenticate }>
+				<CSSTransition
+						in={ true }
+		        timeout={ 250 }
+						classNames={{
+							appear: classes.imgAppear,
+							appearActive: classes.imgAppearActive,
+	            enter: classes.imgEnter,
+	            enterActive: classes.imgEnterActive,
+	            exit: classes.imgExit,
+	            exitActive: classes.imgExitActive
+		        }} 
+		        mountOnEnter
+		        unmountOnExit
+		        appear>
+					{ illustration }
+				</CSSTransition>			
+		    <CSSTransition 
+	        in={ true }
+	        timeout={ animationTiming }
+					classNames={{
+						appear: classes.formAppear,
+						appearActive: classes.formAppearActive,
+            enter: classes.formEnter,
+            enterActive: classes.formEnterActive,
+            exit: classes.formExit,
+            exitActive: classes.formExitActive
+	        }} 
+	        mountOnEnter
+	        unmountOnExit
+	        appear>						
+					<div id="auth" className={ classes.Login }>
+						{ authRedirect }
+						<form className="form" onSubmit={ this.submitHandler }>
+							<div className="form__title">					
+								<h1>{ !this.state.isSignUp ? t('Login') : t('Signin') }</h1>
+								<Button 
+									btnType="button__transparent" 
+									clicked={ this.switchAuthModeHandler }>{ !this.state.isSignUp ? t('Signin') : t('Login')}</Button>
+							</div>
+	        		{ form }
 							<Button 
-								btnType="button__transparent" 
-								clicked={ this.switchAuthModeHandler }>{ !this.state.isSignUp ? t('Signin') : t('Login')}</Button>
-						</div>
-        		{ form }
-						<Button 
-							btnType="button__blue"
-							typeBtn="submit">{ t('Send') }</Button>
-						{ errorMessage }
-					</form>
-					</CSSTransition>
-				</div>
+								btnType="button__blue"
+								typeBtn="submit">{ t('Send') }</Button>
+							{ errorMessage }
+						</form>
+					</div>
+				</CSSTransition>
 			</div>
 		);
 	}

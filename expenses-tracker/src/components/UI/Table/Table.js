@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { Fragment } from 'react';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 import Cell from './Cell/Cell';
-import { loading__span__shimmer, loading__span__empty } from './Table.module.scss';
+import classes from './Table.module.scss';
 
 const table = (props) => {
 	let { headings, rows, footer } = props;
@@ -12,13 +13,13 @@ const table = (props) => {
 		footer = [];
 
 		for(let i = 0; i < 5; i += 1) {
-			headings.push(<span className={ loading__span__shimmer }></span>);
+			headings.push(<span className={ classes.loading__span__shimmer }></span>);
 			rows.push([
-				<span className={ loading__span__empty }></span>, 
-				<span className={ loading__span__empty }></span>, 
-				<span className={ loading__span__empty }></span>, 
-				<span className={ loading__span__empty }></span>, 
-				<span className={ loading__span__empty }></span>,
+				<span className={ classes.loading__span__empty }></span>, 
+				<span className={ classes.loading__span__empty }></span>, 
+				<span className={ classes.loading__span__empty }></span>, 
+				<span className={ classes.loading__span__empty }></span>, 
+				<span className={ classes.loading__span__empty }></span>,
 			]);
 		}
 	}
@@ -35,14 +36,35 @@ const table = (props) => {
 	) : null ;
 
 	let body = rows && rows.length ? (
-		<tbody>
-			{ rows.map((row, rowIndex) => <tr id={ rowIndex } key={ `row-${rowIndex}` }>
-					{ row.map((content, cellIndex) => <Cell 
-						key={ `cell-${rowIndex}-${cellIndex}` }>{ content }</Cell>
-					)}
-				</tr>
-			) }
-		</tbody>
+		<Fragment>
+			<TransitionGroup component="tbody">
+					{ rows.map((row, rowIndex) => {
+						return (
+							<CSSTransition
+								key={ `row-${rowIndex}` }
+								mountOnEnter
+								in={ true }
+								classNames={{
+									appear: classes.rowAppear,
+									appearActive: classes.rowAppearActive,
+				          enter: classes.rowEnter,
+				          enterActive: classes.rowEnterActive,
+				          exit: classes.rowExit,
+				          exitActive: classes.rowExitActive
+				        }}					
+				        timeout={ 350 }
+								appear
+								unmountOnExit>
+								<tr id={ rowIndex } key={ `row-${rowIndex}` }>
+									{ row.map((content, cellIndex) => <Cell 
+										key={ `cell-${rowIndex}-${cellIndex}` }>{ content }</Cell>
+									)}
+								</tr>
+							</CSSTransition>
+						) 
+					}) }
+			</TransitionGroup>
+		</Fragment>
 	) : null ;
 
 	let foot = footer && footer.length ? (

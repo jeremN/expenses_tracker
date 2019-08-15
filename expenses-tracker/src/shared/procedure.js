@@ -5,7 +5,7 @@ import { sumArray, getDate } from './utility';
 export const hasDatesChanged = (data) => {
 	if (!data) return;
 	const dates = getDate()
-	const { currentExpenses: prevMonthExpenses, expenses: prevExpenses, categories } = data
+	const { notif: currentNotif, currentExpenses: prevMonthExpenses, expenses: prevExpenses, categories } = data
 	const savedMonth = Object.keys(prevMonthExpenses[dates.currentYear]);
 	const savedYear = Object.keys(prevMonthExpenses);
 
@@ -14,6 +14,7 @@ export const hasDatesChanged = (data) => {
 		const newExpenses = formatExpenses(currentExp, savedMonth[0], savedYear[0])
 
 		return {
+			formattedNotif: formatNotif(currentNotif),
 			formattedCat: formatCategories(currentExp, categories),
 			formattedExp: hasExistingEntries(newExpenses, prevExpenses),
 			currentExp: {
@@ -25,6 +26,13 @@ export const hasDatesChanged = (data) => {
 	}
 
 	return false;
+}
+
+const formatNotif = (currentNotif) => {
+	const updatedNotifs = !currentNotif ? [] : [...currentNotif];
+
+	updatedNotifs.push(`${moment().format('DD/MMM/YYYY')}`);
+	return updatedNotifs;
 }
 
 const formatCategories = (currentExpenses, categories) => {

@@ -70,6 +70,13 @@ export const updateCategoriesSuccess = ({ data }) => {
 	}
 }
 
+export const updateNotificationsSuccess = ({data}) => {
+	return {
+		notif: data,
+		type: actionTypes.UPDATE_NOTIF_SUCCESS,
+	}
+}
+
 export const updateProfileSuccess = ({ data }) => {
 	return {
 		profile: data,
@@ -158,9 +165,9 @@ export const updateCurrentExpenses = (userId, token, key, datas) => {
 	}
 }
 
-export const updateExpenses = (userId, token, key, datas) => {
+export const updateExpenses = (userId, token, key, datas, loadType = null) => {
 	return dispatch => {	
-		dispatch(updateStart('expenses'));
+		dispatch(updateStart(loadType));
 		axios.put(`users/${userId}/${key}/expenses.json?auth=${token}`, datas)
 			.then(response => {
 				dispatch(updateExpenseSuccess(response));
@@ -178,6 +185,20 @@ export const updateCategories = (userId, token, key, datas) => {
 		axios.put(`users/${userId}/${key}/categories.json?auth=${token}`, datas)
 			.then(response => {
 				dispatch(updateCategoriesSuccess(response));
+			})
+			.catch(error => {
+				console.error(error.response)
+				dispatch(updateFail());
+			})
+	}
+}
+
+export const updateNotifications = (userId, token, key, datas) => {
+	return dispatch => {
+		dispatch(updateStart());
+		axios.put(`users/${userId}/${key}/notif.json?auth=${token}`, datas)
+			.then(response => {
+				dispatch(updateNotificationsSuccess(response));
 			})
 			.catch(error => {
 				console.error(error.response)

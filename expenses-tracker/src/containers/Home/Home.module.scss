@@ -20,3 +20,21 @@ svg {
 	width: 45%;
 	height: auto;
 }
+
+.img {
+	&Enter,
+	&Appear { opacity: 0; }
+
+	&EnterActive,
+	&AppearActive {
+	  opacity: 1;
+	  transition: all 0.25s ease-in;
+	}
+
+	&Exit { opacity: 1; }
+
+	&ExitActive {
+	  opacity: 0;
+	  transition: all 0.25s ease-in-out;
+	}
+}

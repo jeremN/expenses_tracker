@@ -49,45 +49,43 @@
 	}
 }
 
-.onShowCard { animation: showCard 0.4s ease-out forwards; }
-.onHideCard { animation: hideCard 0.4s ease-out forwards; }
-
-.card-enter {}
-.card-enter-active {
-   animation: showCard 0.4s ease-out forwards;
+.form {
+	&Enter,
+	&Appear {
+	  opacity: 0;
+	  transform: translateY(-10%);
+	}
+	&EnterActive,
+	&AppearActive {
+	  opacity: 1;
+	  transform: translateY(0);
+	  transition: all 0.35s ease-in-out;
+	}
+	&Exit {
+	  opacity: 1;
+	  transform: translateY(0);
+	}
+	&ExitActive {
+	  opacity: 0;
+	  transform: translateY(-10%);
+	  transition: all 0.35s ease-in-out;
+	}
 }
 
-.card-leave {}
-.card-leave-active {
-   animation: hideCard 0.4s ease-out forwards;
-}
+.img {
+	&Enter,
+	&Appear { opacity: 0; }
 
-@keyframes showCard {
-    0% {
-        opacity: 0;
-        transform: translateY(-100%);
-    }
-    50% {
-        opacity: 1;
-        transform: translateY(90%);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+	&EnterActive,
+	&AppearActive {
+	  opacity: 1;
+	  transition: all 0.25s ease-in;
+	}
 
-@keyframes hideCard {
-    0% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    50% {
-        opacity: 0.8;
-        transform: translateY(60%);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-100%);
-    }
+	&Exit { opacity: 1; }
+
+	&ExitActive {
+	  opacity: 0;
+	  transition: all 0.25s ease-in-out;
+	}
 }

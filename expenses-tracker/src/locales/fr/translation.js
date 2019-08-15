@@ -4,7 +4,7 @@ const translationFR = {
 	'LogSign': 'Se connecter',
 	'Logout': 'Se déconnecter',
 	'Login': 'Se connecter',
-	'Signin': 'S\'inscire',
+	'Signin': 'S\'inscrire',
 	'CreateAccount': 'Créer un compte',
 	'Send': 'Envoyer',
 	'Password': 'Mot de passe',
@@ -60,6 +60,7 @@ const translationFR = {
 	'PROFIL_Currency': 'Devise',
 	'PROFIL_Language': 'Langue',
 	'PROFIL_Confirm': 'Confirmer les changements',	
+	'SAVE_Month': 'La sauvegarde du mois précédent a été effectué',
 }
 
 export default translationFR;

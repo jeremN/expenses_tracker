@@ -1,0 +1,64 @@
+@import '../../assets/scss/helpers/_variables.scss';
+
+
+$liBgColor: $white;
+$liBorderColor: $grey;
+
+.dashboard__content {
+	grid-column-start: 1;
+	grid-row-start: 2;
+	width: 100%;
+	max-width: 100%;
+	display: flex;
+	flex-direction: column;
+	padding: 1.5rem;
+	margin-top: 7rem;
+}
+
+.updated__list {
+	position: absolute;
+	z-index: 101;
+	width: 200px;
+	font-size: 1.2rem;
+	left: -80px;
+	height: auto;
+	list-style: none;
+
+	li {
+		padding: 1rem;
+		margin-bottom: 0.5rem;
+		display: flex;
+		background-color: $liBgColor;
+		border: 1px solid $liBorderColor;
+		flex-direction: column;
+		box-shadow: 4px 4px 6px -3px rgba($black, 0.2); 
+
+		&:not(:last-of-type) {
+		}
+
+		sup { 
+			margin-top: 0.5rem;
+			margin-bottom: 0.5rem; 
+			color: $blueDark;
+			font-weight: bold;
+		}
+	}
+}
+
+.item {
+	&Enter,
+	&Appear { opacity: 0; }
+
+	&EnterActive,
+	&AppearActive {
+		opacity: 1;
+		transition: opacity 0.3s ease-in;
+	}
+
+	&Exit { opacity: 1; }
+
+	&ExitActive {
+		opacity: 0;
+		transition: opacity 0.3s ease-in;
+	}
+}

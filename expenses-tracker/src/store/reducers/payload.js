@@ -7,6 +7,7 @@ const initialState = {
 	expenses: null,
 	currentExpenses: null,
 	categories: null,
+	notif: null,
 	error: null,
 	loading: false,
 	loadType: null,
@@ -112,6 +113,14 @@ const updateProfileSuccess = (state, action) => {
 	})
 }
 
+const updateNotificationsSuccess = (state, action) => {
+	return updateObject(state, {
+		notif: action.notif,
+		loading: false,
+		loadType: null,
+	})
+}
+
 const updateFail = (state, action) => {
 	return updateObject(state, {
 		error: action.error,
@@ -134,6 +143,7 @@ const reducer = (state = initialState, action) => {
 		case actionTypes.UPDATE_EXPENSE_SUCCESS: return updateExpenseSuccess(state, action);
 		case actionTypes.UPDATE_CATEGORIES_SUCCESS: return updateCategoriesSuccess(state, action);
 		case actionTypes.UPDATE_PROFILE_SUCCESS: return updateProfileSuccess(state, action);
+		case actionTypes.UPDATE_NOTIF_SUCCESS: return updateNotificationsSuccess(state, action);
 		case actionTypes.UPDATE_FAIL: return updateFail(state, action);
 		default:
 			return state;

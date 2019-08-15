@@ -61,6 +61,7 @@ const translationEN = {
 	'PROFIL_Currency': 'Currency',
 	'PROFIL_Language': 'Language',
 	'PROFIL_Confirm': 'Confirm changes',
+	'SAVE_Month': 'The previous month backup was done',
 }
 
 export default translationEN;

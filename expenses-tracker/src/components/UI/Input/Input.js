@@ -1,9 +1,11 @@
 import React from 'react';
+import { withTranslation } from 'react-i18next';
 
 import classes, { form__field } from './Input.module.scss';
 
 const input = (props) => {
-	let inputElement = null
+	const { t } = props;
+	let inputElement = null;
 	const inputClasses = [classes.InputElement];
 
 	if (props.invalid && props.shouldValidate && props.touched) {
@@ -30,7 +32,7 @@ const input = (props) => {
 					<option
 						key={ option.value }
 						value={ option.value }>
-					{ option.displayValue }
+					{ t(option.displayValue) }
 					</option>
 				))} 
 			</select>;
@@ -80,4 +82,4 @@ const input = (props) => {
 	)
 }
 
-export default input;
+export default withTranslation()(input);
