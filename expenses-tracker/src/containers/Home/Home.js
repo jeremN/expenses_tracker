@@ -375,7 +375,7 @@ class Home extends Component {
 		let updatedArray = [...this.props.currentExpenses[dates.currentYear][dates.currentMonth]];
 		updatedArray.splice(rowId, 1);
 
-		if (!updatedArray.length) updatedArray = false
+		if (!updatedArray.length) updatedArray = " "
 		const updatesExpenses = {
 			[dates.currentYear]: {
 				[dates.currentMonth]: updatedArray
@@ -723,7 +723,7 @@ class Home extends Component {
 						{ this.state.hasEmptyTable
 							? (<div className="content__emptyTable">
 									<h2>{ t('HOME_EmptyTable') }</h2>
-								{ emptyTableIllustration }
+									{ emptyTableIllustration }
 								</div>)
 							: (<Table
 								headings={ this.state.table.headings } 
