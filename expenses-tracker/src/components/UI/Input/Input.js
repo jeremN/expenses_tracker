@@ -69,7 +69,7 @@ const input = (props) => {
 				{ props.labelValue } { props.labelSmall ? labelSmall : null }
 			</label>
 			) : null;
-
+	
 	return (
 		<div className={ classes.form__group }>
 			{ !props.labelAfter ? label : null }
@@ -78,6 +78,7 @@ const input = (props) => {
 			<div className={ classes.form__errorMsg }>
 				{ props.errorMsg }
 			</div>
+			{ props.children }
 		</div>
 	)
 }

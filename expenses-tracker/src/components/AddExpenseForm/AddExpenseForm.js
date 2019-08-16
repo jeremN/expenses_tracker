@@ -5,6 +5,7 @@ import { CSSTransition } from 'react-transition-group';
 
 import Input from '../UI/Input/Input';
 import Button from '../UI/Button/Button';
+import Autocomplete from '../Autocomplete/Autocomplete';
 
 import * as actions from '../../store/actions';
 import classes from './AddExpenseForm.module.scss';
@@ -26,7 +27,8 @@ class AddExpense extends Component {
 					required: true,
 				},
 				valid: false,
-				touched: false
+				touched: false,
+				withSuggest: true,
 			},
 			date: {
 				elementType: 'input',
@@ -47,11 +49,11 @@ class AddExpense extends Component {
 				elementType: 'select',
 				elementConfig: {
 					type: '',
-					placeholder: 'Choisir un type',
+					placeholder: 'ChooseType',
 					options: [
 						{
 							value: 'initial',
-							displayValue: 'Choisir un type'
+							displayValue: 'ChooseType'
 						},
 						{
 							value: 'outcome',
@@ -132,17 +134,22 @@ class AddExpense extends Component {
 		this.setState({ controls: resetControlsValues });
 	}
 
-	inputChangedHandler = (event, controlName) => {
+	inputChangedHandler = (event, controlName, val) => {
 		const { target } = event;
 		const updatedControls = updateObject(this.state.controls, {
 			[controlName]: updateObject(this.state.controls[controlName], {
 				...this.state.controls[controlName],
-				value: target.value,
+				value: !val ? target.value : val,
 				valid: formCheckValidity(target.value, this.state.controls[controlName]),
 				touched: true,
 			})
 		});
+
 		this.setState({ controls: updatedControls });
+	}
+
+	inputClickedHandler = (event, controlName) => {
+
 	}
 
 	render() {
@@ -165,7 +172,8 @@ class AddExpense extends Component {
 				validation, 
 				touched,
 				label,
-				labelSmall
+				labelSmall,
+				withSuggest,
 			} = formElement.config
 
 			return (
@@ -179,7 +187,18 @@ class AddExpense extends Component {
 					invalid={ !valid }
 					shouldValidate={ validation }
 					touched={ touched }
-					changed={ (event) => this.inputChangedHandler(event, formElement.id) } />
+					changed={ (event) => this.inputChangedHandler(event, formElement.id) } >
+					{ withSuggest 
+						? (
+								<Autocomplete 
+									elId={ formElement.id }
+									userInput={ value } 
+									clicked={ this.inputChangedHandler } 
+									suggest={ this.props.categories } />
+							) 
+						: '' 
+					}
+				</Input>
 			)
 		});
 
@@ -234,7 +253,8 @@ const mapStateToProps = state => {
 		token: state.auth.token,
 		userId: state.auth.userId,
 		currentExpenses: state.payload.currentExpenses,
-		currentKey: state.payload.currentKey
+		currentKey: state.payload.currentKey, 
+		categories: state.payload.categories,
 	}
 }
 
