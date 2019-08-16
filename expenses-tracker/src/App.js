@@ -2,13 +2,8 @@ import React, { Component } from 'react';
 import { Route, Switch, withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 
+import routes from './routes';
 import Layout from './hoc/Layout/Layout';
-import Auth from './containers/Auth/Auth';
-import Logout from './containers/Auth/Logout/Logout';
-import Home from './containers/Home/Home';
-import Stats from './containers/Statistics/Statistics';
-import Profile from './containers/Profil/Profil';
-import NotFound from './components/NotFound/NotFound';
 
 import * as actions from './store/actions';
 import './App.scss';
@@ -19,32 +14,33 @@ class App extends Component {
   }
 
   render() {
-    let routes = (
+
+    let appRoutes = (
       <Switch>
-        <Route path="/auth" component={ Auth } />
-        <Route path="/" exact component={ Home } />
+        { routes.map((route, index) => {
+            let routeComp = (
+              <Route 
+                key={ index } 
+                path={ route.path } 
+                component={ route.component } 
+                exact={ route.exact } />
+            );
+
+            if (this.props.isAuth && route.display === ('isAuth' || 'always')) {
+              return routeComp;
+            } else if (!this.props.isAuth && route.display === 'always') {
+              return routeComp;
+            }
+            return routeComp;
+        } )}
         <Redirect to="/" />
       </Switch>
     );
 
-    if (this.props.isAuth) {
-      routes = (
-        <Switch>
-          <Route path="/auth" component={ Auth } />
-          <Route path="/logout" component={ Logout } />
-          <Route path="/" exact component={ Home } />
-          <Route path="/stats" exact component={ Stats } />
-          <Route path="/profil" exact component={ Profile } />
-          <Route path="" component={ NotFound } />
-          <Redirect to="/" />
-        </Switch>
-      );
-    }
-
     return (
       <div className="dashboard">
         <Layout>
-          { routes }
+          { appRoutes }
         </Layout>
       </div>
     );

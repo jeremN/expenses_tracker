@@ -1,4 +1,3 @@
-import Layout from './hoc/Layout/Layout';
 import Auth from './containers/Auth/Auth';
 import Logout from './containers/Auth/Logout/Logout';
 import Home from './containers/Home/Home';

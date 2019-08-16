@@ -71,51 +71,63 @@ class Statistics extends Component {
 		chartDatas: [
 			{ 
 				x: 'January', 
-			  y: [0, 0],
+			  in: 0,
+			  out: 0,
 			},
 			{ 
 				x: 'February', 
-			  y: [0, 0],
+			  in: 0,
+			  out: 0,
 			},
 			{ 
 				x: 'March', 
-			  y: [0, 0],
+			  in: 0,
+			  out: 0,
 			},
 			{ 
 				x: 'April', 
-			  y: [0, 0],
+			  in: 0,
+			  out: 0,
 			},
 			{ 
 				x: 'May', 
-			  y: [0, 0],
+			  in: 0,
+			  out: 0,
 			},
 			{ 
 				x: 'June', 
-			  y: [0, 0],
+			  in: 0,
+			  out: 0,
 			},
 			{ 
 				x: 'July', 
-			  y: [0, 0],
+			  in: 0,
+			  out: 0,
 			},
 			{ 
 				x: 'August', 
-			  y: [0, 0],
+			  in: 0,
+			  out: 0,
 			},
 			{ 
 				x: 'September', 
-			  y: [0, 0],
+			  in: 0,
+			  out: 0,
 			},
 			{ 
 				x: 'October', 
-			  y: [0, 0],
+			  in: 0,
+			  out: 0,
 			},
 			{ 
 				x: 'November', 
-			  y: [0, 0],
+			  in: 0,
+			  out: 0,
 			},
 			{ 
 				x: 'December', 
-			  y: [0, 0],
+			  in: 0,
+			  out: 0,
 			},
 		],
 		headings: {
@@ -172,7 +184,7 @@ class Statistics extends Component {
 		if (!expenses || !Object.keys(expenses).length) return;
 		const years = Object.keys(expenses).map(expense => expense);
 		const updatedFilters = this.state.filtersControls;
-
+		console.info(years)
 		years.forEach((year) => {
 			updatedFilters[year] = {
 				elementType: 'check',
@@ -507,6 +519,7 @@ class Statistics extends Component {
 	}
 
 	setDatasAndTable = (expenses, year) => {
+		const { t } = this.props;
 		if (!expenses || !Object.keys(expenses).length) return;
 		const filtered = {
 			years: this.filterByYears(expenses, year),
@@ -514,11 +527,13 @@ class Statistics extends Component {
 		}
 		const updatedTable = filtered[this.state.selected.types];
 		const updatedDatas = this.state.chartDatas.map(item => {
-			let item2 = filtered.years.body.find(i2 => item.x === i2[0])
-			return item2 ? { 
-				x: item.x,
-				y: [item2[2], item2[1]],
-			} : item
+			let item2 = filtered.years.body.find(i2 => t(item.x) === i2[0])
+
+			return { 
+				[t('Month')]: t(item.x),
+				[t('Income')]: item2 ? item2[1] : 0,
+				[t('Outcome')]: item2 ? item2[2] : 0,
+			}
 		})
 
 		this.setState({ 
@@ -583,7 +598,7 @@ class Statistics extends Component {
 			)
 		});
 
-		const chart = <Chart datas={ this.state.chartDatas } container={ "#chartContainer" } chartSize={ [null, 400] } />
+		const chart = <Chart datas={ this.state.chartDatas } container={ "#chartContainer" } chartSize={ [null, 500] } />
 		const table = <Table
 			headings={ this.state.table.headings } 
 			rows={ this.state.table.body } 

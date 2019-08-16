@@ -22,7 +22,7 @@ class Profile extends Component {
 					placeholder: 'PROFIL_Pseudo'
 				},
 				label: 'PROFIL_Pseudo',
-				value: this.props.profile.name,
+				value: '',
 				labelSmall: '',
 				valid: false,
 				touched: false
@@ -34,7 +34,7 @@ class Profile extends Component {
 					placeholder: 'Email'
 				},
 				label: 'Email',
-				value: this.props.profile.email,
+				value: '',
 				labelSmall: '',
 				valid: false,
 				touched: false
@@ -71,7 +71,7 @@ class Profile extends Component {
 					options: [
 						{
 							value: 'initial',
-							displayValue: 'Choisir un type'
+							displayValue: 'ChooseType'
 						},
 						{
 							value: 'euros',
@@ -84,7 +84,7 @@ class Profile extends Component {
 					]
 				},
 				label: 'PROFIL_Currency',
-				value: this.props.profile.currency,
+				value: '',
 				touched: false
 			},
 			language: {
@@ -95,11 +95,11 @@ class Profile extends Component {
 					options: [
 						{
 							value: 'initial',
-							displayValue: 'Choisir un type'
+							displayValue: 'ChooseLang'
 						},
 						{
 							value: 'fr',
-							displayValue: 'Français'
+							displayValue: 'French'
 						},
 						{
 							value: 'en',
@@ -108,14 +108,17 @@ class Profile extends Component {
 					]
 				},
 				label: 'PROFIL_Language',
-				value: this.props.profile.lang,
+				value: '',
 				touched: false
 			}		
 		}
 	}
 
 	componentDidMount() {
-		if (this.props.isAuth && !this.props.profile) {		
+		if (this.props.profile) {
+			this.setProfilData();
+		}	
+		if (this.props.isAuth) {		
 			this.props.getUserDatas(this.props.userId, this.props.token);
 		}
 	}
@@ -123,6 +126,33 @@ class Profile extends Component {
 	componentDidUpdate(prevProps, prevState) {
 		if (this.props.profile !== prevProps.profile) {
 			this.setState({ controls: this.state.controls });
+		}
+	}
+
+	setProfilData = () => {
+		if (this.props.profile) {
+			this.setState({
+				controls: {
+					...this.state.controls,
+					name: {
+						...this.state.controls.name,
+						value: this.props.profile.name,
+					},
+					email: {
+						...this.state.controls.email,
+						value: this.props.profile.email,
+					},
+					devise: {
+						...this.state.controls.devise,
+						value: this.props.profile.currency,
+
+					},
+					language: {
+						...this.state.controls.name,
+						value: this.props.profile.lang,
+					},
+				}
+			})
 		}
 	}
 
@@ -354,6 +384,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
 	return {
+		getUserDatas: (userId, token) => dispatch(actions.getUserData(userId, token)),
 		onUpdateProfile: (userId, token, key, datas) => dispatch(actions.updateProfile(userId, token, key, datas)),
 		onUpdateEmail: (userId, token, key, newEmail, datas) => dispatch(actions.updateUserEmail(userId, token, key, newEmail, datas)),
 		onUpdatePassword: (userId, token, key, newPassword, datas) => dispatch(actions.updateUserPassword(userId, token, key, newPassword, datas)),

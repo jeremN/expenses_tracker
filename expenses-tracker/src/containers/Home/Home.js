@@ -703,7 +703,7 @@ class Home extends Component {
 				</Fragment>
 			)
 		}
-		console.info(this.props.currentExpenses)
+
 		if (this.props.isAuth && this.props.currentExpenses) {
 			dashboardContent = (
 				<Fragment>
