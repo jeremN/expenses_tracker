@@ -54,14 +54,15 @@ const setUserDataStart = (state, action) => {
 		error: null,
 		loading: true,
 		loadType: null,
+		canVerifyDatas: false,
 	});
 }
 
 const setNewUserDataSuccess = (state, action) => {
 	return updateObject(state, {
-		loading: true,
+		loading: false,
 		loadType: null,
-		error: null
+		error: null,
 	});
 }
 
@@ -70,6 +71,7 @@ const setNewUserDataFail = (state, action) => {
 		error: action.error,
 		loading: false,
 		loadType: null,
+		setNewUser: false,
 	});
 }
 

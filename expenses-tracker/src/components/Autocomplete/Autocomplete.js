@@ -13,7 +13,7 @@ class Autocomplete extends Component {
 	}
 
 	componentDidMount() {
-		if (this.props.suggest.length) {
+		if (this.props.suggest && this.props.suggest.length) {
 			this.setState({ suggestions: this.props.suggest });
 		}
 	}

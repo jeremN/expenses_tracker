@@ -1,4 +1,5 @@
 import Auth from './containers/Auth/Auth';
+import ResetPassword from './containers/ResetPassword/ResetPassword';
 import Logout from './containers/Auth/Logout/Logout';
 import Home from './containers/Home/Home';
 import Stats from './containers/Statistics/Statistics';
@@ -15,6 +16,7 @@ const routes = [
 		path: '/auth',
 		component: Auth,
 		display: 'always',
+		exact: true,
 	}, {
 		path: '/logout',
 		component: Logout,
@@ -28,6 +30,11 @@ const routes = [
 		path: '/profil',
 		component: Profile,
 		display: 'isAuth',
+		exact: true,
+	}, {
+		path: '/forgotpassword',
+		component: ResetPassword,
+		display: 'always',
 		exact: true,
 	}, {
 		path: '',

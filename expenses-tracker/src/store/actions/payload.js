@@ -1,6 +1,7 @@
 import * as actionTypes from './actionTypes';
 import axios from '../../axios-user';
 import moment from 'moment';
+import { getDate } from '../../shared/utility';
 
 export const getUserDataStart = () => {
 	return {
@@ -106,32 +107,36 @@ export const updateFail = (error) => {
 	}
 }
 
-export const setNewUserData = (userId, token, email) => {
+export const setNewUserData = (userId, token, email, name) => {
 	return dispatch => {	
 		dispatch(setUserDataStart())
-		const currentDate = moment();
-		const currentYear = currentDate.format('YYYY');
+		const dates = getDate()
+
 		const newUserData = {
 			profile: {
 				email: email,
-				created: currentDate,
-				name: '',
+				created: moment(),
+				name: name,
 				verified: false,
-				currency: ''
+				currency: 'euros'
 			}, 
 			expenses: {
-				[currentYear]: '',
+				[dates.currentYear]: '',
 			},
-			currentExpenses: '',
-			categories: ''
+			currentExpenses: {
+				[dates.currentYear]: {
+					[dates.currentMonth]: ' '
+				},
+			},
 		}
 
 		axios.post(`users/${userId}.json?auth=${token}`, newUserData)
 			.then(response => {
 				dispatch(setNewUserDataSuccess(response));
+				dispatch(getUserData(userId, token));
 			})
 			.catch(error => {
-				console.error(error.response)
+				console.error(error, error.response)
 				dispatch(setNewUserDataFail());
 			})
 	}
@@ -145,7 +150,7 @@ export const getUserData = (userId, token) => {
 				dispatch(getUserDataSuccess(response.data, { userId: userId, token: token }));
 			})
 			.catch(error => {
-				console.log(error.response)
+				console.error(error, error.response)
 				dispatch(getUserDataFail());
 			})
 	}

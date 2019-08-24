@@ -38,7 +38,20 @@ export const authFail = (error) => {
 	}
 }
 
-export const auth = (email, password, isSignUp) => {
+export const recoverSuccess = () => {
+	return {
+		type: actionTypes.RECOVER_SUCCESS
+	}
+}
+
+export const recoverFail = (error) => {
+	return {
+		type: actionTypes.RECOVER_FAIL,
+		error: error
+	}
+}
+
+export const auth = (email, password, isSignUp, name = '') => {
 	return dispatch => {
 		dispatch(authStart());
 		const authData = {
@@ -47,12 +60,8 @@ export const auth = (email, password, isSignUp) => {
 			returnSecureToken: true
 		}
 
-		let url = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=${process.env.REACT_APP_FIREBASE_KEY}`;
-	
-		if (!isSignUp) {
-			url = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${process.env.REACT_APP_FIREBASE_KEY}`;
-		}
-
+		const url = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/${!isSignUp ? 'verifyPassword' : 'signupNewUser'}?key=${process.env.REACT_APP_FIREBASE_KEY}`;
+			
 		axios.post(url, authData)
 			.then(response => {
 				const { data } = response
@@ -64,13 +73,12 @@ export const auth = (email, password, isSignUp) => {
 				}
 				localStorage.setItem('expensesTracker', JSON.stringify(localStorageDatas))
 				if (isSignUp) {
-					dispatch(setNewUserData(data.localId, data.idToken, email));
+					dispatch(setNewUserData(data.localId, data.idToken, email, name));
 				}
 				dispatch(authSuccess(data.idToken, data.localId));
 				dispatch(checkAuthTimeout(data.expiresIn));
 			})
 			.catch(error => {
-				console.debug(error.response)
 				dispatch(authFail(error.response.data.error))
 			});
 	}
@@ -101,5 +109,23 @@ export const authCheckState = () => {
 				dispatch(checkAuthTimeout(dateCalc));
 			}
 		}
+	}
+}
+
+export const recoverPassword = (email) => {
+	return dispatch => {	
+		const recoverData = {
+			type: 'PASSWORD_RESET',
+			email: email,
+		}
+		const url = `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${process.env.REACT_APP_FIREBASE_KEY}`;
+
+		axios.post(url, recoverData)
+			.then(response => {
+				dispatch(recoverSuccess());
+			})
+			.catch(error => {
+				dispatch(recoverFail(error.response.data.error));
+			});
 	}
 }

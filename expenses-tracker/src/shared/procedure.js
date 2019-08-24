@@ -3,14 +3,15 @@ import moment from 'moment';
 import { sumArray, getDate } from './utility';
 
 export const hasDatesChanged = (data) => {
-	if (!data) return;
+	console.info(data)
+	if (!data) return false;
 	const dates = getDate()
 	const { notif: currentNotif, currentExpenses: prevMonthExpenses, expenses: prevExpenses, categories } = data
 
-	if (!prevMonthExpenses) return
+	if (!prevMonthExpenses) return false;
 	const savedMonth = Object.keys(prevMonthExpenses[dates.currentYear]);
 	const savedYear = Object.keys(prevMonthExpenses);
-
+	
 	if (savedMonth[0] !== dates.currentMonth || savedYear[0] !== dates.currentYear) {
 		const currentExp = prevMonthExpenses[savedYear[0]][savedMonth[0]]
 		const newExpenses = formatExpenses(currentExp, savedMonth[0], savedYear[0])
@@ -38,6 +39,7 @@ const formatNotif = (currentNotif) => {
 }
 
 const formatCategories = (currentExpenses, categories) => {
+	if (!categories) return [];
 	const updatedCategories = [...categories];
 
 	currentExpenses.filter(exp => updatedCategories.push(exp.category));

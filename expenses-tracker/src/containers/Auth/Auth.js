@@ -6,6 +6,7 @@ import { CSSTransition } from 'react-transition-group';
 
 import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
+import NavigationItem from '../../components/Navigation/NavigationItems/NavigationItems';
 
 import * as classes from './Auth.module.scss';
 
@@ -28,7 +29,7 @@ class Auth extends Component {
 					isEmail: true
 				},
 				valid: false,
-				touched: false
+				touched: false,
 			},
 			password: {
 				elementType: 'input',
@@ -43,8 +44,21 @@ class Auth extends Component {
 					minLength: 6
 				},
 				valid: false,
-				touched: false
-			}
+				touched: false,
+			},
+			name: {
+				elementType: 'input',
+				elementConfig: {
+					type: 'text',
+					placeholder: 'PROFIL_Pseudo',
+				},
+				label: 'PROFIL_Pseudo',
+				value: '',
+				labelSmall: '',
+				valid: false,
+				touched: false,
+				show: 'signUp'
+			},
 		},
 		isSignUp: true,
 	}
@@ -76,8 +90,8 @@ class Auth extends Component {
 
 	submitHandler = (event) => {
 		event.preventDefault();
-		const { email, password } = this.state.controls
-		this.props.onAuth(email.value, password.value, this.state.isSignUp)
+		const { email, password, name } = this.state.controls
+		this.props.onAuth(email.value, password.value, this.state.isSignUp, name.value)
 	}
 
 	render() {
@@ -96,7 +110,7 @@ class Auth extends Component {
 		}
 
 		let form = formElementsArray.map(formElement => {
-			const {
+			let {
 				elementType, 
 				elementConfig, 
 				value, 
@@ -104,13 +118,26 @@ class Auth extends Component {
 				validation, 
 				touched,
 				label,
+				show,
 			} = formElement.config
+
+			let showOnSignUp = null
+			if (show === 'signUp') {
+				showOnSignUp = { display: `${this.state.isSignUp ? 'block' : 'none'}` };
+				label = this.state.isSignUp ? label : '';
+			}
+
+			const elConfig = { 
+				...elementConfig,
+				placeholder: t(elementConfig.placeholder),
+				style: showOnSignUp
+			}
 
 			return (
 				<Input
 					key={ formElement.id }
 					elementType={ elementType }
-					elementConfig={ elementConfig }
+					elementConfig={ elConfig }
 					value={ value }
 					labelValue={ t(label) }
 					invalid={ !valid }
@@ -319,6 +346,7 @@ class Auth extends Component {
 								btnType="button__blue"
 								typeBtn="submit">{ t('Send') }</Button>
 							{ errorMessage }
+							<NavigationItem link="/forgotpassword" itemClass={ classes.Login__link }>{ t('ForgotPassword') }</NavigationItem>
 						</form>
 					</div>
 				</CSSTransition>
@@ -338,7 +366,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		onAuth: (email, password, isSignUp) => dispatch(actions.auth(email, password, isSignUp)),
+		onAuth: (email, password, isSignUp, name) => dispatch(actions.auth(email, password, isSignUp, name)),
 		onSetAuthRedirectPath: () =>  dispatch(actions.setAuthRedirectPath('/'))
 	}
 }

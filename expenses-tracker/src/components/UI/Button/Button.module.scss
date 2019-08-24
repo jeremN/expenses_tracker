@@ -18,6 +18,11 @@ $btnGreyTextColor: $blueDark !default;
 	flex-basis: 100%;
 	height: 3.2rem;
 
+	&[disabled] {
+		cursor: not-allowed;
+		opacity: 0.5;
+	}
+
 	&__blue {
 		border: 1px solid $btnBlueBorderColor;
 		background-color: $btnBlueBgColor;

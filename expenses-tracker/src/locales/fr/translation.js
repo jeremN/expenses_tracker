@@ -5,6 +5,9 @@ const translationFR = {
 	'Logout': 'Se déconnecter',
 	'Login': 'Se connecter',
 	'Signin': 'S\'inscrire',
+	'ForgotPassword': 'Mot de passe oublié ?',
+	'RecoverPasswordTitle': 'Récupérer mon mot de passe',
+	'SendEMailPassword': 'Envoyer l\'email',
 	'CreateAccount': 'Créer un compte',
 	'Send': 'Envoyer',
 	'Password': 'Mot de passe',
@@ -57,6 +60,7 @@ const translationFR = {
 	'STATS_DisplayTable': 'Table', 
 	'STATS_DisplayChart': 'Chart',
 	'STATS_EditSaving': 'Editer économies',
+	'STATS_EmptyTable': 'Pas de données à afficher',
 	'STATS_ByCatTHead': ['Catégorie', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Decembre'],
 	'STATS_ByYearTHead': ['Mois', 'Dépense', 'Revenu', 'Différence', 'Economie', 'Actions'],
 	'PROFIL_ProfilH1': 'Profil',
@@ -65,7 +69,7 @@ const translationFR = {
 	'PROFIL_NewPassword': 'Changer le mot de passe',
 	'PROFIL_Currency': 'Devise',
 	'PROFIL_Language': 'Langue',
-	'PROFIL_Confirm': 'Confirmer les changements',	
+	'PROFIL_Confirm': 'Confirmer',	
 	'SAVE_Month': 'La sauvegarde du mois précédent a été effectué',
 }
 

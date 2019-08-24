@@ -7,6 +7,7 @@ import { CSSTransition } from 'react-transition-group';
 import Input from '../../components/UI/Input/Input';
 import Card from '../../components/UI/Card/Card';
 import Button from '../../components/UI/Button/Button';
+import Loader from '../../components/UI/Loader/Loader';
 
 import * as actions from '../../store/actions';
 import { updateObject, formCheckValidity } from '../../shared/utility';
@@ -25,7 +26,7 @@ class Profile extends Component {
 				value: '',
 				labelSmall: '',
 				valid: false,
-				touched: false
+				touched: false,
 			},
 			email: {
 				elementType: 'input',
@@ -63,6 +64,30 @@ class Profile extends Component {
 				valid: false,
 				touched: false
 			},
+			language: {
+				elementType: 'select',
+				elementConfig: {
+					type: '',
+					placeholder: 'PROFIL_Language',
+					options: [
+						{
+							value: 'initial',
+							displayValue: 'ChooseLang'
+						},
+						{
+							value: 'fr',
+							displayValue: 'French'
+						},
+						{
+							value: 'en',
+							displayValue: 'English'
+						}
+					]
+				},
+				label: 'PROFIL_Language',
+				value: '',
+				touched: false,
+			},	
 			devise: {
 				elementType: 'select',
 				elementConfig: {
@@ -86,46 +111,21 @@ class Profile extends Component {
 				label: 'PROFIL_Currency',
 				value: '',
 				touched: false
-			},
-			language: {
-				elementType: 'select',
-				elementConfig: {
-					type: '',
-					placeholder: 'PROFIL_Language',
-					options: [
-						{
-							value: 'initial',
-							displayValue: 'ChooseLang'
-						},
-						{
-							value: 'fr',
-							displayValue: 'French'
-						},
-						{
-							value: 'en',
-							displayValue: 'English'
-						}
-					]
-				},
-				label: 'PROFIL_Language',
-				value: '',
-				touched: false
-			}		
+			},	
 		}
 	}
 
 	componentDidMount() {
-		if (this.props.profile) {
-			this.setProfilData();
-		}	
-		if (this.props.isAuth) {		
-			this.props.getUserDatas(this.props.userId, this.props.token);
+		if (this.props.isAuth) {
+			this.props.getUserDatas(this.props.userId, this.props.token)
+		} else {
+			this.props.onSetAuthRedirectPath();
 		}
 	}
 
 	componentDidUpdate(prevProps, prevState) {
 		if (this.props.profile !== prevProps.profile) {
-			this.setState({ controls: this.state.controls });
+			this.setProfilData() 
 		}
 	}
 
@@ -148,7 +148,7 @@ class Profile extends Component {
 
 					},
 					language: {
-						...this.state.controls.name,
+						...this.state.controls.language,
 						value: this.props.profile.lang,
 					},
 				}
@@ -214,8 +214,6 @@ class Profile extends Component {
 			this.props.onUpdateProfile(userId, token, currentKey, datas);
 		}
 	}
-
-	cancelSubmitFormHandler = (event) => {}
 
 	render() {
 		const { t } = this.props;
@@ -309,6 +307,13 @@ class Profile extends Component {
 				</svg>		
 			</Fragment>
 		)
+	
+		const loaderStyles = {
+			position: 'relative',
+			background: 'none',
+			width: '24px',
+			height: '24px',
+		}
 
 		const profil = (
 			<Fragment>
@@ -338,11 +343,12 @@ class Profile extends Component {
 									<div className="row">
 										<Button 
 											btnType="button__blue"
+											disabled={ this.props.loading }
 											typeBtn="submit"
-											clicked={ this.submitFormHandler }>{ t('PROFIL_Confirm') }</Button>
+											clicked={ this.submitFormHandler }>{ this.props.loading ? <Loader styles={ loaderStyles } /> : t('PROFIL_Confirm') }</Button>
 									</div>
 								</form>
-							</Card>
+							</Card> 
 						</CSSTransition>
 					</div>
 					<CSSTransition
@@ -388,6 +394,7 @@ const mapDispatchToProps = dispatch => {
 		onUpdateProfile: (userId, token, key, datas) => dispatch(actions.updateProfile(userId, token, key, datas)),
 		onUpdateEmail: (userId, token, key, newEmail, datas) => dispatch(actions.updateUserEmail(userId, token, key, newEmail, datas)),
 		onUpdatePassword: (userId, token, key, newPassword, datas) => dispatch(actions.updateUserPassword(userId, token, key, newPassword, datas)),
+		onSetAuthRedirectPath: () =>  dispatch(actions.setAuthRedirectPath('/')),
 	}
 }
 

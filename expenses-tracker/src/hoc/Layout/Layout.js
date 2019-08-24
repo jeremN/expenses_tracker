@@ -17,7 +17,7 @@ class Layout extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		if (this.props.profile !== prevProps.profile && this.props.profile !== null) {
+		if (this.props.profile !== prevProps.profile && this.props.profile) {
 			this.setState({ username: this.props.profile.name });
 		}
 

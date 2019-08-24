@@ -149,26 +149,18 @@ class Home extends Component {
 
 	verifyDates = () => {
 		const { userId, token, currentKey } = this.props
-		const data = {
+		const formattedObj = hasDatesChanged({
 			categories: this.props.categories,
 			currentExpenses: this.props.currentExpenses,
 			expenses: this.props.expenses,
 			notif: this.props.notif,
-		}
+		});
 
-		const { 
-			currentExp, 
-			formattedExp, 
-			formattedCat,
-			formattedNotif,
-		} = hasDatesChanged(data);	
-
-
-		if (formattedExp) {		
-			this.props.onUpdateNotifs(userId, token, currentKey, formattedNotif);
-			this.props.onUpdateExpenses(userId, token, currentKey, formattedExp, 'monthlyUpdate');
-			this.props.onUpdateCurrentExpense(userId, token, currentKey, currentExp);
-			this.props.onUpdateCategories(userId, token, currentKey, formattedCat);
+		if (formattedObj.formattedExp) {		
+			this.props.onUpdateNotifs(userId, token, currentKey, formattedObj.formattedNotif);
+			this.props.onUpdateExpenses(userId, token, currentKey, formattedObj.formattedExp, 'monthlyUpdate');
+			this.props.onUpdateCurrentExpense(userId, token, currentKey, formattedObj.currentExp);
+			this.props.onUpdateCategories(userId, token, currentKey, formattedObj.formattedCat);
 		}
 
 		this.props.verifyDatesHandler(false);
@@ -404,7 +396,7 @@ class Home extends Component {
 
 		const updatedIndicators = currentIndicators.map((indicator) => {
 			const currentVal = parseFloat(total[indicator.type]).toFixed(2);
-			const prevVal = parseFloat(lastMonthExpense[indicator.type]).toFixed(2);
+			const prevVal = parseFloat(lastMonthExpense ? lastMonthExpense[indicator.type] : 0).toFixed(2);
 			const percentage = parseFloat(this.getVariation(prevVal, currentVal)).toFixed(2);
 			const variation = Math.sign(percentage);
 
@@ -429,7 +421,7 @@ class Home extends Component {
 	}
 
 	getVariation = (firstVal, secondVal) => {
-		return (secondVal - firstVal) / firstVal * 100
+		return (secondVal - firstVal) / firstVal * 100 || 0;
 	}
 
 	handleErrors = (error) => {

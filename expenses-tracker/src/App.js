@@ -14,7 +14,6 @@ class App extends Component {
   }
 
   render() {
-
     let appRoutes = (
       <Switch>
         { routes.map((route, index) => {
@@ -28,7 +27,7 @@ class App extends Component {
 
             if (this.props.isAuth && route.display === ('isAuth' || 'always')) {
               return routeComp;
-            } else if (!this.props.isAuth && route.display === 'always') {
+            } else if (!this.props.isAuth && route.display === ('notAuth' || 'always')) {
               return routeComp;
             }
             return routeComp;
