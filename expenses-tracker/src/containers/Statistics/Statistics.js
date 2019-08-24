@@ -706,12 +706,11 @@ class Statistics extends Component {
 				</div>
 		);
 
-		if (this.state.table.body && !this.state.table.body.length || !this.state.table.body) {
+		if ((this.state.table.body && !this.state.table.body.length) || !this.state.table.body) {
 			display = emptyTableIllustration
 		} else {
 			display = this.state.selected.display === 'table' ? table : chart;
 		}
-		console.info(this.state.table.body)
 		const statContent = (
 			<div className={ statistic }>
 				<div className="row">

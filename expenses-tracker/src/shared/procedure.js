@@ -3,7 +3,6 @@ import moment from 'moment';
 import { sumArray, getDate } from './utility';
 
 export const hasDatesChanged = (data) => {
-	console.info(data)
 	if (!data) return false;
 	const dates = getDate()
 	const { notif: currentNotif, currentExpenses: prevMonthExpenses, expenses: prevExpenses, categories } = data
