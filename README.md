@@ -35,3 +35,4 @@ Developped with:
  - refac code
  - add email verification
  - add reset password by email
+ - light/dark theme
