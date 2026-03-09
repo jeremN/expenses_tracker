@@ -9,7 +9,7 @@
     "test": "turbo test"
   },
   "devDependencies": {
-    "turbo": "latest",
+    "turbo": "^2.8.14",
     "typescript": "^5.7.0"
   },
   "packageManager": "pnpm@9.15.0"

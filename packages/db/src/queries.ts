@@ -137,6 +137,10 @@ export function createInvestmentSnapshot(db: DB, data: { date: string; totalValu
   return db.insert(schema.investmentSnapshots).values(data).returning().get()
 }
 
+export function getInvestmentSnapshotById(db: DB, id: number) {
+  return db.select().from(schema.investmentSnapshots).where(eq(schema.investmentSnapshots.id, id)).get()
+}
+
 export function deleteInvestmentSnapshot(db: DB, id: number) {
   return db.delete(schema.investmentSnapshots).where(eq(schema.investmentSnapshots.id, id))
 }
@@ -177,6 +181,16 @@ export function getCategoryBreakdown(db: DB, month: string) {
     WHERE t.date LIKE ${month + '%'} AND t.type = 'expense'
     GROUP BY c.id
     ORDER BY total DESC
+  `)
+}
+
+export function getCategorizedDescriptions(db: DB) {
+  return db.run(sql`
+    SELECT description, category_id, COUNT(*) as cnt
+    FROM transactions
+    WHERE description IS NOT NULL AND category_id IS NOT NULL
+    GROUP BY description, category_id
+    ORDER BY cnt DESC
   `)
 }
 

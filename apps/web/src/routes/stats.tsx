@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getDB } from '~/server/db'
 import { getMonthlySummary, getCategoryBreakdown } from '@tracker/db'
+import { z } from 'zod'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
@@ -27,7 +28,7 @@ import { RouteError } from '~/components/route-error'
 // --- Server Functions ---
 
 const getMonthlyStats = createServerFn({ method: 'GET' })
-  .inputValidator((d: { year: string }) => d)
+  .inputValidator(z.object({ year: z.string().regex(/^\d{4}$/) }))
   .handler(async ({ data }) => {
     const db = getDB()
     const result = await getMonthlySummary(db, data.year)
@@ -35,7 +36,7 @@ const getMonthlyStats = createServerFn({ method: 'GET' })
   })
 
 const getCategoryStats = createServerFn({ method: 'GET' })
-  .inputValidator((d: { month: string }) => d)
+  .inputValidator(z.object({ month: z.string().regex(/^\d{4}-\d{2}$/) }))
   .handler(async ({ data }) => {
     const db = getDB()
     const result = await getCategoryBreakdown(db, data.month)

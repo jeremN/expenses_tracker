@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getDB } from '~/server/db'
-import { deleteInvestmentSnapshot } from '@tracker/db'
+import { getInvestmentSnapshotById, deleteInvestmentSnapshot } from '@tracker/db'
 import { jsonResponse, errorResponse } from '~/server/api-helpers'
 
 export const Route = createFileRoute('/api/investments/$id')({
@@ -14,6 +14,11 @@ export const Route = createFileRoute('/api/investments/$id')({
           }
 
           const db = getDB()
+          const snapshot = await getInvestmentSnapshotById(db, id)
+          if (!snapshot) {
+            return errorResponse('Investment snapshot not found', 404)
+          }
+
           await deleteInvestmentSnapshot(db, id)
           return jsonResponse({ success: true })
         } catch {

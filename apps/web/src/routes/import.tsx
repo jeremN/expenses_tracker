@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getDB } from '~/server/db'
-import { getTransactions, getCategories } from '@tracker/db'
+import { getTransactions, getCategories, getCategorizedDescriptions } from '@tracker/db'
 import type { ParsedRow, ParseResult } from '~/server/parsers/csv'
 import { FileUpload } from '~/components/import/file-upload'
 import { ColumnMapper } from '~/components/import/column-mapper'
@@ -38,13 +38,17 @@ const checkDuplicates = createServerFn({ method: 'POST' })
   )
   .handler(async ({ data }) => {
     const db = getDB()
-    const allTransactions = await getTransactions(db)
+
+    // Only query months relevant to the import data
+    const months = [...new Set(data.rows.map((r) => r.date.substring(0, 7)))]
+    const results = await Promise.all(
+      months.map((month) => getTransactions(db, { month })),
+    )
 
     // Build a lookup set from existing transactions
     const existing = new Set<string>()
-    for (const row of allTransactions) {
+    for (const row of results.flat()) {
       const tx = row.transactions
-      // Amount in DB is always positive; type determines sign
       const signedAmount = tx.type === 'income' ? tx.amount : -tx.amount
       existing.add(`${tx.date}:${signedAmount}`)
     }
@@ -66,22 +70,19 @@ const suggestCategories = createServerFn({ method: 'POST' })
   )
   .handler(async ({ data }) => {
     const db = getDB()
-    const [allTransactions, categories] = await Promise.all([
-      getTransactions(db),
+    const [descRows, categories] = await Promise.all([
+      getCategorizedDescriptions(db),
       getCategories(db),
     ])
 
     // Build map of description (lowercase) -> most common categoryId
     const descCategoryCount = new Map<string, Map<number, number>>()
-    for (const row of allTransactions) {
-      const tx = row.transactions
-      if (!tx.description || !tx.categoryId) continue
-      const desc = tx.description.toLowerCase()
+    for (const row of (descRows.results ?? []) as Array<{ description: string; category_id: number; cnt: number }>) {
+      const desc = row.description.toLowerCase()
       if (!descCategoryCount.has(desc)) {
         descCategoryCount.set(desc, new Map())
       }
-      const counts = descCategoryCount.get(desc)!
-      counts.set(tx.categoryId, (counts.get(tx.categoryId) ?? 0) + 1)
+      descCategoryCount.get(desc)!.set(row.category_id, row.cnt)
     }
 
     // Build category lookup
@@ -121,7 +122,6 @@ const suggestCategories = createServerFn({ method: 'POST' })
       }
 
       // Partial match: check if any existing description contains the import description or vice versa
-      let found = false
       for (const [existingDesc, counts] of descCategoryCount) {
         if (
           existingDesc.includes(desc) ||
@@ -141,7 +141,6 @@ const suggestCategories = createServerFn({ method: 'POST' })
               categoryId: bestId,
               categoryName: categoryMap.get(bestId)!,
             })
-            found = true
             break
           }
         }

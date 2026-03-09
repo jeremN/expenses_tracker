@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, integer, text, uniqueIndex, index } from 'drizzle-orm/sqlite-core'
 import { sql } from 'drizzle-orm'
 
 export const categories = sqliteTable('categories', {
@@ -35,6 +35,9 @@ export const transactions = sqliteTable('transactions', {
   updatedAt: text('updated_at').default(sql`(current_timestamp)`).notNull(),
 }, (table) => [
   uniqueIndex('uniq_recurring_date').on(table.recurringId, table.date),
+  index('idx_transactions_date').on(table.date),
+  index('idx_transactions_category_id').on(table.categoryId),
+  index('idx_transactions_type').on(table.type),
 ])
 
 export const investmentSnapshots = sqliteTable('investment_snapshots', {
