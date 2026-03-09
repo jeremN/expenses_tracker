@@ -7,6 +7,8 @@ import type { MonthlySummary, Transaction, Category } from '@tracker/shared'
 import { SummaryCards } from '~/components/dashboard/summary-cards'
 import { MonthlyChart } from '~/components/dashboard/monthly-chart'
 import { RecentTransactions } from '~/components/dashboard/recent-transactions'
+import { Skeleton } from '~/components/ui/skeleton'
+import { RouteError } from '~/components/route-error'
 
 // --- Server Functions ---
 
@@ -75,7 +77,29 @@ const getDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
 export const Route = createFileRoute('/')({
   loader: () => getDashboardData(),
   component: DashboardPage,
+  pendingComponent: DashboardSkeleton,
+  errorComponent: ({ error }) => <RouteError error={error} />,
 })
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <Skeleton className="h-8 w-40" />
+        <Skeleton className="mt-2 h-4 w-64" />
+      </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        <Skeleton className="h-32" />
+        <Skeleton className="h-32" />
+        <Skeleton className="h-32" />
+      </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Skeleton className="h-64" />
+        <Skeleton className="h-64" />
+      </div>
+    </div>
+  )
+}
 
 // --- Page Component ---
 

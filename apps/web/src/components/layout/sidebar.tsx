@@ -9,6 +9,7 @@ import {
   BarChart3,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
+import { ThemeToggle } from '~/components/theme-toggle'
 
 const navItems = [
   { to: '/' as const, label: 'Dashboard', icon: LayoutDashboard },
@@ -51,6 +52,13 @@ export function Sidebar({ className }: { className?: string }) {
           </Link>
         ))}
       </nav>
+
+      <div className="border-t border-border px-3 py-3">
+        <div className="flex items-center justify-between px-3">
+          <span className="text-xs text-muted-foreground">Theme</span>
+          <ThemeToggle />
+        </div>
+      </div>
     </aside>
   )
 }

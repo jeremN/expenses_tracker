@@ -22,6 +22,8 @@ import {
 } from '~/components/ui/dialog'
 import { CategoryForm } from '~/components/categories/category-form'
 import { CategoryList } from '~/components/categories/category-list'
+import { Skeleton } from '~/components/ui/skeleton'
+import { RouteError } from '~/components/route-error'
 
 // --- Server Functions ---
 
@@ -58,7 +60,31 @@ const deleteServerCategory = createServerFn({ method: 'POST' })
 export const Route = createFileRoute('/categories')({
   loader: () => getServerCategories(),
   component: CategoriesPage,
+  pendingComponent: CategoriesSkeleton,
+  errorComponent: ({ error }) => <RouteError error={error} />,
 })
+
+function CategoriesSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <Skeleton className="h-8 w-36" />
+          <Skeleton className="mt-2 h-4 w-56" />
+        </div>
+        <Skeleton className="h-10 w-36" />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <Skeleton className="h-24" />
+        <Skeleton className="h-24" />
+        <Skeleton className="h-24" />
+        <Skeleton className="h-24" />
+        <Skeleton className="h-24" />
+        <Skeleton className="h-24" />
+      </div>
+    </div>
+  )
+}
 
 // --- Page Component ---
 

@@ -6,6 +6,8 @@ import { getCategories, createTransaction } from '@tracker/db'
 import { createTransactionSchema } from '@tracker/shared'
 import type { Category, CreateTransaction } from '@tracker/shared'
 import { TransactionForm } from '~/components/transactions/transaction-form'
+import { Skeleton } from '~/components/ui/skeleton'
+import { RouteError } from '~/components/route-error'
 
 // --- Server Functions ---
 
@@ -26,7 +28,27 @@ const createServerTransaction = createServerFn({ method: 'POST' })
 export const Route = createFileRoute('/transactions/new')({
   loader: () => getServerCategories(),
   component: NewTransactionPage,
+  pendingComponent: NewTransactionSkeleton,
+  errorComponent: ({ error }) => <RouteError error={error} />,
 })
+
+function NewTransactionSkeleton() {
+  return (
+    <div className="mx-auto max-w-lg space-y-6">
+      <div>
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="mt-2 h-4 w-48" />
+      </div>
+      <div className="space-y-4">
+        <Skeleton className="h-10" />
+        <Skeleton className="h-10" />
+        <Skeleton className="h-10" />
+        <Skeleton className="h-10" />
+        <Skeleton className="h-10 w-28" />
+      </div>
+    </div>
+  )
+}
 
 // --- Page Component ---
 

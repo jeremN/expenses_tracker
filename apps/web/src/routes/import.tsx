@@ -9,6 +9,7 @@ import { ColumnMapper } from '~/components/import/column-mapper'
 import { PreviewTable } from '~/components/import/preview-table'
 import { Check, Upload, Columns, Eye } from 'lucide-react'
 import { cn } from '~/lib/utils'
+import { RouteError } from '~/components/route-error'
 
 // --- Server Functions ---
 
@@ -180,6 +181,7 @@ const importTransactions = createServerFn({ method: 'POST' })
 
 export const Route = createFileRoute('/import')({
   component: ImportPage,
+  errorComponent: ({ error }) => <RouteError error={error} />,
 })
 
 // --- Step indicator ---

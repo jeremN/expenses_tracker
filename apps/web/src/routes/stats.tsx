@@ -21,6 +21,8 @@ import {
   CategoryBreakdownChart,
   type CategoryBreakdownRow,
 } from '~/components/stats/category-breakdown-chart'
+import { Skeleton } from '~/components/ui/skeleton'
+import { RouteError } from '~/components/route-error'
 
 // --- Server Functions ---
 
@@ -83,7 +85,22 @@ export const Route = createFileRoute('/stats')({
     return { monthlyData, categoryData, year, month }
   },
   component: StatsPage,
+  pendingComponent: StatsSkeleton,
+  errorComponent: ({ error }) => <RouteError error={error} />,
 })
+
+function StatsSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <Skeleton className="h-8 w-20" />
+        <Skeleton className="mt-2 h-4 w-64" />
+      </div>
+      <Skeleton className="h-80" />
+      <Skeleton className="h-80" />
+    </div>
+  )
+}
 
 // --- Page Component ---
 

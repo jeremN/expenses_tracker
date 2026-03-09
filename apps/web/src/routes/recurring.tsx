@@ -26,6 +26,8 @@ import {
 } from '~/components/ui/dialog'
 import { RecurringForm } from '~/components/recurring/recurring-form'
 import { RecurringList } from '~/components/recurring/recurring-list'
+import { Skeleton } from '~/components/ui/skeleton'
+import { RouteError } from '~/components/route-error'
 
 // --- Server Functions ---
 
@@ -73,7 +75,29 @@ const toggleServerRecurringRule = createServerFn({ method: 'POST' })
 export const Route = createFileRoute('/recurring')({
   loader: () => getServerRecurringRules(),
   component: RecurringPage,
+  pendingComponent: RecurringSkeleton,
+  errorComponent: ({ error }) => <RouteError error={error} />,
 })
+
+function RecurringSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="mt-2 h-4 w-64" />
+        </div>
+        <Skeleton className="h-10 w-28" />
+      </div>
+      <div className="space-y-3">
+        <Skeleton className="h-20" />
+        <Skeleton className="h-20" />
+        <Skeleton className="h-20" />
+        <Skeleton className="h-20" />
+      </div>
+    </div>
+  )
+}
 
 // --- Page Component ---
 

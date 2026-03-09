@@ -16,6 +16,8 @@ import {
 } from '~/components/ui/dialog'
 import { TransactionTable } from '~/components/transactions/transaction-table'
 import { TransactionFilters, type TypeFilter } from '~/components/transactions/transaction-filters'
+import { Skeleton } from '~/components/ui/skeleton'
+import { RouteError } from '~/components/route-error'
 
 // --- Server Functions ---
 
@@ -55,7 +57,29 @@ const deleteServerTransaction = createServerFn({ method: 'POST' })
 export const Route = createFileRoute('/transactions')({
   loader: () => getServerTransactions({ data: {} }),
   component: TransactionsPage,
+  pendingComponent: TransactionsSkeleton,
+  errorComponent: ({ error }) => <RouteError error={error} />,
 })
+
+function TransactionsSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="mt-2 h-4 w-64" />
+        </div>
+        <Skeleton className="h-10 w-36" />
+      </div>
+      <div className="flex gap-3">
+        <Skeleton className="h-10 w-40" />
+        <Skeleton className="h-10 w-40" />
+        <Skeleton className="h-10 w-32" />
+      </div>
+      <Skeleton className="h-96" />
+    </div>
+  )
+}
 
 // --- Page Component ---
 

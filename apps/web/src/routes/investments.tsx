@@ -29,6 +29,8 @@ import { SnapshotForm } from '~/components/investments/snapshot-form'
 import { GrowthChart } from '~/components/investments/growth-chart'
 import { SnapshotHistory } from '~/components/investments/snapshot-history'
 import { formatCents } from '~/lib/utils'
+import { Skeleton } from '~/components/ui/skeleton'
+import { RouteError } from '~/components/route-error'
 
 // --- Server Functions ---
 
@@ -56,7 +58,29 @@ const deleteServerSnapshot = createServerFn({ method: 'POST' })
 export const Route = createFileRoute('/investments')({
   loader: () => getServerSnapshots(),
   component: InvestmentsPage,
+  pendingComponent: InvestmentsSkeleton,
+  errorComponent: ({ error }) => <RouteError error={error} />,
 })
+
+function InvestmentsSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <Skeleton className="h-8 w-36" />
+          <Skeleton className="mt-2 h-4 w-56" />
+        </div>
+        <Skeleton className="h-10 w-36" />
+      </div>
+      <Skeleton className="h-32" />
+      <Skeleton className="h-64" />
+      <div>
+        <Skeleton className="h-6 w-40 mb-3" />
+        <Skeleton className="h-48" />
+      </div>
+    </div>
+  )
+}
 
 // --- Page Component ---
 
