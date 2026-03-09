@@ -1,4 +1,4 @@
-import { eq, desc, sql } from 'drizzle-orm'
+import { eq, and, like, desc, sql } from 'drizzle-orm'
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
 import * as schema from './schema'
 
@@ -27,10 +27,25 @@ export function deleteCategory(db: DB, id: number) {
 
 // --- Transactions ---
 export function getTransactions(db: DB, filters?: { month?: string; categoryId?: number; type?: string }) {
-  let query = db.select().from(schema.transactions)
+  const conditions = []
+
+  if (filters?.month) {
+    conditions.push(like(schema.transactions.date, `${filters.month}%`))
+  }
+  if (filters?.categoryId) {
+    conditions.push(eq(schema.transactions.categoryId, filters.categoryId))
+  }
+  if (filters?.type) {
+    conditions.push(eq(schema.transactions.type, filters.type))
+  }
+
+  const query = db.select().from(schema.transactions)
     .leftJoin(schema.categories, eq(schema.transactions.categoryId, schema.categories.id))
     .orderBy(desc(schema.transactions.date))
-  // Filters applied dynamically in implementation
+
+  if (conditions.length > 0) {
+    return query.where(and(...conditions))
+  }
   return query
 }
 
@@ -97,8 +112,23 @@ export function deleteRecurringRule(db: DB, id: number) {
 
 // --- Investment Snapshots ---
 export function getInvestmentSnapshots(db: DB, range?: { from?: string; to?: string }) {
-  return db.select().from(schema.investmentSnapshots)
+  const conditions = []
+
+  if (range?.from) {
+    conditions.push(like(schema.investmentSnapshots.date, `${range.from}%`))
+  }
+  if (range?.to) {
+    // For "to" we need <=, use raw SQL comparison since dates are YYYY-MM-DD strings
+    conditions.push(sql`${schema.investmentSnapshots.date} <= ${range.to + '-31'}`)
+  }
+
+  const query = db.select().from(schema.investmentSnapshots)
     .orderBy(desc(schema.investmentSnapshots.date))
+
+  if (conditions.length > 0) {
+    return query.where(and(...conditions))
+  }
+  return query
 }
 
 export function createInvestmentSnapshot(db: DB, data: { date: string; totalValue: number; note?: string }) {

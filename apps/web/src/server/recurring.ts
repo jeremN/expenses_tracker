@@ -1,5 +1,5 @@
 import { getDB } from '~/server/db'
-import { getActiveRecurringRules, getLastGeneratedTransaction, createTransaction } from '@tracker/db/queries'
+import { getActiveRecurringRules, getLastGeneratedTransaction, createTransaction } from '@tracker/db'
 
 /**
  * Formats a Date object as a YYYY-MM-DD string.

@@ -23,6 +23,7 @@
     "@tanstack/react-router": "latest",
     "@tanstack/react-start": "latest",
     "@tracker/db": "workspace:*",
+    "@tracker/shared": "workspace:*",
     "drizzle-orm": "latest",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
