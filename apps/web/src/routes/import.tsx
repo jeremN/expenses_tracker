@@ -2,14 +2,15 @@ import { useState, useCallback } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getDB } from '~/server/db'
-import { createTransaction, createBankImport, getTransactions, getCategories } from '@tracker/db'
-import { parseCSV, detectColumns, type ParsedRow, type ParseResult } from '~/server/parsers/csv'
+import { getTransactions, getCategories } from '@tracker/db'
+import type { ParsedRow, ParseResult } from '~/server/parsers/csv'
 import { FileUpload } from '~/components/import/file-upload'
 import { ColumnMapper } from '~/components/import/column-mapper'
 import { PreviewTable } from '~/components/import/preview-table'
 import { Check, Upload, Columns, Eye } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { RouteError } from '~/components/route-error'
+import { processImport } from '~/server/import-helpers'
 
 // --- Server Functions ---
 
@@ -18,7 +19,17 @@ const parseFile = createServerFn({ method: 'POST' })
     (d: { content: string; mapping?: Record<string, string> }) => d,
   )
   .handler(async ({ data }) => {
+    const { parseCSV } = await import('~/server/parsers/csv')
     return parseCSV(data.content, data.mapping)
+  })
+
+const detectFileColumns = createServerFn({ method: 'POST' })
+  .inputValidator(
+    (d: { headers: string[] }) => d,
+  )
+  .handler(async ({ data }) => {
+    const { detectColumns } = await import('~/server/parsers/csv')
+    return detectColumns(data.headers)
   })
 
 const checkDuplicates = createServerFn({ method: 'POST' })
@@ -153,28 +164,7 @@ const importTransactions = createServerFn({ method: 'POST' })
     }) => d,
   )
   .handler(async ({ data }) => {
-    const db = getDB()
-    let imported = 0
-
-    for (const tx of data.transactions) {
-      const isIncome = tx.amount > 0
-      await createTransaction(db, {
-        type: isIncome ? 'income' : 'expense',
-        amount: Math.abs(tx.amount),
-        description: tx.description || undefined,
-        date: tx.date,
-        categoryId: tx.categoryId || undefined,
-      })
-      imported++
-    }
-
-    await createBankImport(db, {
-      filename: data.filename,
-      rowCount: imported,
-      status: imported === data.transactions.length ? 'completed' : 'partial',
-    })
-
-    return { imported, total: data.transactions.length }
+    return processImport(data)
   })
 
 // --- Route ---
@@ -266,8 +256,8 @@ function ImportPage() {
       const result = await parseFile({ data: { content } })
       setParseResult(result)
 
-      // Auto-detect columns
-      const mapping = detectColumns(result.headers)
+      // Auto-detect columns via server function
+      const mapping = await detectFileColumns({ data: { headers: result.headers } })
       setDetectedMapping(mapping)
 
       setStep('mapping')

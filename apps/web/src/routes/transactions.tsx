@@ -104,9 +104,7 @@ function TransactionsPage() {
   })
 
   function handleEdit(tx: Transaction) {
-    // Navigate to an edit page (could also be a dialog; for now reuse the new page pattern)
-    // For simplicity in this implementation, we'll just log — full edit can use the API route
-    console.log('Edit transaction:', tx.id)
+    router.navigate({ to: '/transactions/$id/edit', params: { id: String(tx.id) } })
   }
 
   async function handleDelete() {

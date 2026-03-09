@@ -6,6 +6,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "start": "node .output/server/index.mjs",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "deploy": "pnpm build && wrangler deploy"
   },
@@ -45,6 +46,7 @@
     "typescript": "^5.7.0",
     "vite": "latest",
     "vite-tsconfig-paths": "latest",
+    "vitest": "latest",
     "wrangler": "latest"
   }
 }

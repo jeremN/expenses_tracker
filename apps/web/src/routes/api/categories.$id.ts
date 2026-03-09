@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getDB } from '~/server/db'
-import { getCategoryById, updateCategory, deleteCategory } from '@tracker/db'
+import { getCategoryById, updateCategory, deleteCategory, nullifyCategoryOnTransactions } from '@tracker/db'
 import { updateCategorySchema } from '@tracker/shared'
 import { jsonResponse, errorResponse } from '~/server/api-helpers'
 
@@ -68,6 +68,7 @@ export const Route = createFileRoute('/api/categories/$id')({
             return errorResponse('Category not found', 404)
           }
 
+          await nullifyCategoryOnTransactions(db, id)
           await deleteCategory(db, id)
           return jsonResponse({ success: true })
         } catch {

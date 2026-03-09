@@ -7,6 +7,7 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
+  nullifyCategoryOnTransactions,
 } from '@tracker/db'
 import { z } from 'zod'
 import { createCategorySchema, updateCategorySchema } from '@tracker/shared'
@@ -51,6 +52,7 @@ const deleteServerCategory = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number() }))
   .handler(async ({ data }) => {
     const db = getDB()
+    await nullifyCategoryOnTransactions(db, data.id)
     await deleteCategory(db, data.id)
     return { success: true }
   })

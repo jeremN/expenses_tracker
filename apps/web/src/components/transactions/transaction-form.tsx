@@ -48,19 +48,27 @@ interface TransactionFormProps {
     categoryId?: number
   }) => void
   isSubmitting?: boolean
+  defaultValues?: {
+    type: TransactionType
+    amount: number
+    description?: string | null
+    date: string
+    categoryId?: number | null
+  }
 }
 
-export function TransactionForm({ categories, onSubmit, isSubmitting }: TransactionFormProps) {
+export function TransactionForm({ categories, onSubmit, isSubmitting, defaultValues }: TransactionFormProps) {
   const today = new Date().toISOString().split('T')[0]
+  const isEditing = !!defaultValues
 
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionFormSchema),
     defaultValues: {
-      type: 'expense',
-      amount: '',
-      description: '',
-      date: today,
-      categoryId: undefined,
+      type: defaultValues?.type ?? 'expense',
+      amount: defaultValues ? (defaultValues.amount / 100).toString() : '',
+      description: defaultValues?.description ?? '',
+      date: defaultValues?.date ?? today,
+      categoryId: defaultValues?.categoryId ? String(defaultValues.categoryId) : undefined,
     },
   })
 
@@ -207,9 +215,11 @@ export function TransactionForm({ categories, onSubmit, isSubmitting }: Transact
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting
               ? 'Saving...'
-              : currentType === 'income'
-                ? 'Add Income'
-                : 'Add Expense'}
+              : isEditing
+                ? 'Save Changes'
+                : currentType === 'income'
+                  ? 'Add Income'
+                  : 'Add Expense'}
           </Button>
         </div>
       </form>

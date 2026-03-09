@@ -1,8 +1,8 @@
 import { eq, and, like, desc, sql } from 'drizzle-orm'
-import type { DrizzleD1Database } from 'drizzle-orm/d1'
+import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core'
 import * as schema from './schema'
 
-type DB = DrizzleD1Database<typeof schema>
+type DB = BaseSQLiteDatabase<'async', any, typeof schema>
 
 // --- Categories ---
 export function getCategories(db: DB) {
@@ -19,6 +19,12 @@ export function createCategory(db: DB, data: { name: string; color?: string; ico
 
 export function updateCategory(db: DB, id: number, data: Partial<{ name: string; color: string; icon: string }>) {
   return db.update(schema.categories).set(data).where(eq(schema.categories.id, id)).returning().get()
+}
+
+export function nullifyCategoryOnTransactions(db: DB, categoryId: number) {
+  return db.update(schema.transactions)
+    .set({ categoryId: null })
+    .where(eq(schema.transactions.categoryId, categoryId))
 }
 
 export function deleteCategory(db: DB, id: number) {
