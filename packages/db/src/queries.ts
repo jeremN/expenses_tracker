@@ -118,10 +118,9 @@ export function getInvestmentSnapshots(db: DB, range?: { from?: string; to?: str
   const conditions = []
 
   if (range?.from) {
-    conditions.push(like(schema.investmentSnapshots.date, `${range.from}%`))
+    conditions.push(sql`${schema.investmentSnapshots.date} >= ${range.from + '-01'}`)
   }
   if (range?.to) {
-    // For "to" we need <=, use raw SQL comparison since dates are YYYY-MM-DD strings
     conditions.push(sql`${schema.investmentSnapshots.date} <= ${range.to + '-31'}`)
   }
 

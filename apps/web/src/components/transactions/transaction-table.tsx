@@ -71,7 +71,7 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
               </TableCell>
               <TableCell className="text-right font-medium tabular-nums">
                 <span className={tx.type === 'income' ? 'text-green-600' : 'text-red-600'}>
-                  {tx.type === 'income' ? '+' : '-'}${formatCents(tx.amount)}
+                  {tx.type === 'income' ? '+' : '-'}{formatCents(tx.amount)}
                 </span>
               </TableCell>
               <TableCell>

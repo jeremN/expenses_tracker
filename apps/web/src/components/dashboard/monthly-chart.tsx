@@ -55,7 +55,7 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
                     <div
                       className="w-full rounded-t bg-emerald-500 transition-all hover:bg-emerald-400"
                       style={{ height: `${Math.max(incomeHeight, 2)}%` }}
-                      title={`Income: $${formatCents(month.income)}`}
+                      title={`Income: ${formatCents(month.income)}`}
                     />
                   </div>
                   {/* Expense bar */}
@@ -63,7 +63,7 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
                     <div
                       className="w-full rounded-t bg-red-500 transition-all hover:bg-red-400"
                       style={{ height: `${Math.max(expenseHeight, 2)}%` }}
-                      title={`Expenses: $${formatCents(month.expenses)}`}
+                      title={`Expenses: ${formatCents(month.expenses)}`}
                     />
                   </div>
                 </div>

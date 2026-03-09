@@ -80,7 +80,7 @@ export function MonthlyTrendChart({ data }: { data: MonthlySummaryRow[] }) {
                     />
                   </div>
                   <span className="text-xs text-muted-foreground w-20 text-right tabular-nums">
-                    ${formatCents(row.income)}
+                    {formatCents(row.income)}
                   </span>
                 </div>
                 {/* Expense bar */}
@@ -92,7 +92,7 @@ export function MonthlyTrendChart({ data }: { data: MonthlySummaryRow[] }) {
                     />
                   </div>
                   <span className="text-xs text-muted-foreground w-20 text-right tabular-nums">
-                    ${formatCents(row.expenses)}
+                    {formatCents(row.expenses)}
                   </span>
                 </div>
               </div>
@@ -102,7 +102,7 @@ export function MonthlyTrendChart({ data }: { data: MonthlySummaryRow[] }) {
                   net >= 0 ? 'text-emerald-600' : 'text-red-600'
                 }`}
               >
-                {net >= 0 ? '+' : '-'}${formatCents(Math.abs(net))}
+                {net >= 0 ? '+' : '-'}{formatCents(Math.abs(net))}
               </span>
             </div>
           )

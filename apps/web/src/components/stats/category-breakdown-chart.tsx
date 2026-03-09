@@ -36,7 +36,7 @@ export function CategoryBreakdownChart({ data }: { data: CategoryBreakdownRow[] 
                 backgroundColor: row.category_color || DEFAULT_COLOR,
                 minWidth: percent > 0 ? '2px' : '0',
               }}
-              title={`${row.category_name ?? 'Uncategorized'}: $${formatCents(row.total)}`}
+              title={`${row.category_name ?? 'Uncategorized'}: ${formatCents(row.total)}`}
             />
           )
         })}
@@ -75,7 +75,7 @@ export function CategoryBreakdownChart({ data }: { data: CategoryBreakdownRow[] 
               </div>
 
               <span className="text-sm font-medium text-right tabular-nums">
-                ${formatCents(row.total)}
+                {formatCents(row.total)}
               </span>
 
               <span className="text-xs text-muted-foreground text-right tabular-nums">
@@ -90,7 +90,7 @@ export function CategoryBreakdownChart({ data }: { data: CategoryBreakdownRow[] 
       <div className="flex items-center justify-between border-t pt-3">
         <span className="text-sm font-medium text-muted-foreground">Total Expenses</span>
         <span className="text-sm font-semibold tabular-nums">
-          ${formatCents(grandTotal)}
+          {formatCents(grandTotal)}
         </span>
       </div>
     </div>

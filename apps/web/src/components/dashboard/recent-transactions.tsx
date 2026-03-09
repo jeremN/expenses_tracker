@@ -74,7 +74,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                 tx.type === 'income' ? 'text-emerald-600' : 'text-red-600'
               }`}
             >
-              {tx.type === 'income' ? '+' : '-'}${formatCents(tx.amount)}
+              {tx.type === 'income' ? '+' : '-'}{formatCents(tx.amount)}
             </span>
           </div>
         ))}

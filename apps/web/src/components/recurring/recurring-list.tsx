@@ -72,7 +72,7 @@ export function RecurringList({ rules, onEdit, onDelete, onToggle }: RecurringLi
                   rule.type === 'income' ? 'text-green-600' : 'text-red-600'
                 }`}
               >
-                {rule.type === 'income' ? '+' : '-'}${formatCents(rule.amount)}
+                {rule.type === 'income' ? '+' : '-'}{formatCents(rule.amount)}
               </p>
             </div>
 

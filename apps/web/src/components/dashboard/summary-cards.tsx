@@ -59,7 +59,7 @@ export function SummaryCards({ currentMonth, previousMonth }: SummaryCardsProps)
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-emerald-600">
-            +${formatCents(currentMonth.income)}
+            +{formatCents(currentMonth.income)}
           </div>
           <TrendIndicator current={currentMonth.income} previous={previousMonth.income} />
         </CardContent>
@@ -73,7 +73,7 @@ export function SummaryCards({ currentMonth, previousMonth }: SummaryCardsProps)
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-red-600">
-            -${formatCents(currentMonth.expenses)}
+            -{formatCents(currentMonth.expenses)}
           </div>
           <TrendIndicator current={currentMonth.expenses} previous={previousMonth.expenses} invertColor />
         </CardContent>
@@ -87,7 +87,7 @@ export function SummaryCards({ currentMonth, previousMonth }: SummaryCardsProps)
         </CardHeader>
         <CardContent>
           <div className={`text-2xl font-bold ${currentMonth.balance >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-            {currentMonth.balance >= 0 ? '+' : '-'}${formatCents(Math.abs(currentMonth.balance))}
+            {currentMonth.balance >= 0 ? '+' : '-'}{formatCents(Math.abs(currentMonth.balance))}
           </div>
           <TrendIndicator current={currentMonth.balance} previous={previousMonth.balance} />
         </CardContent>

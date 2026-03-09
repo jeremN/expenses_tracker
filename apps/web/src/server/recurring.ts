@@ -88,15 +88,21 @@ export async function generateMissingTransactions(): Promise<number> {
         break
       }
 
-      await createTransaction(db, {
-        type: rule.type,
-        amount: rule.amount,
-        description: rule.description ?? undefined,
-        date: nextDate,
-        categoryId: rule.categoryId ?? undefined,
-        recurringId: rule.id,
-      })
-      totalGenerated++
+      try {
+        await createTransaction(db, {
+          type: rule.type,
+          amount: rule.amount,
+          description: rule.description ?? undefined,
+          date: nextDate,
+          categoryId: rule.categoryId ?? undefined,
+          recurringId: rule.id,
+        })
+        totalGenerated++
+      } catch (e) {
+        // Skip duplicate (unique constraint on recurring_id + date)
+        if (e instanceof Error && e.message.includes('UNIQUE')) continue
+        throw e
+      }
 
       nextDate = addPeriod(nextDate, rule.frequency)
     }

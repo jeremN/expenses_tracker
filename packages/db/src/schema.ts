@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, integer, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 import { sql } from 'drizzle-orm'
 
 export const categories = sqliteTable('categories', {
@@ -33,7 +33,9 @@ export const transactions = sqliteTable('transactions', {
   recurringId: integer('recurring_id').references(() => recurringRules.id),
   createdAt: text('created_at').default(sql`(current_timestamp)`).notNull(),
   updatedAt: text('updated_at').default(sql`(current_timestamp)`).notNull(),
-})
+}, (table) => [
+  uniqueIndex('uniq_recurring_date').on(table.recurringId, table.date),
+])
 
 export const investmentSnapshots = sqliteTable('investment_snapshots', {
   id: integer('id').primaryKey({ autoIncrement: true }),
