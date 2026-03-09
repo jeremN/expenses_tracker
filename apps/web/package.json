@@ -22,6 +22,8 @@
     "@tailwindcss/vite": "^4.2.1",
     "@tanstack/react-router": "latest",
     "@tanstack/react-start": "latest",
+    "@tracker/db": "workspace:*",
+    "drizzle-orm": "latest",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
