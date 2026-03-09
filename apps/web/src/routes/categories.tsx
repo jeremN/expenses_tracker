@@ -1,5 +1,200 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
+import { getDB } from '~/server/db'
+import {
+  getCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from '@tracker/db'
+import { z } from 'zod'
+import { createCategorySchema, updateCategorySchema } from '@tracker/shared'
+import type { Category, CreateCategory } from '@tracker/shared'
+import { Plus } from 'lucide-react'
+import { Button } from '~/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '~/components/ui/dialog'
+import { CategoryForm } from '~/components/categories/category-form'
+import { CategoryList } from '~/components/categories/category-list'
+
+// --- Server Functions ---
+
+const getServerCategories = createServerFn({ method: 'GET' }).handler(async () => {
+  const db = getDB()
+  return getCategories(db)
+})
+
+const createServerCategory = createServerFn({ method: 'POST' })
+  .inputValidator(createCategorySchema)
+  .handler(async ({ data }) => {
+    const db = getDB()
+    return createCategory(db, data)
+  })
+
+const updateServerCategory = createServerFn({ method: 'POST' })
+  .inputValidator(updateCategorySchema.extend({ id: z.number() }))
+  .handler(async ({ data }) => {
+    const { id, ...rest } = data
+    const db = getDB()
+    return updateCategory(db, id, rest)
+  })
+
+const deleteServerCategory = createServerFn({ method: 'POST' })
+  .inputValidator(z.object({ id: z.number() }))
+  .handler(async ({ data }) => {
+    const db = getDB()
+    await deleteCategory(db, data.id)
+    return { success: true }
+  })
+
+// --- Route ---
 
 export const Route = createFileRoute('/categories')({
-  component: () => <div className="text-2xl font-bold">Categories</div>,
+  loader: () => getServerCategories(),
+  component: CategoriesPage,
 })
+
+// --- Page Component ---
+
+function CategoriesPage() {
+  const categories = Route.useLoaderData() as Category[]
+
+  const [formOpen, setFormOpen] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Category | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const router = useRouter()
+
+  function openCreate() {
+    setEditingCategory(null)
+    setFormOpen(true)
+  }
+
+  function openEdit(category: Category) {
+    setEditingCategory(category)
+    setFormOpen(true)
+  }
+
+  async function handleSubmit(data: CreateCategory) {
+    setIsSubmitting(true)
+    try {
+      if (editingCategory) {
+        await updateServerCategory({ data: { ...data, id: editingCategory.id } })
+      } else {
+        await createServerCategory({ data })
+      }
+      setFormOpen(false)
+      setEditingCategory(null)
+      router.invalidate()
+    } catch (error) {
+      console.error('Failed to save category:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!deleteTarget) return
+    setIsSubmitting(true)
+    try {
+      await deleteServerCategory({ data: { id: deleteTarget.id } })
+      setDeleteTarget(null)
+      router.invalidate()
+    } catch (error) {
+      console.error('Failed to delete category:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Categories</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage your transaction categories.
+          </p>
+        </div>
+        <Button onClick={openCreate}>
+          <Plus className="h-4 w-4" />
+          Add Category
+        </Button>
+      </div>
+
+      {/* Category List */}
+      <CategoryList
+        categories={categories}
+        onEdit={openEdit}
+        onDelete={setDeleteTarget}
+      />
+
+      {/* Create / Edit Dialog */}
+      <Dialog open={formOpen} onOpenChange={(open) => {
+        if (!open) {
+          setFormOpen(false)
+          setEditingCategory(null)
+        }
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingCategory ? 'Edit Category' : 'New Category'}
+            </DialogTitle>
+            <DialogDescription>
+              {editingCategory
+                ? 'Update the details for this category.'
+                : 'Create a new category to organize your transactions.'}
+            </DialogDescription>
+          </DialogHeader>
+          <CategoryForm
+            key={editingCategory?.id ?? 'new'}
+            defaultValues={editingCategory ?? undefined}
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => {
+        if (!open) setDeleteTarget(null)
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Category</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{deleteTarget?.name}"? This action cannot
+              be undone. Transactions using this category will lose their category
+              assignment.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteTarget(null)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
