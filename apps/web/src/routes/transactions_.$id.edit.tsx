@@ -2,20 +2,16 @@ import { useState } from 'react'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getDB } from '~/server/db'
-import { getCategories, getTransactionById, updateTransaction } from '@tracker/db'
+import { getTransactionById, updateTransaction } from '@tracker/db'
 import { updateTransactionSchema } from '@tracker/shared'
 import type { Category, Transaction, UpdateTransaction } from '@tracker/shared'
 import { z } from 'zod'
 import { TransactionForm } from '~/components/transactions/transaction-form'
-import { Skeleton } from '~/components/ui/skeleton'
+import { TransactionFormSkeleton } from '~/components/transactions/transaction-form-skeleton'
 import { RouteError } from '~/components/route-error'
+import { getServerCategories } from '~/server/shared-fns'
 
 // --- Server Functions ---
-
-const getServerCategories = createServerFn({ method: 'GET' }).handler(async () => {
-  const db = getDB()
-  return getCategories(db)
-})
 
 const getServerTransaction = createServerFn({ method: 'GET' })
   .inputValidator(z.object({ id: z.number() }))
@@ -46,27 +42,9 @@ export const Route = createFileRoute('/transactions/$id/edit')({
     return { transaction, categories }
   },
   component: EditTransactionPage,
-  pendingComponent: EditTransactionSkeleton,
+  pendingComponent: TransactionFormSkeleton,
   errorComponent: ({ error }) => <RouteError error={error} />,
 })
-
-function EditTransactionSkeleton() {
-  return (
-    <div className="mx-auto max-w-lg space-y-6">
-      <div>
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="mt-2 h-4 w-48" />
-      </div>
-      <div className="space-y-4">
-        <Skeleton className="h-10" />
-        <Skeleton className="h-10" />
-        <Skeleton className="h-10" />
-        <Skeleton className="h-10" />
-        <Skeleton className="h-10 w-28" />
-      </div>
-    </div>
-  )
-}
 
 // --- Page Component ---
 

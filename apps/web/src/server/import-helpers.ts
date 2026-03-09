@@ -1,5 +1,5 @@
 import { getDB } from '~/server/db'
-import { createTransaction, createBankImport } from '@tracker/db'
+import { transactions, createBankImport } from '@tracker/db'
 
 export async function processImport(data: {
   transactions: Array<{
@@ -11,27 +11,26 @@ export async function processImport(data: {
   filename: string
 }) {
   const db = getDB()
-  let imported = 0
 
-  for (const tx of data.transactions) {
-    if (!tx.date || tx.amount === undefined) continue
-
-    const isIncome = tx.amount > 0
-    await createTransaction(db, {
-      type: isIncome ? 'income' : 'expense',
+  const rows = data.transactions
+    .filter((tx) => tx.date && tx.amount !== undefined)
+    .map((tx) => ({
+      type: tx.amount > 0 ? 'income' as const : 'expense' as const,
       amount: Math.abs(tx.amount),
-      description: tx.description || undefined,
+      description: tx.description ?? undefined,
       date: tx.date,
-      categoryId: tx.categoryId || undefined,
-    })
-    imported++
+      categoryId: tx.categoryId ?? undefined,
+    }))
+
+  if (rows.length > 0) {
+    await db.insert(transactions).values(rows)
   }
 
   await createBankImport(db, {
     filename: data.filename,
-    rowCount: imported,
-    status: imported === data.transactions.length ? 'completed' : 'partial',
+    rowCount: rows.length,
+    status: rows.length === data.transactions.length ? 'completed' : 'partial',
   })
 
-  return { imported, total: data.transactions.length }
+  return { imported: rows.length, total: data.transactions.length }
 }

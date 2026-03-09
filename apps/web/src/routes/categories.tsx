@@ -2,13 +2,7 @@ import { useState } from 'react'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getDB } from '~/server/db'
-import {
-  getCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-  nullifyCategoryOnTransactions,
-} from '@tracker/db'
+import { createCategory, updateCategory, deleteCategory } from '@tracker/db'
 import { z } from 'zod'
 import { createCategorySchema, updateCategorySchema } from '@tracker/shared'
 import type { Category, CreateCategory } from '@tracker/shared'
@@ -25,13 +19,9 @@ import { CategoryForm } from '~/components/categories/category-form'
 import { CategoryList } from '~/components/categories/category-list'
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
+import { getServerCategories } from '~/server/shared-fns'
 
 // --- Server Functions ---
-
-const getServerCategories = createServerFn({ method: 'GET' }).handler(async () => {
-  const db = getDB()
-  return getCategories(db)
-})
 
 const createServerCategory = createServerFn({ method: 'POST' })
   .inputValidator(createCategorySchema)
@@ -52,7 +42,6 @@ const deleteServerCategory = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number() }))
   .handler(async ({ data }) => {
     const db = getDB()
-    await nullifyCategoryOnTransactions(db, data.id)
     await deleteCategory(db, data.id)
     return { success: true }
   })

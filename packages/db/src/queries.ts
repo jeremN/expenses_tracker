@@ -21,13 +21,10 @@ export function updateCategory(db: DB, id: number, data: Partial<{ name: string;
   return db.update(schema.categories).set(data).where(eq(schema.categories.id, id)).returning().get()
 }
 
-export function nullifyCategoryOnTransactions(db: DB, categoryId: number) {
-  return db.update(schema.transactions)
+export async function deleteCategory(db: DB, id: number) {
+  await db.update(schema.transactions)
     .set({ categoryId: null })
-    .where(eq(schema.transactions.categoryId, categoryId))
-}
-
-export function deleteCategory(db: DB, id: number) {
+    .where(eq(schema.transactions.categoryId, id))
   return db.delete(schema.categories).where(eq(schema.categories.id, id))
 }
 

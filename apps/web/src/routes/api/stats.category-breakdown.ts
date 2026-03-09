@@ -11,8 +11,8 @@ export const Route = createFileRoute('/api/stats/category-breakdown')({
           const url = new URL(request.url)
           const month = url.searchParams.get('month')
 
-          if (!month) {
-            return errorResponse('month query parameter is required')
+          if (!month || !/^\d{4}-\d{2}$/.test(month)) {
+            return errorResponse('month must be YYYY-MM format (e.g., 2026-01)')
           }
 
           const db = getDB()

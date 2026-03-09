@@ -11,8 +11,8 @@ export const Route = createFileRoute('/api/stats/monthly-summary')({
           const url = new URL(request.url)
           const year = url.searchParams.get('year')
 
-          if (!year) {
-            return errorResponse('year query parameter is required')
+          if (!year || !/^\d{4}$/.test(year)) {
+            return errorResponse('year must be a 4-digit year (e.g., 2026)')
           }
 
           const db = getDB()
