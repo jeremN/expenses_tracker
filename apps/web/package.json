@@ -6,7 +6,8 @@
     "dev": "vite dev",
     "build": "vite build",
     "start": "node .output/server/index.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "deploy": "pnpm build && wrangler deploy"
   },
   "dependencies": {
     "@tanstack/react-router": "latest",
@@ -20,6 +21,8 @@
     "@vitejs/plugin-react": "latest",
     "vite": "latest",
     "vite-tsconfig-paths": "latest",
-    "typescript": "^5.7.0"
+    "@cloudflare/vite-plugin": "latest",
+    "typescript": "^5.7.0",
+    "wrangler": "latest"
   }
 }
