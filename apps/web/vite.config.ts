@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import { cloudflare } from '@cloudflare/vite-plugin'
+import tailwindcss from '@tailwindcss/vite'
 import tsConfigPaths from 'vite-tsconfig-paths'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
@@ -10,6 +11,7 @@ export default defineConfig({
   },
   plugins: [
     cloudflare({ viteEnvironment: { name: 'ssr' } }),
+    tailwindcss(),
     tsConfigPaths(),
     tanstackStart(),
     // react's vite plugin must come after start's vite plugin
