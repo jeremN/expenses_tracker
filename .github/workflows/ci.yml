@@ -39,6 +39,21 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # `pnpm build` re-runs the tanstackStart() vite plugin which
+      # regenerates routeTree.gen.ts and (in some cases) rewrites the
+      # `createFileRoute(...)` string in route source files. If the
+      # committed state was inconsistent, the build step modifies these
+      # files in place — fail the run so the author is forced to commit
+      # the regenerated tree.
+      - name: Verify TanStack Router state matches sources
+        run: |
+          if ! git diff --quiet -- apps/web/src/routeTree.gen.ts apps/web/src/routes; then
+            echo "::error::Build regenerated TanStack Router state. Run 'pnpm build' locally and commit the changes to apps/web/src/routeTree.gen.ts and apps/web/src/routes/."
+            git status --short -- apps/web/src/routeTree.gen.ts apps/web/src/routes
+            git diff -- apps/web/src/routeTree.gen.ts apps/web/src/routes
+            exit 1
+          fi
+
       # Catches schema-vs-migration drift: if someone edits
       # packages/db/src/schema.ts without re-running `db:generate`, this
       # step produces a new migration file and the git-diff guard fails.
