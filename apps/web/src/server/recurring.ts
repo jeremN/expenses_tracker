@@ -99,11 +99,15 @@ export async function generateMissingTransactions(): Promise<number> {
         })
         totalGenerated++
       } catch (e) {
-        // Skip duplicate (unique constraint on recurring_id + date)
-        if (e instanceof Error && e.message.includes('UNIQUE')) continue
-        throw e
+        // UNIQUE conflict means another concurrent generator already inserted
+        // this occurrence — safe to skip and continue advancing the loop.
+        if (!(e instanceof Error && e.message.includes('UNIQUE'))) {
+          throw e
+        }
       }
 
+      // Always advance — both on success and on swallowed UNIQUE conflict —
+      // otherwise the loop spins forever on a duplicate.
       nextDate = addPeriod(nextDate, rule.frequency)
     }
   }

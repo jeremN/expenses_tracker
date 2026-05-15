@@ -163,6 +163,48 @@ not-a-date,100
     expect(result.rows[0].date).toBe('2026-01-15')
   })
 
+  it('correctly disambiguates US-format 2-digit-year via >12 heuristic', () => {
+    // 01/15/26: first number is 1 (≤12), second is 15 (>12) → MM/DD/YY
+    const csv = `Date,Amount
+01/15/26,100`
+
+    const result = parseCSV(csv, { date: 'Date', amount: 'Amount' })
+    expect(result.rows[0].date).toBe('2026-01-15')
+  })
+
+  it('rejects YYYY-MM-DD strings with out-of-range components', () => {
+    const csv = `Date,Amount
+2026-13-40,100
+2026-02-30,200
+2025-02-29,300
+2026-01-15,400`
+
+    const result = parseCSV(csv, { date: 'Date', amount: 'Amount' })
+    // Only the valid date survives — the others fail isValidIsoDate round-trip
+    expect(result.rows).toHaveLength(1)
+    expect(result.rows[0].date).toBe('2026-01-15')
+  })
+
+  it('rejects DD/MM/YYYY strings with out-of-range components', () => {
+    const csv = `Date,Amount
+99/99/2026,100
+30/02/2026,200
+15/01/2026,300`
+
+    const result = parseCSV(csv, { date: 'Date', amount: 'Amount' })
+    expect(result.rows).toHaveLength(1)
+    expect(result.rows[0].date).toBe('2026-01-15')
+  })
+
+  it('accepts valid Feb 29 in a leap year', () => {
+    const csv = `Date,Amount
+2024-02-29,100`
+
+    const result = parseCSV(csv, { date: 'Date', amount: 'Amount' })
+    expect(result.rows).toHaveLength(1)
+    expect(result.rows[0].date).toBe('2024-02-29')
+  })
+
   it('handles Windows-style line endings (CRLF)', () => {
     const csv = "Date,Amount\r\n2026-01-15,100\r\n2026-01-16,200"
 

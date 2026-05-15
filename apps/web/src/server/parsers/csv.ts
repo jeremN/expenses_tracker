@@ -223,54 +223,84 @@ function parseLine(line: string, delimiter: string): string[] {
 }
 
 /**
+ * Validate a YYYY-MM-DD string by round-tripping through Date.UTC.
+ * Rejects invalid months (e.g. 13), invalid days (e.g. Feb 30), and
+ * other semantically broken inputs that pass the surface regex.
+ */
+function isValidIsoDate(iso: string): boolean {
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!m) return false
+  const y = parseInt(m[1], 10)
+  const mo = parseInt(m[2], 10)
+  const d = parseInt(m[3], 10)
+  if (mo < 1 || mo > 12 || d < 1 || d > 31) return false
+  const utc = new Date(Date.UTC(y, mo - 1, d))
+  return (
+    utc.getUTCFullYear() === y &&
+    utc.getUTCMonth() === mo - 1 &&
+    utc.getUTCDate() === d
+  )
+}
+
+/**
+ * Disambiguate a (a, b, year) triple captured from a numeric date string
+ * into a YYYY-MM-DD format. Uses the >12 heuristic to detect day vs month
+ * position; defaults to DD/MM/YYYY for ambiguous cases (more common in
+ * European bank statements). Returns null if the resulting date isn't real.
+ */
+function buildDate(a: string, b: string, year: string): string | null {
+  const aPad = a.padStart(2, '0')
+  const bPad = b.padStart(2, '0')
+  const ai = parseInt(a, 10)
+  const bi = parseInt(b, 10)
+
+  let iso: string
+  if (ai > 12 && bi <= 12) {
+    iso = `${year}-${bPad}-${aPad}` // DD/MM/YYYY
+  } else if (bi > 12 && ai <= 12) {
+    iso = `${year}-${aPad}-${bPad}` // MM/DD/YYYY
+  } else {
+    iso = `${year}-${bPad}-${aPad}` // ambiguous: default DD/MM/YYYY
+  }
+
+  return isValidIsoDate(iso) ? iso : null
+}
+
+/**
  * Parse a date string into YYYY-MM-DD format.
- * Tries multiple common formats.
+ * Tries multiple common formats. Returns null if no format matches OR if
+ * the parsed result is not a real calendar date.
  */
 function parseDate(str: string): string | null {
   const s = str.trim()
   if (!s) return null
 
-  // Already YYYY-MM-DD
+  // Already YYYY-MM-DD — still validate (e.g. reject 2026-13-40)
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-    return s
+    return isValidIsoDate(s) ? s : null
   }
 
-  // DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
+  // DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY (4-digit year)
   const dmy = s.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})$/)
   if (dmy) {
-    const day = dmy[1].padStart(2, '0')
-    const month = dmy[2].padStart(2, '0')
-    const year = dmy[3]
-    // Heuristic: if first number > 12, it's definitely the day (DD/MM/YYYY)
-    // If second number > 12, it's definitely the month position (MM/DD/YYYY)
-    const d = parseInt(day, 10)
-    const m = parseInt(month, 10)
-    if (d > 12 && m <= 12) {
-      // DD/MM/YYYY
-      return `${year}-${month}-${day}`
-    }
-    if (m > 12 && d <= 12) {
-      // MM/DD/YYYY
-      return `${year}-${day}-${month}`
-    }
-    // Ambiguous — default to DD/MM/YYYY (more common in bank statements)
-    return `${year}-${month}-${day}`
+    return buildDate(dmy[1], dmy[2], dmy[3])
   }
 
-  // MM/DD/YYYY or similar with 2-digit year
+  // Same with 2-digit year (50-99 → 19xx, 00-49 → 20xx).
+  // Previously this branch unconditionally treated `a` as day, which
+  // mangled US-formatted dates like 01/15/26 into 2026-15-01.
   const short = s.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2})$/)
   if (short) {
-    const a = short[1].padStart(2, '0')
-    const b = short[2].padStart(2, '0')
     const yr = parseInt(short[3], 10)
     const year = yr >= 50 ? `19${short[3]}` : `20${short[3]}`
-    return `${year}-${b}-${a}` // default DD/MM/YY
+    return buildDate(short[1], short[2], year)
   }
 
-  // YYYY/MM/DD
+  // YYYY/MM/DD or YYYY.MM.DD
   const ymd = s.match(/^(\d{4})[/.](\d{1,2})[/.](\d{1,2})$/)
   if (ymd) {
-    return `${ymd[1]}-${ymd[2].padStart(2, '0')}-${ymd[3].padStart(2, '0')}`
+    const iso = `${ymd[1]}-${ymd[2].padStart(2, '0')}-${ymd[3].padStart(2, '0')}`
+    return isValidIsoDate(iso) ? iso : null
   }
 
   return null

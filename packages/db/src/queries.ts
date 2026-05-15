@@ -4,6 +4,10 @@ import * as schema from './schema'
 
 type DB = BaseSQLiteDatabase<'async', any, typeof schema>
 
+type TxType = 'income' | 'expense'
+type Frequency = 'weekly' | 'monthly' | 'yearly'
+type ImportStatus = 'pending' | 'completed' | 'partial'
+
 // --- Categories ---
 export function getCategories(db: DB) {
   return db.select().from(schema.categories).orderBy(schema.categories.name)
@@ -25,6 +29,11 @@ export async function deleteCategory(db: DB, id: number) {
   await db.update(schema.transactions)
     .set({ categoryId: null })
     .where(eq(schema.transactions.categoryId, id))
+  // Also null the FK on recurring rules — otherwise newly generated
+  // transactions inherit a dangling category_id that breaks join-based stats.
+  await db.update(schema.recurringRules)
+    .set({ categoryId: null })
+    .where(eq(schema.recurringRules.categoryId, id))
   return db.delete(schema.categories).where(eq(schema.categories.id, id))
 }
 
@@ -39,7 +48,7 @@ export function getTransactions(db: DB, filters?: { month?: string; categoryId?:
     conditions.push(eq(schema.transactions.categoryId, filters.categoryId))
   }
   if (filters?.type) {
-    conditions.push(eq(schema.transactions.type, filters.type))
+    conditions.push(eq(schema.transactions.type, filters.type as TxType))
   }
 
   const query = db.select().from(schema.transactions)
@@ -60,14 +69,14 @@ export function getTransactionById(db: DB, id: number) {
 }
 
 export function createTransaction(db: DB, data: {
-  type: string; amount: number; description?: string; date: string;
+  type: TxType; amount: number; description?: string; date: string;
   categoryId?: number; recurringId?: number;
 }) {
   return db.insert(schema.transactions).values(data).returning().get()
 }
 
 export function updateTransaction(db: DB, id: number, data: Partial<{
-  type: string; amount: number; description: string; date: string; categoryId: number;
+  type: TxType; amount: number; description: string; date: string; categoryId: number;
 }>) {
   return db.update(schema.transactions)
     .set({ ...data, updatedAt: sql`(current_timestamp)` })
@@ -92,15 +101,15 @@ export function getActiveRecurringRules(db: DB) {
 }
 
 export function createRecurringRule(db: DB, data: {
-  type: string; amount: number; description?: string; categoryId?: number;
-  frequency: string; startDate: string; endDate?: string;
+  type: TxType; amount: number; description?: string; categoryId?: number;
+  frequency: Frequency; startDate: string; endDate?: string;
 }) {
   return db.insert(schema.recurringRules).values(data).returning().get()
 }
 
 export function updateRecurringRule(db: DB, id: number, data: Partial<{
-  type: string; amount: number; description: string; categoryId: number;
-  frequency: string; startDate: string; endDate: string; isActive: boolean;
+  type: TxType; amount: number; description: string; categoryId: number;
+  frequency: Frequency; startDate: string; endDate: string; isActive: boolean;
 }>) {
   return db.update(schema.recurringRules).set(data)
     .where(eq(schema.recurringRules.id, id)).returning().get()
@@ -146,8 +155,12 @@ export function deleteInvestmentSnapshot(db: DB, id: number) {
 }
 
 // --- Bank Imports ---
-export function createBankImport(db: DB, data: { filename: string; rowCount: number; status: string }) {
+export function createBankImport(db: DB, data: { filename: string; rowCount: number; status: ImportStatus }) {
   return db.insert(schema.bankImports).values(data).returning().get()
+}
+
+export function updateBankImportStatus(db: DB, id: number, data: { rowCount?: number; status: ImportStatus }) {
+  return db.update(schema.bankImports).set(data).where(eq(schema.bankImports.id, id)).returning().get()
 }
 
 export function getBankImports(db: DB) {
