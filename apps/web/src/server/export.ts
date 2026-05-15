@@ -34,8 +34,8 @@ export async function buildExportZip(db: DB): Promise<Uint8Array> {
   const transactions = (txRows as Array<{ transactions: Record<string, unknown> }>).map(
     (r) => r.transactions,
   )
-  const recurringRules = (recurringRows as Array<{ recurring_rules?: Record<string, unknown>; recurringRules?: Record<string, unknown> }>).map(
-    (r) => r.recurring_rules ?? r.recurringRules ?? r,
+  const recurringRules = (recurringRows as Array<{ recurring_rules: Record<string, unknown> }>).map(
+    (r) => r.recurring_rules,
   )
 
   const zip = new JSZip()
