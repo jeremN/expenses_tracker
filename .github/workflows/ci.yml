@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+# Cancel any in-progress run for the same ref when a new commit arrives.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      # Catches schema-vs-migration drift: if someone edits
+      # packages/db/src/schema.ts without re-running `db:generate`, this
+      # step produces a new migration file and the git-diff guard fails.
+      - name: Verify Drizzle migrations match schema
+        run: |
+          pnpm --filter @tracker/db db:generate
+          if ! git diff --quiet -- packages/db/drizzle; then
+            echo "::error::Schema in packages/db/src/schema.ts is ahead of its migrations. Run 'pnpm --filter @tracker/db db:generate' locally and commit the new migration."
+            git diff -- packages/db/drizzle
+            exit 1
+          fi

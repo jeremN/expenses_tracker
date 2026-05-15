@@ -1,3 +1,14 @@
 *.env
 /expenses-tracker/package-lock.json
 /expenses-tracker/yarn.lock
+.worktrees/
+
+# Monorepo
+node_modules
+.output
+dist
+.turbo
+.wrangler
+.env
+.env.local
+*.db
