@@ -24,26 +24,29 @@ export function parseCSV(
   content: string,
   columnMapping?: Record<string, string>,
 ): ParseResult {
-  const lines = content
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n')
-    .split('\n')
-    .filter((line) => line.trim().length > 0)
+  const normalized = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
 
-  if (lines.length === 0) {
+  // Records may span multiple physical lines when a field is quoted and
+  // contains an embedded newline. Split into records using a quote-aware
+  // scanner before parsing each one.
+  const records = splitRecords(normalized).filter(
+    (r) => r.trim().length > 0,
+  )
+
+  if (records.length === 0) {
     return { headers: [], rows: [], rawRows: [] }
   }
 
-  // Detect delimiter by counting occurrences in the first line
-  const delimiter = detectDelimiter(lines[0])
+  // Detect delimiter by counting occurrences in the header record
+  const delimiter = detectDelimiter(records[0])
 
   // Parse header row
-  const headers = parseLine(lines[0], delimiter)
+  const headers = parseLine(records[0], delimiter)
 
   // Parse data rows
   const rawRows: Record<string, string>[] = []
-  for (let i = 1; i < lines.length; i++) {
-    const values = parseLine(lines[i], delimiter)
+  for (let i = 1; i < records.length; i++) {
+    const values = parseLine(records[i], delimiter)
     const row: Record<string, string> = {}
     for (let j = 0; j < headers.length; j++) {
       row[headers[j]] = values[j] ?? ''
@@ -163,6 +166,39 @@ export function detectColumns(
 }
 
 // --- Internal helpers ---
+
+/**
+ * Split a CSV string into logical records, respecting quoted fields that
+ * may contain embedded newlines. Newlines inside `"..."` do not terminate
+ * the record; only unquoted newlines do.
+ */
+function splitRecords(content: string): string[] {
+  const records: string[] = []
+  let current = ''
+  let inQuotes = false
+
+  for (let i = 0; i < content.length; i++) {
+    const ch = content[i]
+    if (ch === '"') {
+      // Track quote state, but keep the character in `current` so parseLine
+      // sees the same input it always has.
+      if (inQuotes && content[i + 1] === '"') {
+        current += '""'
+        i++ // skip escaped quote
+        continue
+      }
+      inQuotes = !inQuotes
+      current += ch
+    } else if (ch === '\n' && !inQuotes) {
+      records.push(current)
+      current = ''
+    } else {
+      current += ch
+    }
+  }
+  if (current.length > 0) records.push(current)
+  return records
+}
 
 function detectDelimiter(line: string): string {
   // Count occurrences outside of quoted fields
