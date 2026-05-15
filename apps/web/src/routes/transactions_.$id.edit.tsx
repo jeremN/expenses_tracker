@@ -32,7 +32,7 @@ const updateServerTransaction = createServerFn({ method: 'POST' })
 
 // --- Route ---
 
-export const Route = createFileRoute('/transactions/$id/edit')({
+export const Route = createFileRoute('/transactions_/$id/edit')({
   loader: async ({ params }) => {
     const id = Number(params.id)
     const [transaction, categories] = await Promise.all([

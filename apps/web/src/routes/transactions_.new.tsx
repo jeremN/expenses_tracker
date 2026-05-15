@@ -19,7 +19,7 @@ const createServerTransaction = createServerFn({ method: 'POST' })
 
 // --- Route ---
 
-export const Route = createFileRoute('/transactions/new')({
+export const Route = createFileRoute('/transactions_/new')({
   loader: () => getServerCategories(),
   component: NewTransactionPage,
   pendingComponent: TransactionFormSkeleton,
