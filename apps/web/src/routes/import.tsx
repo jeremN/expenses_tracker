@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 import { getDB } from '~/server/db'
 import { getTransactions, getCategories, getCategorizedDescriptions } from '@tracker/db'
 import type { ParsedRow, ParseResult } from '~/server/parsers/csv'
@@ -10,32 +11,49 @@ import { PreviewTable } from '~/components/import/preview-table'
 import { Check, Upload, Columns, Eye } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { RouteError } from '~/components/route-error'
-import { processImport } from '~/server/import-helpers'
+import { processImport, MAX_IMPORT_ROWS } from '~/server/import-helpers'
 
 // --- Server Functions ---
 
+// Server-side cap (defense in depth — the client already enforces 10MB).
+const MAX_FILE_BYTES = 10 * 1024 * 1024
+
+const parseFileSchema = z.object({
+  content: z.string().max(MAX_FILE_BYTES, `File exceeds ${MAX_FILE_BYTES} bytes`),
+  mapping: z.record(z.string(), z.string()).optional(),
+})
+
 const parseFile = createServerFn({ method: 'POST' })
-  .inputValidator(
-    (d: { content: string; mapping?: Record<string, string> }) => d,
-  )
+  .inputValidator((d: unknown) => parseFileSchema.parse(d))
   .handler(async ({ data }) => {
     const { parseCSV } = await import('~/server/parsers/csv')
     return parseCSV(data.content, data.mapping)
   })
 
+const detectColumnsSchema = z.object({
+  headers: z.array(z.string()).max(200),
+})
+
 const detectFileColumns = createServerFn({ method: 'POST' })
-  .inputValidator(
-    (d: { headers: string[] }) => d,
-  )
+  .inputValidator((d: unknown) => detectColumnsSchema.parse(d))
   .handler(async ({ data }) => {
     const { detectColumns } = await import('~/server/parsers/csv')
     return detectColumns(data.headers)
   })
 
+const checkDuplicatesSchema = z.object({
+  rows: z
+    .array(
+      z.object({
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        amount: z.number().int(),
+      }),
+    )
+    .max(MAX_IMPORT_ROWS),
+})
+
 const checkDuplicates = createServerFn({ method: 'POST' })
-  .inputValidator(
-    (d: { rows: Array<{ date: string; amount: number }> }) => d,
-  )
+  .inputValidator((d: unknown) => checkDuplicatesSchema.parse(d))
   .handler(async ({ data }) => {
     const db = getDB()
 
@@ -64,10 +82,17 @@ const checkDuplicates = createServerFn({ method: 'POST' })
     return duplicates
   })
 
+const suggestCategoriesSchema = z.object({
+  descriptions: z.array(z.string()).max(MAX_IMPORT_ROWS),
+})
+
+// Minimum length for a description to be considered for partial matching.
+// Shorter strings match too much (e.g. "a" substrings into half the corpus)
+// and produce nonsense suggestions.
+const MIN_PARTIAL_MATCH_LEN = 4
+
 const suggestCategories = createServerFn({ method: 'POST' })
-  .inputValidator(
-    (d: { descriptions: string[] }) => d,
-  )
+  .inputValidator((d: unknown) => suggestCategoriesSchema.parse(d))
   .handler(async ({ data }) => {
     const db = getDB()
     const [descRows, categories] = await Promise.all([
@@ -91,77 +116,88 @@ const suggestCategories = createServerFn({ method: 'POST' })
       categoryMap.set(c.id, c.name)
     }
 
-    // For each unique description, find the best category match
+    // Pick the (categoryId, totalMatchCount) with the highest count from
+    // a counts-by-category map. Returns null if empty.
+    function bestCategory(counts: Map<number, number>): { id: number; count: number } | null {
+      let bestId = 0
+      let bestCount = 0
+      for (const [catId, count] of counts) {
+        if (count > bestCount) {
+          bestCount = count
+          bestId = catId
+        }
+      }
+      return bestId && categoryMap.has(bestId) ? { id: bestId, count: bestCount } : null
+    }
+
     const suggestions: Array<{
       description: string
       categoryId: number
       categoryName: string
     }> = []
 
-    const uniqueDescs = [...new Set(data.descriptions.map((d) => d.toLowerCase()))]
+    const uniqueDescs = [...new Set(data.descriptions.map((d) => d.toLowerCase().trim()))]
     for (const desc of uniqueDescs) {
-      // Exact match first
-      if (descCategoryCount.has(desc)) {
-        const counts = descCategoryCount.get(desc)!
-        let bestId = 0
-        let bestCount = 0
-        for (const [catId, count] of counts) {
-          if (count > bestCount) {
-            bestCount = count
-            bestId = catId
-          }
-        }
-        if (bestId && categoryMap.has(bestId)) {
+      if (!desc) continue
+
+      // Exact match wins.
+      const exact = descCategoryCount.get(desc)
+      if (exact) {
+        const best = bestCategory(exact)
+        if (best) {
           suggestions.push({
             description: desc,
-            categoryId: bestId,
-            categoryName: categoryMap.get(bestId)!,
+            categoryId: best.id,
+            categoryName: categoryMap.get(best.id)!,
           })
           continue
         }
       }
 
-      // Partial match: check if any existing description contains the import description or vice versa
+      // Partial match: aggregate ALL matching existing descriptions and
+      // pick the category with the highest total count across them.
+      // Skip descriptions shorter than MIN_PARTIAL_MATCH_LEN to avoid the
+      // "single character substrings everything" failure mode.
+      if (desc.length < MIN_PARTIAL_MATCH_LEN) continue
+
+      const aggregated = new Map<number, number>()
       for (const [existingDesc, counts] of descCategoryCount) {
-        if (
-          existingDesc.includes(desc) ||
-          desc.includes(existingDesc)
-        ) {
-          let bestId = 0
-          let bestCount = 0
+        if (existingDesc.length < MIN_PARTIAL_MATCH_LEN) continue
+        if (existingDesc.includes(desc) || desc.includes(existingDesc)) {
           for (const [catId, count] of counts) {
-            if (count > bestCount) {
-              bestCount = count
-              bestId = catId
-            }
-          }
-          if (bestId && categoryMap.has(bestId)) {
-            suggestions.push({
-              description: desc,
-              categoryId: bestId,
-              categoryName: categoryMap.get(bestId)!,
-            })
-            break
+            aggregated.set(catId, (aggregated.get(catId) ?? 0) + count)
           }
         }
+      }
+      const best = bestCategory(aggregated)
+      if (best) {
+        suggestions.push({
+          description: desc,
+          categoryId: best.id,
+          categoryName: categoryMap.get(best.id)!,
+        })
       }
     }
 
     return suggestions
   })
 
+const importTransactionsSchema = z.object({
+  transactions: z
+    .array(
+      z.object({
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        description: z.string().max(500).optional(),
+        amount: z.number().int(),
+        categoryId: z.number().int().positive().optional(),
+      }),
+    )
+    .max(MAX_IMPORT_ROWS),
+  filename: z.string().min(1).max(255),
+})
+
 const importTransactions = createServerFn({ method: 'POST' })
-  .inputValidator(
-    (d: {
-      transactions: Array<{
-        date: string
-        description: string
-        amount: number
-        categoryId?: number
-      }>
-      filename: string
-    }) => d,
-  )
+  .inputValidator((d: unknown) => importTransactionsSchema.parse(d))
   .handler(async ({ data }) => {
     return processImport(data)
   })
