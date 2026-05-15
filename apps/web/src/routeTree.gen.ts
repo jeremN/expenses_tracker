@@ -21,6 +21,7 @@ import { Route as ApiTransactionsRouteImport } from './routes/api/transactions'
 import { Route as ApiRecurringRouteImport } from './routes/api/recurring'
 import { Route as ApiInvestmentsRouteImport } from './routes/api/investments'
 import { Route as ApiImportRouteImport } from './routes/api/import'
+import { Route as ApiExportRouteImport } from './routes/api/export'
 import { Route as ApiCategoriesRouteImport } from './routes/api/categories'
 import { Route as TransactionsIdEditRouteImport } from './routes/transactions_.$id.edit'
 import { Route as ApiTransactionsIdRouteImport } from './routes/api/transactions.$id'
@@ -90,6 +91,11 @@ const ApiImportRoute = ApiImportRouteImport.update({
   path: '/api/import',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiExportRoute = ApiExportRouteImport.update({
+  id: '/api/export',
+  path: '/api/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCategoriesRoute = ApiCategoriesRouteImport.update({
   id: '/api/categories',
   path: '/api/categories',
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/stats': typeof StatsRoute
   '/transactions': typeof TransactionsRoute
   '/api/categories': typeof ApiCategoriesRouteWithChildren
+  '/api/export': typeof ApiExportRoute
   '/api/import': typeof ApiImportRoute
   '/api/investments': typeof ApiInvestmentsRouteWithChildren
   '/api/recurring': typeof ApiRecurringRouteWithChildren
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/stats': typeof StatsRoute
   '/transactions': typeof TransactionsRoute
   '/api/categories': typeof ApiCategoriesRouteWithChildren
+  '/api/export': typeof ApiExportRoute
   '/api/import': typeof ApiImportRoute
   '/api/investments': typeof ApiInvestmentsRouteWithChildren
   '/api/recurring': typeof ApiRecurringRouteWithChildren
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/stats': typeof StatsRoute
   '/transactions': typeof TransactionsRoute
   '/api/categories': typeof ApiCategoriesRouteWithChildren
+  '/api/export': typeof ApiExportRoute
   '/api/import': typeof ApiImportRoute
   '/api/investments': typeof ApiInvestmentsRouteWithChildren
   '/api/recurring': typeof ApiRecurringRouteWithChildren
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/stats'
     | '/transactions'
     | '/api/categories'
+    | '/api/export'
     | '/api/import'
     | '/api/investments'
     | '/api/recurring'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/stats'
     | '/transactions'
     | '/api/categories'
+    | '/api/export'
     | '/api/import'
     | '/api/investments'
     | '/api/recurring'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/stats'
     | '/transactions'
     | '/api/categories'
+    | '/api/export'
     | '/api/import'
     | '/api/investments'
     | '/api/recurring'
@@ -277,6 +289,7 @@ export interface RootRouteChildren {
   StatsRoute: typeof StatsRoute
   TransactionsRoute: typeof TransactionsRoute
   ApiCategoriesRoute: typeof ApiCategoriesRouteWithChildren
+  ApiExportRoute: typeof ApiExportRoute
   ApiImportRoute: typeof ApiImportRoute
   ApiInvestmentsRoute: typeof ApiInvestmentsRouteWithChildren
   ApiRecurringRoute: typeof ApiRecurringRouteWithChildren
@@ -371,6 +384,13 @@ declare module '@tanstack/react-router' {
       path: '/api/import'
       fullPath: '/api/import'
       preLoaderRoute: typeof ApiImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/export': {
+      id: '/api/export'
+      path: '/api/export'
+      fullPath: '/api/export'
+      preLoaderRoute: typeof ApiExportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/categories': {
@@ -489,6 +509,7 @@ const rootRouteChildren: RootRouteChildren = {
   StatsRoute: StatsRoute,
   TransactionsRoute: TransactionsRoute,
   ApiCategoriesRoute: ApiCategoriesRouteWithChildren,
+  ApiExportRoute: ApiExportRoute,
   ApiImportRoute: ApiImportRoute,
   ApiInvestmentsRoute: ApiInvestmentsRouteWithChildren,
   ApiRecurringRoute: ApiRecurringRouteWithChildren,
