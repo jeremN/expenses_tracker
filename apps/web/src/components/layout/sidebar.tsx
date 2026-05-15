@@ -7,6 +7,7 @@ import {
   Upload,
   Tags,
   BarChart3,
+  Settings,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { ThemeToggle } from '~/components/theme-toggle'
@@ -19,6 +20,7 @@ const navItems = [
   { to: '/import' as const, label: 'Import', icon: Upload },
   { to: '/categories' as const, label: 'Categories', icon: Tags },
   { to: '/stats' as const, label: 'Stats', icon: BarChart3 },
+  { to: '/settings' as const, label: 'Settings', icon: Settings },
 ]
 
 export function Sidebar({ className }: { className?: string }) {
