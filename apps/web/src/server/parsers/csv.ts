@@ -171,6 +171,12 @@ export function detectColumns(
  * Split a CSV string into logical records, respecting quoted fields that
  * may contain embedded newlines. Newlines inside `"..."` do not terminate
  * the record; only unquoted newlines do.
+ *
+ * Lenient behavior: if the input ends while still inside a quoted field
+ * (e.g. a truncated bank export missing its closing `"`), the partial
+ * record is still emitted rather than throwing. A single `console.warn`
+ * is logged so the gap is visible during debugging. Callers that need
+ * strict validation should check for this warning in their pipeline.
  */
 function splitRecords(content: string): string[] {
   const records: string[] = []
@@ -195,6 +201,9 @@ function splitRecords(content: string): string[] {
     } else {
       current += ch
     }
+  }
+  if (inQuotes) {
+    console.warn('parseCSV: unterminated quoted field')
   }
   if (current.length > 0) records.push(current)
   return records

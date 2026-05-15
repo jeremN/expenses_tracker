@@ -85,4 +85,20 @@ describe('toCSV', () => {
     const out = toCSV(['a', 'b', 'c'], [{ a: 1 }])
     expect(out).toBe('﻿a,b,c\n1,,\n')
   })
+
+  it('round-trips CRLF inside quoted fields after parser normalization', () => {
+    const rows = [{ desc: 'line1\r\nline2' }]
+    const csv = toCSV(['desc'], rows)
+    const stripped = csv.replace(/^﻿/, '')
+    const parsed = parseCSV(stripped)
+    // parseCSV normalizes \r\n → \n before record splitting, so the CR is
+    // gone but the newline survives inside the quoted field.
+    expect(parsed.rawRows).toEqual([{ desc: 'line1\nline2' }])
+  })
+
+  it('treats empty string, undefined, and missing key identically', () => {
+    expect(toCSV(['a'], [{ a: '' }])).toBe('﻿a\n\n')
+    expect(toCSV(['a'], [{ a: undefined }])).toBe('﻿a\n\n')
+    expect(toCSV(['a'], [{}])).toBe('﻿a\n\n')
+  })
 })
