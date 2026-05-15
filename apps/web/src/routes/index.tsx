@@ -50,7 +50,7 @@ const getDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
   const previousMonthData = allMonthlyData.find((m) => m.month === previousMonth)
 
   // Map transaction rows to include category info
-  const transactions = transactionRows.map((row: { transactions: Record<string, unknown>; categories: Record<string, unknown> | null }) => ({
+  const transactions = transactionRows.map((row) => ({
     ...row.transactions,
     category: row.categories,
   }))

@@ -7,15 +7,20 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
     "baseUrl": ".",
+    "types": ["vite/client"],
     "paths": {
       "~/*": ["./src/*"],
       "@tracker/db": ["../../packages/db/src/index.ts"],
       "@tracker/shared": ["../../packages/shared/src/index.ts"]
     }
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "../../packages/db/src/**/*",
+    "../../packages/shared/src/**/*"
+  ],
   "exclude": ["node_modules", "dist", ".output"]
 }

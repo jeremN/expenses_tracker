@@ -52,7 +52,9 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
                 <div className="flex items-center gap-1.5">
                   {tx.description || '-'}
                   {tx.recurringId && (
-                    <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" title="Recurring" />
+                    <span title="Recurring" className="inline-flex">
+                      <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" aria-label="Recurring" />
+                    </span>
                   )}
                 </div>
               </TableCell>
