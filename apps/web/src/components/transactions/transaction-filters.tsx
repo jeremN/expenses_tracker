@@ -1,6 +1,7 @@
 import type { Category } from '@tracker/shared'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
+import { useTranslation } from '~/i18n'
 import {
   Select,
   SelectContent,
@@ -30,6 +31,7 @@ export function TransactionFilters({
   onTypeChange,
   categories,
 }: TransactionFiltersProps) {
+  const { t } = useTranslation()
   return (
     <div className="flex flex-wrap items-center gap-3">
       {/* Month picker */}
@@ -43,10 +45,10 @@ export function TransactionFilters({
       {/* Category filter */}
       <Select value={categoryId} onValueChange={onCategoryChange}>
         <SelectTrigger className="w-44">
-          <SelectValue placeholder="All Categories" />
+          <SelectValue placeholder={t('common.allCategories')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Categories</SelectItem>
+          <SelectItem value="all">{t('common.allCategories')}</SelectItem>
           {categories.map((cat) => (
             <SelectItem key={cat.id} value={String(cat.id)}>
               <span className="flex items-center gap-2">
@@ -71,7 +73,11 @@ export function TransactionFilters({
             className="rounded-none first:rounded-l-md last:rounded-r-md"
             onClick={() => onTypeChange(type)}
           >
-            {type === 'all' ? 'All' : type === 'income' ? 'Income' : 'Expense'}
+            {type === 'all'
+              ? t('common.all')
+              : type === 'income'
+                ? t('common.income')
+                : t('common.expense')}
           </Button>
         ))}
       </div>

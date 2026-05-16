@@ -10,6 +10,7 @@ import { TransactionForm } from '~/components/transactions/transaction-form'
 import { TransactionFormSkeleton } from '~/components/transactions/transaction-form-skeleton'
 import { RouteError } from '~/components/route-error'
 import { getServerCategories } from '~/server/shared-fns'
+import { useTranslation } from '~/i18n'
 
 // --- Server Functions ---
 
@@ -53,6 +54,7 @@ function EditTransactionPage() {
     transaction: Transaction
     categories: Category[]
   }
+  const { t } = useTranslation()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
 
@@ -71,9 +73,9 @@ function EditTransactionPage() {
   return (
     <div className="mx-auto max-w-lg space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Edit Transaction</h1>
+        <h1 className="text-2xl font-bold">{t('transactions.edit.title')}</h1>
         <p className="text-sm text-muted-foreground">
-          Update the details of this transaction.
+          {t('transactions.edit.subtitle')}
         </p>
       </div>
 

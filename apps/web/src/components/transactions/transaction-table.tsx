@@ -10,7 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table'
-import { formatCents } from '~/lib/utils'
+import { useFormat } from '~/lib/format'
+import { useTranslation } from '~/i18n'
 
 interface TransactionTableProps {
   transactions: Transaction[]
@@ -19,12 +20,15 @@ interface TransactionTableProps {
 }
 
 export function TransactionTable({ transactions, onEdit, onDelete }: TransactionTableProps) {
+  const { t } = useTranslation()
+  const { formatMoney, formatDate } = useFormat()
+
   if (transactions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-        <p className="text-lg font-medium text-muted-foreground">No transactions found</p>
+        <p className="text-lg font-medium text-muted-foreground">{t('transactions.empty.title')}</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Add your first transaction or adjust the filters.
+          {t('transactions.empty.subtitle')}
         </p>
       </div>
     )
@@ -35,10 +39,10 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
+            <TableHead>{t('transactions.field.date')}</TableHead>
+            <TableHead>{t('transactions.field.description')}</TableHead>
+            <TableHead>{t('transactions.field.category')}</TableHead>
+            <TableHead className="text-right">{t('transactions.field.amount')}</TableHead>
             <TableHead className="w-24" />
           </TableRow>
         </TableHeader>
@@ -46,14 +50,14 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
           {transactions.map((tx) => (
             <TableRow key={tx.id}>
               <TableCell className="whitespace-nowrap">
-                {tx.date}
+                {formatDate(tx.date)}
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-1.5">
                   {tx.description || '-'}
                   {tx.recurringId && (
-                    <span title="Recurring" className="inline-flex">
-                      <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" aria-label="Recurring" />
+                    <span title={t('transactions.recurringBadge')} className="inline-flex">
+                      <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" aria-label={t('transactions.recurringBadge')} />
                     </span>
                   )}
                 </div>
@@ -73,7 +77,7 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
               </TableCell>
               <TableCell className="text-right font-medium tabular-nums">
                 <span className={tx.type === 'income' ? 'text-green-600' : 'text-red-600'}>
-                  {tx.type === 'income' ? '+' : '-'}{formatCents(tx.amount)}
+                  {tx.type === 'income' ? '+' : '-'}{formatMoney(tx.amount)}
                 </span>
               </TableCell>
               <TableCell>
@@ -82,7 +86,7 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
                     variant="ghost"
                     size="icon"
                     onClick={() => onEdit(tx)}
-                    aria-label="Edit transaction"
+                    aria-label={t('transactions.editAction')}
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
@@ -90,7 +94,7 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
                     variant="ghost"
                     size="icon"
                     onClick={() => onDelete(tx)}
-                    aria-label="Delete transaction"
+                    aria-label={t('transactions.deleteAction')}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
