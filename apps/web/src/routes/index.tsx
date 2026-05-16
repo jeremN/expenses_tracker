@@ -9,6 +9,7 @@ import { MonthlyChart } from '~/components/dashboard/monthly-chart'
 import { RecentTransactions } from '~/components/dashboard/recent-transactions'
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
+import { useTranslation } from '~/i18n'
 
 // --- Server Functions ---
 
@@ -113,14 +114,15 @@ interface DashboardData {
 
 function DashboardPage() {
   const data = Route.useLoaderData() as DashboardData
+  const { t } = useTranslation()
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl font-bold">{t('dashboard.title')}</h1>
         <p className="text-sm text-muted-foreground">
-          Your financial overview at a glance.
+          {t('dashboard.subtitle')}
         </p>
       </div>
 

@@ -7,16 +7,18 @@ import {
   BarChart3,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
+import { useTranslation } from '~/i18n'
 
 const mobileNavItems = [
-  { to: '/' as const, label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/transactions' as const, label: 'Transactions', icon: ArrowLeftRight },
-  { to: '/recurring' as const, label: 'Recurring', icon: RefreshCw },
-  { to: '/categories' as const, label: 'Categories', icon: Tags },
-  { to: '/stats' as const, label: 'Stats', icon: BarChart3 },
+  { to: '/' as const, labelKey: 'nav.dashboard', icon: LayoutDashboard },
+  { to: '/transactions' as const, labelKey: 'nav.transactions', icon: ArrowLeftRight },
+  { to: '/recurring' as const, labelKey: 'nav.recurring', icon: RefreshCw },
+  { to: '/categories' as const, labelKey: 'nav.categories', icon: Tags },
+  { to: '/stats' as const, labelKey: 'nav.stats', icon: BarChart3 },
 ]
 
 export function MobileNav({ className }: { className?: string }) {
+  const { t } = useTranslation()
   return (
     <nav
       className={cn(
@@ -37,7 +39,7 @@ export function MobileNav({ className }: { className?: string }) {
             }}
           >
             <item.icon className="h-5 w-5" />
-            <span className="text-[10px] font-medium">{item.label}</span>
+            <span className="text-[10px] font-medium">{t(item.labelKey)}</span>
           </Link>
         ))}
       </div>
