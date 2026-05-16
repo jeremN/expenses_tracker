@@ -13,5 +13,13 @@
   "common.edit": "Edit",
   "common.add": "Add",
   "common.back": "Back",
-  "import.result": "Successfully imported {imported} of {total} transactions from {filename}."
+  "import.result": "Successfully imported {imported} of {total} transactions from {filename}.",
+  "settings.title": "Settings",
+  "settings.subtitle": "Manage your data and app preferences.",
+  "settings.language.title": "Language",
+  "settings.language.description": "Choose the display language.",
+  "settings.export.title": "Export data",
+  "settings.export.description": "Download a zip containing every table as CSV. For backup or migration. Amounts are stored as integer cents.",
+  "settings.export.button": "Export all data",
+  "settings.export.preparing": "Preparing export…"
 }

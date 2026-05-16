@@ -13,5 +13,13 @@
   "common.edit": "Éditer",
   "common.add": "Ajouter",
   "common.back": "Retour",
-  "import.result": "{imported} transactions sur {total} importées depuis {filename}."
+  "import.result": "{imported} transactions sur {total} importées depuis {filename}.",
+  "settings.title": "Paramètres",
+  "settings.subtitle": "Gérez vos données et les préférences de l'application.",
+  "settings.language.title": "Langue",
+  "settings.language.description": "Choisissez la langue d'affichage.",
+  "settings.export.title": "Exporter les données",
+  "settings.export.description": "Téléchargez une archive zip contenant chaque table au format CSV. Pour sauvegarde ou migration. Les montants sont stockés en centimes entiers.",
+  "settings.export.button": "Tout exporter",
+  "settings.export.preparing": "Préparation de l'export…"
 }
