@@ -16,7 +16,11 @@ const dicts: Record<Locale, Record<string, string>> = { en, fr }
 /**
  * Resolve a key for a locale with fallback chain:
  * active-locale dict -> en dict -> the key itself. Never throws.
- * Interpolates every {name} token from `vars`.
+ *
+ * Interpolates every {name} token from `vars`. Values are inserted
+ * literally in Object.entries order; a value containing another var's
+ * {token} is NOT recursively re-substituted (acceptable — our strings
+ * don't interpolate user-controlled text containing brace tokens).
  */
 export function translate(
   locale: Locale,
@@ -35,6 +39,8 @@ export function translate(
 /**
  * Tiny Accept-Language matcher (only two supported locales, so no full
  * RFC-4647 lookup). First subtag starting with "fr" -> fr, else en.
+ * Note the prefix match also catches e.g. "frisian" -> fr; acceptable
+ * given the two-locale set and that browsers send well-formed tags.
  */
 export function parseAcceptLanguage(header: string | null | undefined): Locale {
   if (!header) return 'en'
