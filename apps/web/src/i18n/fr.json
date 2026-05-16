@@ -1,0 +1,17 @@
+{
+  "nav.dashboard": "Tableau de bord",
+  "nav.transactions": "Transactions",
+  "nav.recurring": "Récurrents",
+  "nav.investments": "Investissements",
+  "nav.import": "Importer",
+  "nav.categories": "Catégories",
+  "nav.stats": "Stats",
+  "nav.settings": "Paramètres",
+  "common.save": "Sauvegarder",
+  "common.cancel": "Annuler",
+  "common.delete": "Effacer",
+  "common.edit": "Éditer",
+  "common.add": "Ajouter",
+  "common.back": "Retour",
+  "import.result": "{imported} transactions sur {total} importées depuis {filename}."
+}

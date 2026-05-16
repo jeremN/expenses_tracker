@@ -1,0 +1,17 @@
+{
+  "nav.dashboard": "Dashboard",
+  "nav.transactions": "Transactions",
+  "nav.recurring": "Recurring",
+  "nav.investments": "Investments",
+  "nav.import": "Import",
+  "nav.categories": "Categories",
+  "nav.stats": "Stats",
+  "nav.settings": "Settings",
+  "common.save": "Save",
+  "common.cancel": "Cancel",
+  "common.delete": "Delete",
+  "common.edit": "Edit",
+  "common.add": "Add",
+  "common.back": "Back",
+  "import.result": "Successfully imported {imported} of {total} transactions from {filename}."
+}
