@@ -2,7 +2,8 @@ import type { RecurringRule, Category } from '@tracker/shared'
 import { Pencil, Trash2, Pause, Play } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Badge } from '~/components/ui/badge'
-import { formatCents } from '~/lib/utils'
+import { useFormat } from '~/lib/format'
+import { useTranslation } from '~/i18n'
 
 interface RecurringRuleWithCategory {
   recurring_rules: RecurringRule
@@ -17,15 +18,24 @@ interface RecurringListProps {
 }
 
 export function RecurringList({ rules, onEdit, onDelete, onToggle }: RecurringListProps) {
+  const { t } = useTranslation()
+  const { formatMoney } = useFormat()
+
   if (rules.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-        <p className="text-lg font-medium text-muted-foreground">No recurring rules yet</p>
+        <p className="text-lg font-medium text-muted-foreground">{t('recurring.empty.title')}</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Create your first recurring rule to automate regular transactions.
+          {t('recurring.empty.subtitle')}
         </p>
       </div>
     )
+  }
+
+  const freqKey: Record<string, string> = {
+    weekly: 'recurring.freq.weekly',
+    monthly: 'recurring.freq.monthly',
+    yearly: 'recurring.freq.yearly',
   }
 
   return (
@@ -42,10 +52,10 @@ export function RecurringList({ rules, onEdit, onDelete, onToggle }: RecurringLi
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <p className="font-medium truncate">
-                  {rule.description || 'Untitled rule'}
+                  {rule.description || t('recurring.untitled')}
                 </p>
                 <Badge variant={rule.isActive ? 'default' : 'secondary'}>
-                  {rule.isActive ? 'Active' : 'Paused'}
+                  {rule.isActive ? t('recurring.status.active') : t('recurring.status.paused')}
                 </Badge>
               </div>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -60,8 +70,8 @@ export function RecurringList({ rules, onEdit, onDelete, onToggle }: RecurringLi
                     {category.name}
                   </span>
                 )}
-                <span>Starts {rule.startDate}</span>
-                {rule.endDate && <span>Ends {rule.endDate}</span>}
+                <span>{t('recurring.starts', { date: rule.startDate })}</span>
+                {rule.endDate && <span>{t('recurring.ends', { date: rule.endDate })}</span>}
               </div>
             </div>
 
@@ -72,17 +82,17 @@ export function RecurringList({ rules, onEdit, onDelete, onToggle }: RecurringLi
                   rule.type === 'income' ? 'text-green-600' : 'text-red-600'
                 }`}
               >
-                {rule.type === 'income' ? '+' : '-'}{formatCents(rule.amount)}
+                {rule.type === 'income' ? '+' : '-'}{formatMoney(rule.amount)}
               </p>
             </div>
 
             {/* Badges */}
             <div className="flex items-center gap-2">
               <Badge variant="outline">
-                {rule.type === 'income' ? 'Income' : 'Expense'}
+                {rule.type === 'income' ? t('common.income') : t('common.expense')}
               </Badge>
               <Badge variant="secondary">
-                {rule.frequency.charAt(0).toUpperCase() + rule.frequency.slice(1)}
+                {t(freqKey[rule.frequency] ?? rule.frequency)}
               </Badge>
             </div>
           </div>
@@ -93,7 +103,7 @@ export function RecurringList({ rules, onEdit, onDelete, onToggle }: RecurringLi
               variant="ghost"
               size="icon"
               onClick={() => onToggle(rule)}
-              aria-label={rule.isActive ? 'Pause rule' : 'Activate rule'}
+              aria-label={rule.isActive ? t('recurring.pause') : t('recurring.activate')}
             >
               {rule.isActive ? (
                 <Pause className="h-4 w-4" />
@@ -105,7 +115,7 @@ export function RecurringList({ rules, onEdit, onDelete, onToggle }: RecurringLi
               variant="ghost"
               size="icon"
               onClick={() => onEdit(rule)}
-              aria-label="Edit rule"
+              aria-label={t('recurring.editAction')}
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -113,7 +123,7 @@ export function RecurringList({ rules, onEdit, onDelete, onToggle }: RecurringLi
               variant="ghost"
               size="icon"
               onClick={() => onDelete(rule)}
-              aria-label="Delete rule"
+              aria-label={t('recurring.deleteAction')}
             >
               <Trash2 className="h-4 w-4 text-destructive" />
             </Button>

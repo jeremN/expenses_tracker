@@ -28,9 +28,10 @@ import {
 import { SnapshotForm } from '~/components/investments/snapshot-form'
 import { GrowthChart } from '~/components/investments/growth-chart'
 import { SnapshotHistory } from '~/components/investments/snapshot-history'
-import { formatCents } from '~/lib/utils'
+import { useFormat } from '~/lib/format'
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
+import { useTranslation } from '~/i18n'
 
 // --- Server Functions ---
 
@@ -85,6 +86,8 @@ function InvestmentsSkeleton() {
 // --- Page Component ---
 
 function InvestmentsPage() {
+  const { t } = useTranslation()
+  const { formatMoney } = useFormat()
   const snapshots = Route.useLoaderData() as InvestmentSnapshot[]
 
   const [formOpen, setFormOpen] = useState(false)
@@ -143,34 +146,34 @@ function InvestmentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Investments</h1>
+          <h1 className="text-2xl font-bold">{t('investments.title')}</h1>
           <p className="text-sm text-muted-foreground">
-            Track your portfolio value over time.
+            {t('investments.subtitle')}
           </p>
         </div>
         <Button onClick={() => setFormOpen(true)}>
           <Plus className="h-4 w-4" />
-          Add Snapshot
+          {t('investments.addSnapshot')}
         </Button>
       </div>
 
       {/* Portfolio Summary Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base font-medium">Portfolio Summary</CardTitle>
+          <CardTitle className="text-base font-medium">{t('investments.summary.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           {latestSnapshot ? (
             <div className="flex items-baseline gap-6">
               <div>
-                <p className="text-sm text-muted-foreground">Current Value</p>
+                <p className="text-sm text-muted-foreground">{t('investments.summary.currentValue')}</p>
                 <p className="text-3xl font-bold tabular-nums">
-                  {formatCents(latestSnapshot.totalValue)}
+                  {formatMoney(latestSnapshot.totalValue)}
                 </p>
               </div>
               {gainLossPercent !== null && (
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Gain/Loss</p>
+                  <p className="text-sm text-muted-foreground">{t('investments.summary.gainLoss')}</p>
                   <div className="flex items-center gap-1">
                     {gainLossPercent >= 0 ? (
                       <TrendingUp className="h-4 w-4 text-green-500" />
@@ -191,7 +194,7 @@ function InvestmentsPage() {
             </div>
           ) : (
             <p className="text-muted-foreground">
-              No snapshots yet. Add your first snapshot to see your portfolio summary.
+              {t('investments.summary.empty')}
             </p>
           )}
         </CardContent>
@@ -202,7 +205,7 @@ function InvestmentsPage() {
 
       {/* Snapshot History */}
       <div>
-        <h2 className="mb-3 text-lg font-semibold">Snapshot History</h2>
+        <h2 className="mb-3 text-lg font-semibold">{t('investments.history.title')}</h2>
         <SnapshotHistory snapshots={snapshots} onDelete={setDeleteTarget} />
       </div>
 
@@ -212,9 +215,9 @@ function InvestmentsPage() {
       }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Investment Snapshot</DialogTitle>
+            <DialogTitle>{t('investments.dialog.title')}</DialogTitle>
             <DialogDescription>
-              Record your current portfolio value to track growth over time.
+              {t('investments.dialog.subtitle')}
             </DialogDescription>
           </DialogHeader>
           <SnapshotForm
@@ -230,10 +233,9 @@ function InvestmentsPage() {
       }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Snapshot</DialogTitle>
+            <DialogTitle>{t('investments.delete.title')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete the snapshot from{' '}
-              {deleteTarget?.date}? This action cannot be undone.
+              {t('investments.delete.confirm', { date: deleteTarget?.date ?? '' })}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
@@ -242,14 +244,14 @@ function InvestmentsPage() {
               onClick={() => setDeleteTarget(null)}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Deleting...' : 'Delete'}
+              {isSubmitting ? t('common.deleting') : t('common.delete')}
             </Button>
           </div>
         </DialogContent>
