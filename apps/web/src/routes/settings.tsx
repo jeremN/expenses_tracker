@@ -44,7 +44,7 @@ function SettingsPage() {
             value={locale}
             onValueChange={(v) => setLocale(v as Locale)}
           >
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-48" aria-label={t('settings.language.title')}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
