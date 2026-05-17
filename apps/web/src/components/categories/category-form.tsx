@@ -12,6 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from '~/components/ui/form'
+import { useTranslation } from '~/i18n'
 
 const PRESET_COLORS = [
   '#ef4444', // red
@@ -33,6 +34,7 @@ interface CategoryFormProps {
 }
 
 export function CategoryForm({ defaultValues, onSubmit, isSubmitting }: CategoryFormProps) {
+  const { t } = useTranslation()
   const form = useForm<CreateCategory>({
     resolver: zodResolver(createCategorySchema),
     defaultValues: {
@@ -52,9 +54,9 @@ export function CategoryForm({ defaultValues, onSubmit, isSubmitting }: Category
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>{t('categories.form.name')}</FormLabel>
               <FormControl>
-                <Input placeholder="e.g. Groceries" {...field} />
+                <Input placeholder={t('categories.form.namePlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,7 +68,7 @@ export function CategoryForm({ defaultValues, onSubmit, isSubmitting }: Category
           name="color"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Color</FormLabel>
+              <FormLabel>{t('categories.form.color')}</FormLabel>
               <div className="space-y-3">
                 <div className="flex flex-wrap gap-2">
                   {PRESET_COLORS.map((color) => (
@@ -110,10 +112,10 @@ export function CategoryForm({ defaultValues, onSubmit, isSubmitting }: Category
           name="icon"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Icon (optional)</FormLabel>
+              <FormLabel>{t('categories.form.icon')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="e.g. shopping-cart"
+                  placeholder={t('categories.form.iconPlaceholder')}
                   {...field}
                   value={field.value ?? ''}
                 />
@@ -125,7 +127,7 @@ export function CategoryForm({ defaultValues, onSubmit, isSubmitting }: Category
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Saving...' : defaultValues ? 'Update Category' : 'Create Category'}
+            {isSubmitting ? t('common.saving') : defaultValues ? t('categories.form.update') : t('categories.form.create')}
           </Button>
         </div>
       </form>

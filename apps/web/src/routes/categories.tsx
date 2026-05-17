@@ -20,6 +20,7 @@ import { CategoryList } from '~/components/categories/category-list'
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
 import { getServerCategories } from '~/server/shared-fns'
+import { useTranslation } from '~/i18n'
 
 // --- Server Functions ---
 
@@ -80,6 +81,7 @@ function CategoriesSkeleton() {
 // --- Page Component ---
 
 function CategoriesPage() {
+  const { t } = useTranslation()
   const categories = Route.useLoaderData() as Category[]
 
   const [formOpen, setFormOpen] = useState(false)
@@ -136,14 +138,14 @@ function CategoriesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Categories</h1>
+          <h1 className="text-2xl font-bold">{t('categories.title')}</h1>
           <p className="text-sm text-muted-foreground">
-            Manage your transaction categories.
+            {t('categories.subtitle')}
           </p>
         </div>
         <Button onClick={openCreate}>
           <Plus className="h-4 w-4" />
-          Add Category
+          {t('categories.add')}
         </Button>
       </div>
 
@@ -164,12 +166,12 @@ function CategoriesPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingCategory ? 'Edit Category' : 'New Category'}
+              {editingCategory ? t('categories.edit.title') : t('categories.new.title')}
             </DialogTitle>
             <DialogDescription>
               {editingCategory
-                ? 'Update the details for this category.'
-                : 'Create a new category to organize your transactions.'}
+                ? t('categories.edit.subtitle')
+                : t('categories.new.subtitle')}
             </DialogDescription>
           </DialogHeader>
           <CategoryForm
@@ -187,11 +189,9 @@ function CategoriesPage() {
       }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Category</DialogTitle>
+            <DialogTitle>{t('categories.delete.title')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{deleteTarget?.name}"? This action cannot
-              be undone. Transactions using this category will lose their category
-              assignment.
+              {t('categories.delete.confirm', { name: deleteTarget?.name ?? '' })}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
@@ -200,14 +200,14 @@ function CategoriesPage() {
               onClick={() => setDeleteTarget(null)}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Deleting...' : 'Delete'}
+              {isSubmitting ? t('common.deleting') : t('common.delete')}
             </Button>
           </div>
         </DialogContent>

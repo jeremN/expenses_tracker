@@ -24,6 +24,7 @@ import {
 } from '~/components/stats/category-breakdown-chart'
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
+import { useTranslation } from '~/i18n'
 
 // --- Server Functions ---
 
@@ -56,20 +57,7 @@ function getCurrentMonth(): string {
   return `${y}-${m}`
 }
 
-const MONTH_OPTIONS = [
-  { value: '01', label: 'January' },
-  { value: '02', label: 'February' },
-  { value: '03', label: 'March' },
-  { value: '04', label: 'April' },
-  { value: '05', label: 'May' },
-  { value: '06', label: 'June' },
-  { value: '07', label: 'July' },
-  { value: '08', label: 'August' },
-  { value: '09', label: 'September' },
-  { value: '10', label: 'October' },
-  { value: '11', label: 'November' },
-  { value: '12', label: 'December' },
-]
+const MONTH_VALUES = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 
 // --- Route ---
 
@@ -106,6 +94,7 @@ function StatsSkeleton() {
 // --- Page Component ---
 
 function StatsPage() {
+  const { t } = useTranslation()
   const loaderData = Route.useLoaderData()
 
   const [year, setYear] = useState(Number(loaderData.year))
@@ -161,9 +150,9 @@ function StatsPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold">Stats</h1>
+        <h1 className="text-2xl font-bold">{t('stats.title')}</h1>
         <p className="text-sm text-muted-foreground">
-          Track your financial trends and spending patterns.
+          {t('stats.subtitle')}
         </p>
       </div>
 
@@ -171,7 +160,7 @@ function StatsPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Monthly Trends</CardTitle>
+            <CardTitle className="text-lg">{t('stats.monthlyTrends')}</CardTitle>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -198,7 +187,7 @@ function StatsPage() {
         <CardContent>
           {isLoadingMonthly ? (
             <div className="flex items-center justify-center py-12 text-muted-foreground">
-              Loading...
+              {t('common.loading')}
             </div>
           ) : (
             <MonthlyTrendChart data={monthlyData} />
@@ -210,7 +199,7 @@ function StatsPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Category Breakdown</CardTitle>
+            <CardTitle className="text-lg">{t('stats.categoryBreakdown')}</CardTitle>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -225,9 +214,9 @@ function StatsPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {MONTH_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
+                  {MONTH_VALUES.map((mm) => (
+                    <SelectItem key={mm} value={mm}>
+                      {t(`common.month.full.${mm}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -247,7 +236,7 @@ function StatsPage() {
         <CardContent>
           {isLoadingCategory ? (
             <div className="flex items-center justify-center py-12 text-muted-foreground">
-              Loading...
+              {t('common.loading')}
             </div>
           ) : (
             <CategoryBreakdownChart data={categoryData} />
