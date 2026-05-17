@@ -3,6 +3,7 @@ import { Upload, FileText, X } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent } from '~/components/ui/card'
 import { cn } from '~/lib/utils'
+import { useTranslation } from '~/i18n'
 
 interface FileUploadProps {
   onFileLoaded: (content: string, filename: string) => void
@@ -10,6 +11,7 @@ interface FileUploadProps {
 }
 
 export function FileUpload({ onFileLoaded, isLoading }: FileUploadProps) {
+  const { t } = useTranslation()
   const [isDragging, setIsDragging] = useState(false)
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -20,13 +22,13 @@ export function FileUpload({ onFileLoaded, isLoading }: FileUploadProps) {
       setError(null)
 
       if (!file.name.endsWith('.csv')) {
-        setError('Please upload a .csv file')
+        setError(t('import.upload.errCsv'))
         return
       }
 
       // 10 MB limit
       if (file.size > 10 * 1024 * 1024) {
-        setError('File is too large (max 10 MB)')
+        setError(t('import.upload.errSize'))
         return
       }
 
@@ -40,12 +42,12 @@ export function FileUpload({ onFileLoaded, isLoading }: FileUploadProps) {
         }
       }
       reader.onerror = () => {
-        setError('Failed to read file')
+        setError(t('import.upload.errRead'))
         setSelectedFile(null)
       }
       reader.readAsText(file)
     },
-    [onFileLoaded],
+    [onFileLoaded, t],
   )
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -124,7 +126,7 @@ export function FileUpload({ onFileLoaded, isLoading }: FileUploadProps) {
                 </Button>
               </div>
               {isLoading && (
-                <p className="text-sm text-muted-foreground">Parsing...</p>
+                <p className="text-sm text-muted-foreground">{t('import.upload.parsing')}</p>
               )}
             </div>
           ) : (
@@ -132,10 +134,10 @@ export function FileUpload({ onFileLoaded, isLoading }: FileUploadProps) {
               <Upload className="h-10 w-10 text-muted-foreground" />
               <div className="text-center">
                 <p className="text-sm font-medium">
-                  Drop your bank statement here
+                  {t('import.upload.drop')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  or click to browse. CSV files only (max 10 MB).
+                  {t('import.upload.browse')}
                 </p>
               </div>
             </div>
