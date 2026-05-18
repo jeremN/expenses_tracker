@@ -32,6 +32,8 @@ import { useFormat } from '~/lib/format'
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
 import { useTranslation } from '~/i18n'
+import { toast } from 'sonner'
+import { translateApiError } from '~/i18n/errors'
 
 // --- Server Functions ---
 
@@ -118,10 +120,12 @@ function InvestmentsPage() {
     setIsSubmitting(true)
     try {
       await createServerSnapshot({ data })
+      toast.success(t('toast.created'))
       setFormOpen(false)
       router.invalidate()
     } catch (error) {
       console.error('Failed to create snapshot:', error)
+      toast.error(translateApiError(error, t))
     } finally {
       setIsSubmitting(false)
     }
@@ -132,10 +136,12 @@ function InvestmentsPage() {
     setIsSubmitting(true)
     try {
       await deleteServerSnapshot({ data: { id: deleteTarget.id } })
+      toast.success(t('toast.deleted'))
       setDeleteTarget(null)
       router.invalidate()
     } catch (error) {
       console.error('Failed to delete snapshot:', error)
+      toast.error(translateApiError(error, t))
     } finally {
       setIsSubmitting(false)
     }

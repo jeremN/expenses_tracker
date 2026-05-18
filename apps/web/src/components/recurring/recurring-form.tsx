@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useZodResolver } from '~/i18n/use-zod-resolver'
 import { createRecurringRuleSchema } from '@tracker/shared'
 import type { CreateRecurringRule, RecurringRule, Category } from '@tracker/shared'
 import { Button } from '~/components/ui/button'
@@ -36,7 +36,7 @@ export function RecurringForm({
   isSubmitting,
 }: RecurringFormProps) {
   const form = useForm<CreateRecurringRule>({
-    resolver: zodResolver(createRecurringRuleSchema),
+    resolver: useZodResolver(createRecurringRuleSchema),
     defaultValues: {
       type: defaultValues?.type ?? 'expense',
       amount: defaultValues?.amount ?? 0,

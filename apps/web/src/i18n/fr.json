@@ -217,5 +217,17 @@
   "error.form.amountRequired": "Le montant est requis",
   "error.form.positiveNumber": "Doit être un nombre positif",
   "error.form.validDate": "Date valide requise",
-  "error.form.totalValueRequired": "La valeur totale est requise"
+  "error.form.totalValueRequired": "La valeur totale est requise",
+  "error.zod.required": "Ce champ est requis",
+  "error.zod.mustBeNumber": "Doit être un nombre",
+  "error.zod.invalidType": "Valeur invalide",
+  "error.zod.tooShort": "Trop court",
+  "error.zod.tooSmall": "La valeur est trop petite",
+  "error.zod.tooBig": "La valeur est trop grande",
+  "error.zod.invalidFormat": "Format invalide",
+  "error.zod.invalid": "Valeur invalide",
+  "toast.created": "Créé avec succès",
+  "toast.updated": "Modifié avec succès",
+  "toast.deleted": "Supprimé avec succès",
+  "toast.imported": "Import terminé"
 }
