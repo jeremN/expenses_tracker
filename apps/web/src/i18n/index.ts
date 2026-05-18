@@ -11,6 +11,11 @@ import fr from './fr.json'
 
 export type Locale = 'en' | 'fr'
 
+export type Currency = 'EUR' | 'USD' | 'GBP'
+
+/** Selector options. EUR is the default (see design doc). */
+export const CURRENCIES: Currency[] = ['EUR', 'USD', 'GBP']
+
 const dicts: Record<Locale, Record<string, string>> = { en, fr }
 
 /**
@@ -51,6 +56,8 @@ export function parseAcceptLanguage(header: string | null | undefined): Locale {
 interface LocaleContextValue {
   locale: Locale
   setLocale: (l: Locale) => void
+  currency: Currency
+  setCurrency: (c: Currency) => void
 }
 
 const LocaleContext = createContext<LocaleContextValue | undefined>(undefined)
@@ -63,12 +70,21 @@ export function LocaleProvider({
   children: ReactNode
 }) {
   const [locale, setLocaleState] = useState<Locale>(initial)
+  const [currency, setCurrencyState] = useState<Currency>('EUR')
 
   // Post-mount: a stored preference overrides the Accept-Language default.
   useEffect(() => {
     const stored = localStorage.getItem('locale')
     if (stored === 'en' || stored === 'fr') {
       setLocaleState(stored)
+    }
+  }, [])
+
+  // Post-mount: a stored currency overrides the EUR default.
+  useEffect(() => {
+    const stored = localStorage.getItem('currency')
+    if (stored && (CURRENCIES as readonly string[]).includes(stored)) {
+      setCurrencyState(stored as Currency)
     }
   }, [])
 
@@ -82,9 +98,14 @@ export function LocaleProvider({
     localStorage.setItem('locale', next)
   }
 
+  function setCurrency(next: Currency) {
+    setCurrencyState(next)
+    localStorage.setItem('currency', next)
+  }
+
   return createElement(
     LocaleContext.Provider,
-    { value: { locale, setLocale } },
+    { value: { locale, setLocale, currency, setCurrency } },
     children,
   )
 }

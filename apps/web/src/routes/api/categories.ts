@@ -13,7 +13,7 @@ export const Route = createFileRoute('/api/categories')({
           const categories = await getCategories(db)
           return jsonResponse(categories)
         } catch {
-          return errorResponse('Failed to fetch categories', 500)
+          return errorResponse('Failed to fetch categories', 500, 'INTERNAL')
         }
       },
       POST: async ({ request }) => {
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/api/categories')({
           const parsed = createCategorySchema.safeParse(body)
 
           if (!parsed.success) {
-            return errorResponse(parsed.error.issues[0].message)
+            return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
           }
 
           const db = getDB()
@@ -30,9 +30,9 @@ export const Route = createFileRoute('/api/categories')({
           return jsonResponse(category, 201)
         } catch (error) {
           if (error instanceof Error && error.message.includes('UNIQUE')) {
-            return errorResponse('A category with this name already exists', 409)
+            return errorResponse('A category with this name already exists', 409, 'DUPLICATE_NAME')
           }
-          return errorResponse('Failed to create category', 500)
+          return errorResponse('Failed to create category', 500, 'INTERNAL')
         }
       },
     },

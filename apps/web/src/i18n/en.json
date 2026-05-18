@@ -33,6 +33,8 @@
   "settings.subtitle": "Manage your data and app preferences.",
   "settings.language.title": "Language",
   "settings.language.description": "Choose the display language.",
+  "settings.currency.title": "Currency",
+  "settings.currency.description": "Currency used to display all amounts.",
   "settings.export.title": "Export data",
   "settings.export.description": "Download a zip containing every table as CSV. For backup or migration. Amounts are stored as integer cents.",
   "settings.export.button": "Export all data",
@@ -202,5 +204,18 @@
   "stats.uncategorized": "Uncategorized",
   "stats.totalExpenses": "Total Expenses",
   "error.title": "Something went wrong",
-  "error.tryAgain": "Try Again"
+  "error.tryAgain": "Try Again",
+  "error.generic": "Something went wrong. Please try again.",
+  "error.code.NOT_FOUND": "The requested item was not found.",
+  "error.code.INVALID_ID": "That identifier is not valid.",
+  "error.code.VALIDATION": "Some of the information provided is invalid.",
+  "error.code.DUPLICATE_NAME": "An item with this name already exists.",
+  "error.code.INTERNAL": "Something went wrong on our side. Please try again.",
+  "error.code.IMPORT_FAILED": "The import could not be completed.",
+  "error.code.EXPORT_FAILED": "The export could not be completed.",
+  "error.code.BAD_QUERY": "The request parameters are invalid.",
+  "error.form.amountRequired": "Amount is required",
+  "error.form.positiveNumber": "Must be a positive number",
+  "error.form.validDate": "Valid date required",
+  "error.form.totalValueRequired": "Total value is required"
 }

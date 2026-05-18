@@ -13,7 +13,7 @@ export const Route = createFileRoute('/api/recurring')({
           const rules = await getRecurringRules(db)
           return jsonResponse(rules)
         } catch {
-          return errorResponse('Failed to fetch recurring rules', 500)
+          return errorResponse('Failed to fetch recurring rules', 500, 'INTERNAL')
         }
       },
       POST: async ({ request }) => {
@@ -22,14 +22,14 @@ export const Route = createFileRoute('/api/recurring')({
           const parsed = createRecurringRuleSchema.safeParse(body)
 
           if (!parsed.success) {
-            return errorResponse(parsed.error.issues[0].message)
+            return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
           }
 
           const db = getDB()
           const rule = await createRecurringRule(db, parsed.data)
           return jsonResponse(rule, 201)
         } catch {
-          return errorResponse('Failed to create recurring rule', 500)
+          return errorResponse('Failed to create recurring rule', 500, 'INTERNAL')
         }
       },
     },

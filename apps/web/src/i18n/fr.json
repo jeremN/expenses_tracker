@@ -33,6 +33,8 @@
   "settings.subtitle": "Gérez vos données et les préférences de l'application.",
   "settings.language.title": "Langue",
   "settings.language.description": "Choisissez la langue d'affichage.",
+  "settings.currency.title": "Devise",
+  "settings.currency.description": "Devise utilisée pour afficher tous les montants.",
   "settings.export.title": "Exporter les données",
   "settings.export.description": "Téléchargez une archive zip contenant chaque table au format CSV. Pour sauvegarde ou migration. Les montants sont stockés en centimes entiers.",
   "settings.export.button": "Tout exporter",
@@ -202,5 +204,18 @@
   "stats.uncategorized": "Sans catégorie",
   "stats.totalExpenses": "Total des dépenses",
   "error.title": "Une erreur s'est produite",
-  "error.tryAgain": "Réessayer"
+  "error.tryAgain": "Réessayer",
+  "error.generic": "Une erreur s'est produite. Veuillez réessayer.",
+  "error.code.NOT_FOUND": "L'élément demandé est introuvable.",
+  "error.code.INVALID_ID": "Cet identifiant n'est pas valide.",
+  "error.code.VALIDATION": "Certaines informations fournies sont invalides.",
+  "error.code.DUPLICATE_NAME": "Un élément portant ce nom existe déjà.",
+  "error.code.INTERNAL": "Une erreur interne s'est produite. Veuillez réessayer.",
+  "error.code.IMPORT_FAILED": "L'import n'a pas pu être effectué.",
+  "error.code.EXPORT_FAILED": "L'export n'a pas pu être effectué.",
+  "error.code.BAD_QUERY": "Les paramètres de la requête sont invalides.",
+  "error.form.amountRequired": "Le montant est requis",
+  "error.form.positiveNumber": "Doit être un nombre positif",
+  "error.form.validDate": "Date valide requise",
+  "error.form.totalValueRequired": "La valeur totale est requise"
 }

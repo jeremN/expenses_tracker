@@ -12,6 +12,7 @@ import {
 
 import { cn } from "~/lib/utils"
 import { Label } from "~/components/ui/label"
+import { useTranslation } from '~/i18n'
 
 const Form = FormProvider
 
@@ -140,12 +141,23 @@ const FormDescription = React.forwardRef<
 })
 FormDescription.displayName = "FormDescription"
 
+/**
+ * Renders the active field's error (or `children`). String messages are
+ * passed through i18n `t()` (messages are translation keys; non-key
+ * strings fall back to themselves). Requires a `LocaleProvider` ancestor
+ * — always satisfied via the root layout; isolated renders (unit tests,
+ * stories) must wrap in `LocaleProvider`.
+ */
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField()
-  const body = error ? String(error?.message ?? "") : children
+  const { t } = useTranslation()
+  const raw = error ? String(error?.message ?? '') : children
+  // Messages are i18n keys; translate() falls back to the key itself for
+  // any non-key string, so plain literals still render unchanged.
+  const body = typeof raw === 'string' && raw ? t(raw) : raw
 
   if (!body) {
     return null

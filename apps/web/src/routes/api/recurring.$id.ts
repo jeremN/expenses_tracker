@@ -11,7 +11,7 @@ export const Route = createFileRoute('/api/recurring/$id')({
         try {
           const id = Number(params.id)
           if (Number.isNaN(id)) {
-            return errorResponse('Invalid recurring rule ID')
+            return errorResponse('Invalid recurring rule ID', 400, 'INVALID_ID')
           }
 
           const db = getDB()
@@ -20,57 +20,57 @@ export const Route = createFileRoute('/api/recurring/$id')({
           })
 
           if (!rule) {
-            return errorResponse('Recurring rule not found', 404)
+            return errorResponse('Recurring rule not found', 404, 'NOT_FOUND')
           }
 
           return jsonResponse(rule)
         } catch {
-          return errorResponse('Failed to fetch recurring rule', 500)
+          return errorResponse('Failed to fetch recurring rule', 500, 'INTERNAL')
         }
       },
       PUT: async ({ request, params }) => {
         try {
           const id = Number(params.id)
           if (Number.isNaN(id)) {
-            return errorResponse('Invalid recurring rule ID')
+            return errorResponse('Invalid recurring rule ID', 400, 'INVALID_ID')
           }
 
           const body = await request.json()
           const parsed = updateRecurringRuleSchema.safeParse(body)
 
           if (!parsed.success) {
-            return errorResponse(parsed.error.issues[0].message)
+            return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
           }
 
           const db = getDB()
           const rule = await updateRecurringRule(db, id, parsed.data)
 
           if (!rule) {
-            return errorResponse('Recurring rule not found', 404)
+            return errorResponse('Recurring rule not found', 404, 'NOT_FOUND')
           }
 
           return jsonResponse(rule)
         } catch {
-          return errorResponse('Failed to update recurring rule', 500)
+          return errorResponse('Failed to update recurring rule', 500, 'INTERNAL')
         }
       },
       DELETE: async ({ params }) => {
         try {
           const id = Number(params.id)
           if (Number.isNaN(id)) {
-            return errorResponse('Invalid recurring rule ID')
+            return errorResponse('Invalid recurring rule ID', 400, 'INVALID_ID')
           }
 
           const db = getDB()
           const rule = await deleteRecurringRule(db, id)
 
           if (!rule) {
-            return errorResponse('Recurring rule not found', 404)
+            return errorResponse('Recurring rule not found', 404, 'NOT_FOUND')
           }
 
           return jsonResponse({ success: true })
         } catch {
-          return errorResponse('Failed to delete recurring rule', 500)
+          return errorResponse('Failed to delete recurring rule', 500, 'INTERNAL')
         }
       },
     },
