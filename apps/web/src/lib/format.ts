@@ -6,7 +6,7 @@ const TAGS: Record<Locale, string> = { en: 'en-US', fr: 'fr-FR' }
  * Format integer cents as a currency string for the given locale and currency.
  *
  * The currency is supplied by the caller; when used via `useFormat()`, it is
- * sourced from the active locale context (default EUR).
+ * sourced from the active locale context (`LocaleProvider` defaults to EUR).
  */
 export function formatMoney(
   cents: number,

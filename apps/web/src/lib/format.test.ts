@@ -22,6 +22,7 @@ describe('formatMoney', () => {
     const out = formatMoney(123456, 'fr', 'USD')
     expect(out).toContain('1 234')
     expect(out).toContain(',56')
+    expect(out).toContain('$')
   })
 })
 
