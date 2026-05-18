@@ -17,7 +17,7 @@ import { useTranslation } from '~/i18n'
 
 const formSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  totalValue: z.string().min(1, 'Total value is required'),
+  totalValue: z.string().min(1, 'error.form.totalValueRequired'),
   note: z.string().optional(),
 })
 
@@ -50,7 +50,7 @@ export function SnapshotForm({ onSubmit, isSubmitting }: SnapshotFormProps) {
   function handleSubmit(values: FormValues) {
     const cents = parseToCents(values.totalValue)
     if (cents <= 0 || Number.isNaN(cents)) {
-      form.setError('totalValue', { message: 'Must be a positive number' })
+      form.setError('totalValue', { message: 'error.form.positiveNumber' })
       return
     }
     onSubmit({

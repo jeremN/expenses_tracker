@@ -12,6 +12,7 @@ import {
 
 import { cn } from "~/lib/utils"
 import { Label } from "~/components/ui/label"
+import { useTranslation } from '~/i18n'
 
 const Form = FormProvider
 
@@ -145,7 +146,11 @@ const FormMessage = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField()
-  const body = error ? String(error?.message ?? "") : children
+  const { t } = useTranslation()
+  const raw = error ? String(error?.message ?? '') : children
+  // Messages are i18n keys; translate() falls back to the key itself for
+  // any non-key string, so plain literals still render unchanged.
+  const body = typeof raw === 'string' && raw ? t(raw) : raw
 
   if (!body) {
     return null

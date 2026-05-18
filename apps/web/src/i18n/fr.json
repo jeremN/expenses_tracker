@@ -213,5 +213,9 @@
   "error.code.INTERNAL": "Une erreur interne s'est produite. Veuillez réessayer.",
   "error.code.IMPORT_FAILED": "L'import n'a pas pu être effectué.",
   "error.code.EXPORT_FAILED": "L'export n'a pas pu être effectué.",
-  "error.code.BAD_QUERY": "Les paramètres de la requête sont invalides."
+  "error.code.BAD_QUERY": "Les paramètres de la requête sont invalides.",
+  "error.form.amountRequired": "Le montant est requis",
+  "error.form.positiveNumber": "Doit être un nombre positif",
+  "error.form.validDate": "Date valide requise",
+  "error.form.totalValueRequired": "La valeur totale est requise"
 }

@@ -25,15 +25,15 @@ import { useTranslation } from '~/i18n'
 // Form-level schema works with a decimal string for amount
 const transactionFormSchema = z.object({
   type: z.enum(['income', 'expense']),
-  amount: z.string().min(1, 'Amount is required').refine(
+  amount: z.string().min(1, 'error.form.amountRequired').refine(
     (val) => {
       const num = parseFloat(val)
       return !isNaN(num) && num > 0
     },
-    { message: 'Must be a positive number' },
+    { message: 'error.form.positiveNumber' },
   ),
   description: z.string().optional(),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Valid date required'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'error.form.validDate'),
   categoryId: z.string().optional(),
 })
 
