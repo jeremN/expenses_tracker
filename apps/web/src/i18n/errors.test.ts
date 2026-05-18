@@ -6,9 +6,9 @@ const t = (k: string) => translate('en', k)
 
 describe('translateApiError', () => {
   it('maps a known code to its key', () => {
-    expect(translateApiError({ code: 'NOT_FOUND' }, t)).toBe(
-      translate('en', 'error.code.NOT_FOUND'),
-    )
+    const result = translateApiError({ code: 'NOT_FOUND' }, t)
+    expect(result).toBe(translate('en', 'error.code.NOT_FOUND'))
+    expect(result).not.toBe('error.code.NOT_FOUND')
   })
   it('reads code off an Error with a code property', () => {
     const e = Object.assign(new Error('raw db text'), { code: 'INTERNAL' })
@@ -27,5 +27,6 @@ describe('translateApiError', () => {
   it('handles non-object input without throwing', () => {
     expect(translateApiError('a string', t)).toBe(translate('en', 'error.generic'))
     expect(translateApiError(undefined, t)).toBe(translate('en', 'error.generic'))
+    expect(translateApiError(null, t)).toBe(translate('en', 'error.generic'))
   })
 })

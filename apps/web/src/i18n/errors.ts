@@ -1,14 +1,11 @@
-import type { AppErrorCode } from '@tracker/shared'
+import { APP_ERROR_CODES, type AppErrorCode } from '@tracker/shared'
 
-const KNOWN: readonly AppErrorCode[] = [
-  'NOT_FOUND', 'INVALID_ID', 'VALIDATION', 'DUPLICATE_NAME',
-  'INTERNAL', 'IMPORT_FAILED', 'EXPORT_FAILED', 'BAD_QUERY',
-]
+const KNOWN: ReadonlySet<string> = new Set(APP_ERROR_CODES)
 
 function extractCode(error: unknown): AppErrorCode | undefined {
   if (error && typeof error === 'object' && 'code' in error) {
     const c = (error as { code: unknown }).code
-    if (typeof c === 'string' && (KNOWN as readonly string[]).includes(c)) {
+    if (typeof c === 'string' && KNOWN.has(c)) {
       return c as AppErrorCode
     }
   }
