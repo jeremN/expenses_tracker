@@ -33,4 +33,7 @@ describe('toAppError', () => {
     expect(toAppError(undefined).code).toBe('INTERNAL')
     expect(toAppError(null).code).toBe('INTERNAL')
   })
+  it('does not misclassify a non-constraint message containing the word UNIQUE', () => {
+    expect(toAppError(new Error('The value must be UNIQUE across records')).code).toBe('INTERNAL')
+  })
 })

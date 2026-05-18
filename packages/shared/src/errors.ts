@@ -32,7 +32,7 @@ export class AppError extends Error {
 export function toAppError(error: unknown): AppError {
   if (error instanceof AppError) return error
   if (error instanceof Error) {
-    if (error.message.includes('UNIQUE')) {
+    if (error.message.includes('UNIQUE constraint failed')) {
       return new AppError('DUPLICATE_NAME', error.message)
     }
     return new AppError('INTERNAL', error.message)
