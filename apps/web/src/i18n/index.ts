@@ -83,8 +83,8 @@ export function LocaleProvider({
   // Post-mount: a stored currency overrides the EUR default.
   useEffect(() => {
     const stored = localStorage.getItem('currency')
-    if (stored === 'EUR' || stored === 'USD' || stored === 'GBP') {
-      setCurrencyState(stored)
+    if (stored && (CURRENCIES as readonly string[]).includes(stored)) {
+      setCurrencyState(stored as Currency)
     }
   }, [])
 
