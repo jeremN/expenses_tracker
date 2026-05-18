@@ -4,7 +4,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { getDB } from '~/server/db'
 import { createCategory, updateCategory, deleteCategory } from '@tracker/db'
 import { z } from 'zod'
-import { createCategorySchema, updateCategorySchema } from '@tracker/shared'
+import { createCategorySchema, updateCategorySchema, toAppError } from '@tracker/shared'
 import type { Category, CreateCategory } from '@tracker/shared'
 import { Plus } from 'lucide-react'
 import { Button } from '~/components/ui/button'
@@ -29,16 +29,24 @@ import { translateApiError } from '~/i18n/errors'
 const createServerCategory = createServerFn({ method: 'POST' })
   .inputValidator(createCategorySchema)
   .handler(async ({ data }) => {
-    const db = getDB()
-    return createCategory(db, data)
+    try {
+      const db = getDB()
+      return await createCategory(db, data)
+    } catch (e) {
+      throw toAppError(e)
+    }
   })
 
 const updateServerCategory = createServerFn({ method: 'POST' })
   .inputValidator(updateCategorySchema.extend({ id: z.number() }))
   .handler(async ({ data }) => {
-    const { id, ...rest } = data
-    const db = getDB()
-    return updateCategory(db, id, rest)
+    try {
+      const { id, ...rest } = data
+      const db = getDB()
+      return await updateCategory(db, id, rest)
+    } catch (e) {
+      throw toAppError(e)
+    }
   })
 
 const deleteServerCategory = createServerFn({ method: 'POST' })
