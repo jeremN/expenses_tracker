@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useZodResolver } from '~/i18n/use-zod-resolver'
 import { z } from 'zod'
 import type { Category, TransactionType } from '@tracker/shared'
 import { Button } from '~/components/ui/button'
@@ -64,7 +64,7 @@ export function TransactionForm({ categories, onSubmit, isSubmitting, defaultVal
   const isEditing = !!defaultValues
 
   const form = useForm<TransactionFormValues>({
-    resolver: zodResolver(transactionFormSchema),
+    resolver: useZodResolver(transactionFormSchema),
     defaultValues: {
       type: defaultValues?.type ?? 'expense',
       amount: defaultValues ? (defaultValues.amount / 100).toString() : '',

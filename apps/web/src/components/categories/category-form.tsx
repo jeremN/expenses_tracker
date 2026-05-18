@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useZodResolver } from '~/i18n/use-zod-resolver'
 import { createCategorySchema } from '@tracker/shared'
 import type { CreateCategory, Category } from '@tracker/shared'
 import { Button } from '~/components/ui/button'
@@ -36,7 +36,7 @@ interface CategoryFormProps {
 export function CategoryForm({ defaultValues, onSubmit, isSubmitting }: CategoryFormProps) {
   const { t } = useTranslation()
   const form = useForm<CreateCategory>({
-    resolver: zodResolver(createCategorySchema),
+    resolver: useZodResolver(createCategorySchema),
     defaultValues: {
       name: defaultValues?.name ?? '',
       color: defaultValues?.color ?? '#3b82f6',

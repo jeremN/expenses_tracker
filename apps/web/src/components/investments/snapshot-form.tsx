@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useZodResolver } from '~/i18n/use-zod-resolver'
 import { z } from 'zod'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -39,7 +39,7 @@ function todayString() {
 export function SnapshotForm({ onSubmit, isSubmitting }: SnapshotFormProps) {
   const { t } = useTranslation()
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: useZodResolver(formSchema),
     defaultValues: {
       date: todayString(),
       totalValue: '',
