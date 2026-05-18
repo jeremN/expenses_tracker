@@ -12,6 +12,7 @@ import { Sidebar } from '~/components/layout/sidebar'
 import { MobileNav } from '~/components/layout/mobile-nav'
 import { ThemeProvider } from '~/components/theme-provider'
 import { LocaleProvider, parseAcceptLanguage, type Locale } from '~/i18n'
+import { Toaster } from 'sonner'
 
 const getInitialLocale = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Locale> => {
@@ -70,6 +71,7 @@ function RootDocument({
               <MobileNav className="md:hidden" />
             </div>
           </ThemeProvider>
+          <Toaster richColors closeButton />
         </LocaleProvider>
         <Scripts />
       </body>

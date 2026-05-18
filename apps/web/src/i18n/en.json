@@ -225,5 +225,9 @@
   "error.zod.tooSmall": "Value is too small",
   "error.zod.tooBig": "Value is too large",
   "error.zod.invalidFormat": "Invalid format",
-  "error.zod.invalid": "Invalid value"
+  "error.zod.invalid": "Invalid value",
+  "toast.created": "Created successfully",
+  "toast.updated": "Updated successfully",
+  "toast.deleted": "Deleted successfully",
+  "toast.imported": "Import completed"
 }
