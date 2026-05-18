@@ -8,10 +8,15 @@ import { makeZodErrorMap } from '~/i18n/zod-error-map'
  * locale-bound errorMap so zod-default messages are localized. Explicit
  * per-field messages in the schema still take precedence.
  *
- * Type note: @hookform/resolvers v5 maps zod v3 schemaOptions to the full
- * z.ParseParams type (path + async required at the type level), but at
- * runtime only errorMap is consulted. We cast to satisfy TS while keeping
- * identical runtime behavior.
+ * Type note: @hookform/resolvers v5 + zod v3.25.76 types the second arg of
+ * the zod v3 overload as the full `z.ParseParams` (path + async required).
+ * The internal `Zod3ParseParams` uses `InexactPartial<ParseParams>` (all
+ * optional), but that type is not exported. Narrower casts such as
+ * `Parameters<typeof zodResolver>[1]`, `Pick<z.ParseParams, 'errorMap'>`, or
+ * `{ errorMap: z.ZodErrorMap }` all fail TS2769 because the assertion target
+ * is not assignable to the overload's parameter type. `as z.ParseParams` is
+ * therefore the smallest cast that compiles; only errorMap is consulted at
+ * runtime, path/async are ignored.
  */
 export function useZodResolver<T extends z.ZodTypeAny>(schema: T) {
   const { t } = useTranslation()
