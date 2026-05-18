@@ -28,6 +28,7 @@ import { RecurringForm } from '~/components/recurring/recurring-form'
 import { RecurringList } from '~/components/recurring/recurring-list'
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
+import { useTranslation } from '~/i18n'
 
 // --- Server Functions ---
 
@@ -102,6 +103,7 @@ function RecurringSkeleton() {
 // --- Page Component ---
 
 function RecurringPage() {
+  const { t } = useTranslation()
   const { rules, categories } = Route.useLoaderData()
 
   const [formOpen, setFormOpen] = useState(false)
@@ -169,14 +171,14 @@ function RecurringPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Recurring</h1>
+          <h1 className="text-2xl font-bold">{t('recurring.title')}</h1>
           <p className="text-sm text-muted-foreground">
-            Manage your recurring income and expense rules.
+            {t('recurring.subtitle')}
           </p>
         </div>
         <Button onClick={openCreate}>
           <Plus className="h-4 w-4" />
-          Add Rule
+          {t('recurring.add')}
         </Button>
       </div>
 
@@ -201,12 +203,12 @@ function RecurringPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingRule ? 'Edit Rule' : 'New Recurring Rule'}
+              {editingRule ? t('recurring.edit.title') : t('recurring.new.title')}
             </DialogTitle>
             <DialogDescription>
               {editingRule
-                ? 'Update the details for this recurring rule.'
-                : 'Create a new recurring rule for automatic transactions.'}
+                ? t('recurring.edit.subtitle')
+                : t('recurring.new.subtitle')}
             </DialogDescription>
           </DialogHeader>
           <RecurringForm
@@ -228,11 +230,11 @@ function RecurringPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Deactivate Recurring Rule</DialogTitle>
+            <DialogTitle>{t('recurring.deactivate.title')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to deactivate "
-              {deleteTarget?.description || 'this rule'}"? The rule will be
-              paused and can be reactivated later.
+              {t('recurring.deactivate.confirm', {
+                name: deleteTarget?.description || t('recurring.untitled'),
+              })}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
@@ -241,14 +243,14 @@ function RecurringPage() {
               onClick={() => setDeleteTarget(null)}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Deactivating...' : 'Deactivate'}
+              {isSubmitting ? t('recurring.deactivating') : t('recurring.deactivate.action')}
             </Button>
           </div>
         </DialogContent>

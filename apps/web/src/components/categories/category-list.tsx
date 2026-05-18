@@ -1,6 +1,7 @@
 import type { Category } from '@tracker/shared'
 import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
+import { useTranslation } from '~/i18n'
 
 interface CategoryListProps {
   categories: Category[]
@@ -9,12 +10,14 @@ interface CategoryListProps {
 }
 
 export function CategoryList({ categories, onEdit, onDelete }: CategoryListProps) {
+  const { t } = useTranslation()
+
   if (categories.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-        <p className="text-lg font-medium text-muted-foreground">No categories yet</p>
+        <p className="text-lg font-medium text-muted-foreground">{t('categories.empty.title')}</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Create your first category to start organizing your transactions.
+          {t('categories.empty.subtitle')}
         </p>
       </div>
     )
@@ -45,7 +48,7 @@ export function CategoryList({ categories, onEdit, onDelete }: CategoryListProps
               variant="ghost"
               size="icon"
               onClick={() => onEdit(category)}
-              aria-label={`Edit ${category.name}`}
+              aria-label={t('categories.editAction', { name: category.name })}
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -53,7 +56,7 @@ export function CategoryList({ categories, onEdit, onDelete }: CategoryListProps
               variant="ghost"
               size="icon"
               onClick={() => onDelete(category)}
-              aria-label={`Delete ${category.name}`}
+              aria-label={t('categories.deleteAction', { name: category.name })}
             >
               <Trash2 className="h-4 w-4 text-destructive" />
             </Button>

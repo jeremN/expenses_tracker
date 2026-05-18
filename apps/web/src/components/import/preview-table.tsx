@@ -11,7 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table'
-import { cn, formatCents } from '~/lib/utils'
+import { cn } from '~/lib/utils'
+import { useFormat } from '~/lib/format'
+import { useTranslation } from '~/i18n'
 import type { ParsedRow } from '~/server/parsers/csv'
 
 interface DuplicateInfo {
@@ -42,6 +44,8 @@ export function PreviewTable({
   onBack,
   isImporting,
 }: PreviewTableProps) {
+  const { t } = useTranslation()
+  const { formatMoney, formatDate } = useFormat()
   const [selected, setSelected] = useState<Set<number>>(() => {
     return new Set(rows.map((_, i) => i))
   })
@@ -96,12 +100,12 @@ export function PreviewTable({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Preview & Import</CardTitle>
+        <CardTitle className="text-lg">{t('import.preview.title')}</CardTitle>
         <CardDescription>
-          {selectedCount} of {rows.length} rows selected.
+          {t('import.preview.selected', { selected: selectedCount, total: rows.length })}
           {duplicateCount > 0 && (
             <span className="text-amber-600">
-              {' '}{duplicateCount} potential duplicate{duplicateCount !== 1 ? 's' : ''} detected.
+              {' '}{t('import.preview.dupes', { count: duplicateCount })}
             </span>
           )}
         </CardDescription>
@@ -119,10 +123,10 @@ export function PreviewTable({
                     className="h-4 w-4 rounded border-gray-300"
                   />
                 </TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead>Category</TableHead>
+                <TableHead>{t('transactions.field.date')}</TableHead>
+                <TableHead>{t('transactions.field.description')}</TableHead>
+                <TableHead className="text-right">{t('transactions.field.amount')}</TableHead>
+                <TableHead>{t('transactions.field.category')}</TableHead>
                 <TableHead className="w-[40px]" />
               </TableRow>
             </TableHeader>
@@ -149,7 +153,7 @@ export function PreviewTable({
                       />
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-sm">
-                      {row.date}
+                      {formatDate(row.date)}
                     </TableCell>
                     <TableCell className="max-w-[300px] truncate text-sm" title={row.description}>
                       {row.description}
@@ -160,7 +164,7 @@ export function PreviewTable({
                         isIncome ? 'text-emerald-600' : 'text-red-600',
                       )}
                     >
-                      {isIncome ? '+' : ''}{formatCents(row.amount)}
+                      {isIncome ? '+' : ''}{formatMoney(row.amount)}
                     </TableCell>
                     <TableCell>
                       {suggestion && (
@@ -171,7 +175,7 @@ export function PreviewTable({
                     </TableCell>
                     <TableCell>
                       {isDuplicate && (
-                        <span title="Possible duplicate: a transaction with the same date and amount already exists">
+                        <span title={t('import.preview.dupTooltip')}>
                           <AlertTriangle className="h-4 w-4 text-amber-500" />
                         </span>
                       )}
@@ -185,15 +189,15 @@ export function PreviewTable({
 
         <div className="flex justify-between">
           <Button variant="outline" onClick={onBack} disabled={isImporting}>
-            Back
+            {t('common.back')}
           </Button>
           <Button onClick={handleImport} disabled={isImporting || selectedCount === 0}>
             {isImporting ? (
-              'Importing...'
+              t('import.preview.importing')
             ) : (
               <>
                 <Check className="h-4 w-4" />
-                Import {selectedCount} Transaction{selectedCount !== 1 ? 's' : ''}
+                {t('import.preview.importBtn', { count: selectedCount })}
               </>
             )}
           </Button>

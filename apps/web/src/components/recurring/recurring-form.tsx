@@ -19,7 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select'
-import { parseToCents, formatCents } from '~/lib/utils'
+import { parseToCents } from '~/lib/utils'
+import { useTranslation } from '~/i18n'
 
 interface RecurringFormProps {
   defaultValues?: RecurringRule
@@ -47,8 +48,10 @@ export function RecurringForm({
     },
   })
 
-  // Display amount in dollars for user input
-  const amountInDollars = defaultValues ? formatCents(defaultValues.amount) : ''
+  const { t } = useTranslation()
+  // Amount as a plain decimal string for the number input (NOT a localized
+  // currency string — that belongs to display via useFormat, not inputs).
+  const amountInDollars = defaultValues ? (defaultValues.amount / 100).toString() : ''
 
   function handleFormSubmit(data: CreateRecurringRule) {
     onSubmit(data)
@@ -62,16 +65,16 @@ export function RecurringForm({
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Type</FormLabel>
+              <FormLabel>{t('transactions.field.type')}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder={t('recurring.form.selectType')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="income">Income</SelectItem>
-                  <SelectItem value="expense">Expense</SelectItem>
+                  <SelectItem value="income">{t('common.income')}</SelectItem>
+                  <SelectItem value="expense">{t('common.expense')}</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -84,7 +87,7 @@ export function RecurringForm({
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel>{t('transactions.field.amount')}</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -108,10 +111,10 @@ export function RecurringForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>{t('transactions.field.description')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="e.g. Monthly rent"
+                  placeholder={t('recurring.form.descriptionPlaceholder')}
                   {...field}
                   value={field.value ?? ''}
                 />
@@ -126,18 +129,18 @@ export function RecurringForm({
           name="categoryId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel>{t('transactions.field.category')}</FormLabel>
               <Select
                 onValueChange={(val) => field.onChange(val === '_none' ? undefined : Number(val))}
                 defaultValue={field.value?.toString() ?? '_none'}
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder={t('recurring.form.selectCategory')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="_none">No category</SelectItem>
+                  <SelectItem value="_none">{t('common.noCategory')}</SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id.toString()}>
                       <span className="flex items-center gap-2">
@@ -163,17 +166,17 @@ export function RecurringForm({
           name="frequency"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Frequency</FormLabel>
+              <FormLabel>{t('recurring.form.frequency')}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select frequency" />
+                    <SelectValue placeholder={t('recurring.form.selectFrequency')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                  <SelectItem value="yearly">Yearly</SelectItem>
+                  <SelectItem value="weekly">{t('recurring.freq.weekly')}</SelectItem>
+                  <SelectItem value="monthly">{t('recurring.freq.monthly')}</SelectItem>
+                  <SelectItem value="yearly">{t('recurring.freq.yearly')}</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -186,7 +189,7 @@ export function RecurringForm({
           name="startDate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Start Date</FormLabel>
+              <FormLabel>{t('recurring.form.startDate')}</FormLabel>
               <FormControl>
                 <Input type="date" {...field} />
               </FormControl>
@@ -200,7 +203,7 @@ export function RecurringForm({
           name="endDate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>End Date (optional)</FormLabel>
+              <FormLabel>{t('recurring.form.endDate')}</FormLabel>
               <FormControl>
                 <Input
                   type="date"
@@ -216,10 +219,10 @@ export function RecurringForm({
         <div className="flex justify-end gap-2 pt-2">
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting
-              ? 'Saving...'
+              ? t('common.saving')
               : defaultValues
-                ? 'Update Rule'
-                : 'Create Rule'}
+                ? t('recurring.form.update')
+                : t('recurring.form.create')}
           </Button>
         </div>
       </form>

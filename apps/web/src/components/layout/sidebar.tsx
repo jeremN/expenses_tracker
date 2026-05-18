@@ -11,19 +11,21 @@ import {
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { ThemeToggle } from '~/components/theme-toggle'
+import { useTranslation } from '~/i18n'
 
 const navItems = [
-  { to: '/' as const, label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/transactions' as const, label: 'Transactions', icon: ArrowLeftRight },
-  { to: '/recurring' as const, label: 'Recurring', icon: RefreshCw },
-  { to: '/investments' as const, label: 'Investments', icon: TrendingUp },
-  { to: '/import' as const, label: 'Import', icon: Upload },
-  { to: '/categories' as const, label: 'Categories', icon: Tags },
-  { to: '/stats' as const, label: 'Stats', icon: BarChart3 },
-  { to: '/settings' as const, label: 'Settings', icon: Settings },
+  { to: '/' as const, labelKey: 'nav.dashboard', icon: LayoutDashboard },
+  { to: '/transactions' as const, labelKey: 'nav.transactions', icon: ArrowLeftRight },
+  { to: '/recurring' as const, labelKey: 'nav.recurring', icon: RefreshCw },
+  { to: '/investments' as const, labelKey: 'nav.investments', icon: TrendingUp },
+  { to: '/import' as const, labelKey: 'nav.import', icon: Upload },
+  { to: '/categories' as const, labelKey: 'nav.categories', icon: Tags },
+  { to: '/stats' as const, labelKey: 'nav.stats', icon: BarChart3 },
+  { to: '/settings' as const, labelKey: 'nav.settings', icon: Settings },
 ]
 
 export function Sidebar({ className }: { className?: string }) {
+  const { t } = useTranslation()
   return (
     <aside
       className={cn(
@@ -33,7 +35,7 @@ export function Sidebar({ className }: { className?: string }) {
     >
       <div className="flex h-14 items-center border-b border-border px-5">
         <span className="text-lg font-semibold tracking-tight">
-          Expenses Tracker
+          {t('common.appName')}
         </span>
       </div>
 
@@ -50,14 +52,14 @@ export function Sidebar({ className }: { className?: string }) {
             }}
           >
             <item.icon className="h-4 w-4" />
-            {item.label}
+            {t(item.labelKey)}
           </Link>
         ))}
       </nav>
 
       <div className="border-t border-border px-3 py-3">
         <div className="flex items-center justify-between px-3">
-          <span className="text-xs text-muted-foreground">Theme</span>
+          <span className="text-xs text-muted-foreground">{t('common.theme')}</span>
           <ThemeToggle />
         </div>
       </div>

@@ -1,18 +1,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
-import { formatCents } from '~/lib/utils'
+import { useFormat } from '~/lib/format'
+import { useTranslation } from '~/i18n'
 import type { MonthlySummary } from '@tracker/shared'
 
 interface MonthlyChartProps {
   data: MonthlySummary[]
 }
 
-function formatMonthLabel(month: string): string {
+const LOCALE_TAGS = { en: 'en-US', fr: 'fr-FR' } as const
+
+function formatMonthLabel(month: string, locale: 'en' | 'fr'): string {
   const [year, m] = month.split('-')
   const date = new Date(Number(year), Number(m) - 1)
-  return date.toLocaleDateString('en-US', { month: 'short' })
+  return date.toLocaleDateString(LOCALE_TAGS[locale], { month: 'short' })
 }
 
 export function MonthlyChart({ data }: MonthlyChartProps) {
+  const { t, locale } = useTranslation()
+  const { formatMoney } = useFormat()
   // Take the last 6 months of data
   const months = data.slice(-6)
 
@@ -20,10 +25,10 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Monthly Overview</CardTitle>
+          <CardTitle className="text-base">{t('dashboard.monthlyOverview')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No data available yet.</p>
+          <p className="text-sm text-muted-foreground">{t('dashboard.noDataYet')}</p>
         </CardContent>
       </Card>
     )
@@ -38,7 +43,7 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Monthly Overview</CardTitle>
+        <CardTitle className="text-base">{t('dashboard.monthlyOverview')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-end gap-3 sm:gap-6" style={{ height: '200px' }}>
@@ -55,7 +60,7 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
                     <div
                       className="w-full rounded-t bg-emerald-500 transition-all hover:bg-emerald-400"
                       style={{ height: `${Math.max(incomeHeight, 2)}%` }}
-                      title={`Income: ${formatCents(month.income)}`}
+                      title={t('dashboard.income') + ': ' + formatMoney(month.income)}
                     />
                   </div>
                   {/* Expense bar */}
@@ -63,13 +68,13 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
                     <div
                       className="w-full rounded-t bg-red-500 transition-all hover:bg-red-400"
                       style={{ height: `${Math.max(expenseHeight, 2)}%` }}
-                      title={`Expenses: ${formatCents(month.expenses)}`}
+                      title={t('dashboard.expenses') + ': ' + formatMoney(month.expenses)}
                     />
                   </div>
                 </div>
                 {/* Month label */}
                 <span className="text-xs text-muted-foreground">
-                  {formatMonthLabel(month.month)}
+                  {formatMonthLabel(month.month, locale)}
                 </span>
               </div>
             )
@@ -80,11 +85,11 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
         <div className="mt-4 flex items-center justify-center gap-4">
           <div className="flex items-center gap-1.5">
             <div className="h-3 w-3 rounded-sm bg-emerald-500" />
-            <span className="text-xs text-muted-foreground">Income</span>
+            <span className="text-xs text-muted-foreground">{t('dashboard.income')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="h-3 w-3 rounded-sm bg-red-500" />
-            <span className="text-xs text-muted-foreground">Expenses</span>
+            <span className="text-xs text-muted-foreground">{t('dashboard.expenses')}</span>
           </div>
         </div>
       </CardContent>

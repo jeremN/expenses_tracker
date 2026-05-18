@@ -18,6 +18,7 @@ import { TransactionTable } from '~/components/transactions/transaction-table'
 import { TransactionFilters, type TypeFilter } from '~/components/transactions/transaction-filters'
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
+import { useTranslation } from '~/i18n'
 
 // --- Server Functions ---
 
@@ -84,6 +85,7 @@ function TransactionsSkeleton() {
 // --- Page Component ---
 
 function TransactionsPage() {
+  const { t } = useTranslation()
   const { transactions: initialTransactions, categories } =
     Route.useLoaderData() as { transactions: Transaction[]; categories: Category[] }
 
@@ -126,15 +128,15 @@ function TransactionsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Transactions</h1>
+          <h1 className="text-2xl font-bold">{t('transactions.title')}</h1>
           <p className="text-sm text-muted-foreground">
-            View and manage your income and expenses.
+            {t('transactions.subtitle')}
           </p>
         </div>
         <Button asChild>
           <Link to="/transactions/new">
             <Plus className="h-4 w-4" />
-            Add Transaction
+            {t('transactions.add')}
           </Link>
         </Button>
       </div>
@@ -166,11 +168,13 @@ function TransactionsPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Transaction</DialogTitle>
+            <DialogTitle>{t('transactions.delete.title')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this transaction
-              {deleteTarget?.description ? ` "${deleteTarget.description}"` : ''}? This
-              action cannot be undone.
+              {t('transactions.delete.confirm', {
+                name: deleteTarget?.description
+                  ? ` "${deleteTarget.description}"`
+                  : '',
+              })}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
@@ -179,14 +183,14 @@ function TransactionsPage() {
               onClick={() => setDeleteTarget(null)}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Deleting...' : 'Delete'}
+              {isSubmitting ? t('common.deleting') : t('common.delete')}
             </Button>
           </div>
         </DialogContent>

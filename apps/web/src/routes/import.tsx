@@ -12,6 +12,7 @@ import { Check, Upload, Columns, Eye } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { RouteError } from '~/components/route-error'
 import { processImport, MAX_IMPORT_ROWS } from '~/server/import-helpers'
+import { useTranslation } from '~/i18n'
 
 // --- Server Functions ---
 
@@ -213,13 +214,14 @@ export const Route = createFileRoute('/import')({
 
 type Step = 'upload' | 'mapping' | 'preview'
 
-const STEPS: { key: Step; label: string; icon: typeof Upload }[] = [
-  { key: 'upload', label: 'Upload', icon: Upload },
-  { key: 'mapping', label: 'Map Columns', icon: Columns },
-  { key: 'preview', label: 'Preview', icon: Eye },
+const STEPS: { key: Step; labelKey: string; icon: typeof Upload }[] = [
+  { key: 'upload', labelKey: 'import.step.upload', icon: Upload },
+  { key: 'mapping', labelKey: 'import.step.mapping', icon: Columns },
+  { key: 'preview', labelKey: 'import.step.preview', icon: Eye },
 ]
 
 function StepIndicator({ current }: { current: Step }) {
+  const { t } = useTranslation()
   const currentIndex = STEPS.findIndex((s) => s.key === current)
 
   return (
@@ -252,7 +254,7 @@ function StepIndicator({ current }: { current: Step }) {
               ) : (
                 <Icon className="h-3.5 w-3.5" />
               )}
-              {step.label}
+              {t(step.labelKey)}
             </div>
           </div>
         )
@@ -264,6 +266,7 @@ function StepIndicator({ current }: { current: Step }) {
 // --- Page Component ---
 
 function ImportPage() {
+  const { t } = useTranslation()
   const [step, setStep] = useState<Step>('upload')
   const [isLoading, setIsLoading] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
@@ -390,9 +393,9 @@ function ImportPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Import</h1>
+          <h1 className="text-2xl font-bold">{t('import.title')}</h1>
           <p className="text-sm text-muted-foreground">
-            Import transactions from a bank statement CSV file.
+            {t('import.subtitle')}
           </p>
         </div>
       </div>
@@ -403,16 +406,19 @@ function ImportPage() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
             <Check className="h-6 w-6 text-emerald-600" />
           </div>
-          <h2 className="text-lg font-semibold">Import Complete</h2>
+          <h2 className="text-lg font-semibold">{t('import.complete.title')}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Successfully imported {importResult.imported} of {importResult.total} transactions
-            from {filename}.
+            {t('import.result', {
+              imported: importResult.imported,
+              total: importResult.total,
+              filename,
+            })}
           </p>
           <button
             onClick={handleReset}
             className="mt-4 text-sm font-medium text-primary hover:underline"
           >
-            Import another file
+            {t('import.complete.again')}
           </button>
         </div>
       ) : (

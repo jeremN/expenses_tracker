@@ -13,6 +13,7 @@ import {
 } from '~/components/ui/form'
 import { parseToCents } from '~/lib/utils'
 import type { CreateInvestmentSnapshot } from '@tracker/shared'
+import { useTranslation } from '~/i18n'
 
 const formSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -36,6 +37,7 @@ function todayString() {
 }
 
 export function SnapshotForm({ onSubmit, isSubmitting }: SnapshotFormProps) {
+  const { t } = useTranslation()
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -66,7 +68,7 @@ export function SnapshotForm({ onSubmit, isSubmitting }: SnapshotFormProps) {
           name="date"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Date</FormLabel>
+              <FormLabel>{t('transactions.field.date')}</FormLabel>
               <FormControl>
                 <Input type="date" {...field} />
               </FormControl>
@@ -80,7 +82,7 @@ export function SnapshotForm({ onSubmit, isSubmitting }: SnapshotFormProps) {
           name="totalValue"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Total Portfolio Value</FormLabel>
+              <FormLabel>{t('investments.form.totalValue')}</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -100,10 +102,10 @@ export function SnapshotForm({ onSubmit, isSubmitting }: SnapshotFormProps) {
           name="note"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Note (optional)</FormLabel>
+              <FormLabel>{t('investments.form.note')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder='e.g. "Monthly DCA", "Added 500"'
+                  placeholder={t('investments.form.notePlaceholder')}
                   {...field}
                   value={field.value ?? ''}
                 />
@@ -115,7 +117,7 @@ export function SnapshotForm({ onSubmit, isSubmitting }: SnapshotFormProps) {
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Saving...' : 'Add Snapshot'}
+            {isSubmitting ? t('common.saving') : t('investments.addSnapshot')}
           </Button>
         </div>
       </form>

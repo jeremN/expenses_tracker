@@ -17,15 +17,17 @@ import {
   TableRow,
 } from '~/components/ui/table'
 
+import { useTranslation } from '~/i18n'
+
 type ColumnRole = 'date' | 'description' | 'amount' | 'debit' | 'credit' | 'skip'
 
-const ROLE_OPTIONS: { value: ColumnRole; label: string }[] = [
-  { value: 'date', label: 'Date' },
-  { value: 'description', label: 'Description' },
-  { value: 'amount', label: 'Amount' },
-  { value: 'debit', label: 'Debit' },
-  { value: 'credit', label: 'Credit' },
-  { value: 'skip', label: 'Skip' },
+const ROLE_OPTIONS: { value: ColumnRole; labelKey: string }[] = [
+  { value: 'date', labelKey: 'transactions.field.date' },
+  { value: 'description', labelKey: 'transactions.field.description' },
+  { value: 'amount', labelKey: 'transactions.field.amount' },
+  { value: 'debit', labelKey: 'import.role.debit' },
+  { value: 'credit', labelKey: 'import.role.credit' },
+  { value: 'skip', labelKey: 'import.role.skip' },
 ]
 
 interface ColumnMapperProps {
@@ -43,6 +45,7 @@ export function ColumnMapper({
   onConfirm,
   onBack,
 }: ColumnMapperProps) {
+  const { t } = useTranslation()
   // Build initial role assignments from detected mapping
   const [roles, setRoles] = useState<Record<string, ColumnRole>>(() => {
     const initial: Record<string, ColumnRole> = {}
@@ -80,11 +83,11 @@ export function ColumnMapper({
 
     // Validate: must have date and either amount or (debit + credit)
     if (!mapping.date) {
-      setError('Please assign a Date column')
+      setError(t('import.map.errDate'))
       return
     }
     if (!mapping.amount && !(mapping.debit && mapping.credit)) {
-      setError('Please assign an Amount column (or both Debit and Credit)')
+      setError(t('import.map.errAmount'))
       return
     }
 
@@ -97,10 +100,9 @@ export function ColumnMapper({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Map Columns</CardTitle>
+        <CardTitle className="text-lg">{t('import.step.mapping')}</CardTitle>
         <CardDescription>
-          Tell us which columns contain the date, description, and amount.
-          Auto-detection has been applied; adjust if needed.
+          {t('import.map.desc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -124,7 +126,7 @@ export function ColumnMapper({
                         <SelectContent>
                           {ROLE_OPTIONS.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
-                              {opt.label}
+                              {t(opt.labelKey)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -154,10 +156,10 @@ export function ColumnMapper({
 
         <div className="flex justify-between">
           <Button variant="outline" onClick={onBack}>
-            Back
+            {t('common.back')}
           </Button>
           <Button onClick={handleConfirm}>
-            Continue
+            {t('import.continue')}
           </Button>
         </div>
       </CardContent>

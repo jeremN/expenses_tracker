@@ -9,6 +9,7 @@ import { TransactionForm } from '~/components/transactions/transaction-form'
 import { TransactionFormSkeleton } from '~/components/transactions/transaction-form-skeleton'
 import { RouteError } from '~/components/route-error'
 import { getServerCategories } from '~/server/shared-fns'
+import { useTranslation } from '~/i18n'
 
 const createServerTransaction = createServerFn({ method: 'POST' })
   .inputValidator(createTransactionSchema)
@@ -29,6 +30,7 @@ export const Route = createFileRoute('/transactions_/new')({
 // --- Page Component ---
 
 function NewTransactionPage() {
+  const { t } = useTranslation()
   const categories = Route.useLoaderData() as Category[]
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
@@ -48,9 +50,9 @@ function NewTransactionPage() {
   return (
     <div className="mx-auto max-w-lg space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">New Transaction</h1>
+        <h1 className="text-2xl font-bold">{t('transactions.new.title')}</h1>
         <p className="text-sm text-muted-foreground">
-          Record a new income or expense.
+          {t('transactions.new.subtitle')}
         </p>
       </div>
 

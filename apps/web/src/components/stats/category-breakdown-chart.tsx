@@ -1,4 +1,5 @@
-import { formatCents } from '~/lib/utils'
+import { useFormat } from '~/lib/format'
+import { useTranslation } from '~/i18n'
 
 export type CategoryBreakdownRow = {
   category_id: number | null
@@ -10,10 +11,13 @@ export type CategoryBreakdownRow = {
 const DEFAULT_COLOR = '#94a3b8' // slate-400
 
 export function CategoryBreakdownChart({ data }: { data: CategoryBreakdownRow[] }) {
+  const { t } = useTranslation()
+  const { formatMoney } = useFormat()
+
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center py-12 text-muted-foreground">
-        No expense data for the selected month.
+        {t('stats.category.noData')}
       </div>
     )
   }
@@ -36,7 +40,7 @@ export function CategoryBreakdownChart({ data }: { data: CategoryBreakdownRow[] 
                 backgroundColor: row.category_color || DEFAULT_COLOR,
                 minWidth: percent > 0 ? '2px' : '0',
               }}
-              title={`${row.category_name ?? 'Uncategorized'}: ${formatCents(row.total)}`}
+              title={`${row.category_name ?? t('stats.uncategorized')}: ${formatMoney(row.total)}`}
             />
           )
         })}
@@ -60,7 +64,7 @@ export function CategoryBreakdownChart({ data }: { data: CategoryBreakdownRow[] 
                     style={{ backgroundColor: row.category_color || DEFAULT_COLOR }}
                   />
                   <span className="text-sm font-medium truncate">
-                    {row.category_name ?? 'Uncategorized'}
+                    {row.category_name ?? t('stats.uncategorized')}
                   </span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
@@ -75,7 +79,7 @@ export function CategoryBreakdownChart({ data }: { data: CategoryBreakdownRow[] 
               </div>
 
               <span className="text-sm font-medium text-right tabular-nums">
-                {formatCents(row.total)}
+                {formatMoney(row.total)}
               </span>
 
               <span className="text-xs text-muted-foreground text-right tabular-nums">
@@ -88,9 +92,9 @@ export function CategoryBreakdownChart({ data }: { data: CategoryBreakdownRow[] 
 
       {/* Total */}
       <div className="flex items-center justify-between border-t pt-3">
-        <span className="text-sm font-medium text-muted-foreground">Total Expenses</span>
+        <span className="text-sm font-medium text-muted-foreground">{t('stats.totalExpenses')}</span>
         <span className="text-sm font-semibold tabular-nums">
-          {formatCents(grandTotal)}
+          {formatMoney(grandTotal)}
         </span>
       </div>
     </div>

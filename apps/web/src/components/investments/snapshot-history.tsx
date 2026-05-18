@@ -1,7 +1,8 @@
 import type { InvestmentSnapshot } from '@tracker/shared'
 import { Trash2 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
-import { formatCents } from '~/lib/utils'
+import { useFormat } from '~/lib/format'
+import { useTranslation } from '~/i18n'
 
 interface SnapshotHistoryProps {
   snapshots: InvestmentSnapshot[]
@@ -9,14 +10,17 @@ interface SnapshotHistoryProps {
 }
 
 export function SnapshotHistory({ snapshots, onDelete }: SnapshotHistoryProps) {
+  const { t } = useTranslation()
+  const { formatMoney, formatDate } = useFormat()
+
   if (snapshots.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
         <p className="text-lg font-medium text-muted-foreground">
-          No snapshots yet
+          {t('investments.empty.title')}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Add your first investment snapshot to start tracking your portfolio.
+          {t('investments.empty.subtitle')}
         </p>
       </div>
     )
@@ -31,10 +35,10 @@ export function SnapshotHistory({ snapshots, onDelete }: SnapshotHistoryProps) {
         >
           <div className="flex items-center gap-4">
             <div className="text-sm text-muted-foreground font-mono">
-              {formatDisplayDate(snapshot.date)}
+              {formatDate(snapshot.date)}
             </div>
             <div className="font-semibold tabular-nums">
-              {formatCents(snapshot.totalValue)}
+              {formatMoney(snapshot.totalValue)}
             </div>
             {snapshot.note && (
               <div className="text-sm text-muted-foreground">
@@ -47,7 +51,7 @@ export function SnapshotHistory({ snapshots, onDelete }: SnapshotHistoryProps) {
             variant="ghost"
             size="icon"
             onClick={() => onDelete(snapshot)}
-            aria-label={`Delete snapshot from ${snapshot.date}`}
+            aria-label={t('investments.deleteAction', { date: snapshot.date })}
           >
             <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
@@ -55,9 +59,4 @@ export function SnapshotHistory({ snapshots, onDelete }: SnapshotHistoryProps) {
       ))}
     </div>
   )
-}
-
-function formatDisplayDate(dateStr: string) {
-  const [year, month, day] = dateStr.split('-')
-  return `${year}-${month}-${day}`
 }

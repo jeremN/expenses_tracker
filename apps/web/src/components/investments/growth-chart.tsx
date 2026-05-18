@@ -1,19 +1,23 @@
 import type { InvestmentSnapshot } from '@tracker/shared'
-import { formatCents } from '~/lib/utils'
+import { useFormat } from '~/lib/format'
+import { useTranslation } from '~/i18n'
 
 interface GrowthChartProps {
   snapshots: InvestmentSnapshot[]
 }
 
 export function GrowthChart({ snapshots }: GrowthChartProps) {
+  const { t } = useTranslation()
+  const { formatMoney } = useFormat()
+
   if (snapshots.length < 2) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
         <p className="text-lg font-medium text-muted-foreground">
-          Not enough data
+          {t('investments.chart.notEnough.title')}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Add more snapshots to see your portfolio growth over time.
+          {t('investments.chart.notEnough.subtitle')}
         </p>
       </div>
     )
@@ -151,7 +155,7 @@ export function GrowthChart({ snapshots }: GrowthChartProps) {
             className="text-primary"
           >
             <title>
-              {formatDate(p.snapshot.date)}: {formatCents(p.snapshot.totalValue)}
+              {formatDate(p.snapshot.date)}: {formatMoney(p.snapshot.totalValue)}
             </title>
           </circle>
         ))}

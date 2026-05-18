@@ -2,30 +2,25 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Badge } from '~/components/ui/badge'
-import { formatCents } from '~/lib/utils'
+import { useFormat } from '~/lib/format'
+import { useTranslation } from '~/i18n'
 import type { Transaction } from '@tracker/shared'
 
 interface RecentTransactionsProps {
   transactions: Transaction[]
 }
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr + 'T00:00:00')
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-  })
-}
-
 export function RecentTransactions({ transactions }: RecentTransactionsProps) {
+  const { t } = useTranslation()
+  const { formatMoney, formatDate } = useFormat()
   if (transactions.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Recent Transactions</CardTitle>
+          <CardTitle className="text-base">{t('dashboard.recentTransactions')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No transactions yet.</p>
+          <p className="text-sm text-muted-foreground">{t('dashboard.noTransactions')}</p>
         </CardContent>
       </Card>
     )
@@ -34,7 +29,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Recent Transactions</CardTitle>
+        <CardTitle className="text-base">{t('dashboard.recentTransactions')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {transactions.map((tx) => (
@@ -45,7 +40,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
             <div className="flex flex-col gap-1 min-w-0">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium truncate">
-                  {tx.description || 'Untitled'}
+                  {tx.description || t('dashboard.untitled')}
                 </span>
                 {tx.category && (
                   <Badge
@@ -66,7 +61,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                 )}
               </div>
               <span className="text-xs text-muted-foreground">
-                {formatDate(tx.date)}
+                {formatDate(tx.date)}{/* stored YYYY-MM-DD */}
               </span>
             </div>
             <span
@@ -74,7 +69,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                 tx.type === 'income' ? 'text-emerald-600' : 'text-red-600'
               }`}
             >
-              {tx.type === 'income' ? '+' : '-'}{formatCents(tx.amount)}
+              {tx.type === 'income' ? '+' : '-'}{formatMoney(tx.amount)}
             </span>
           </div>
         ))}
@@ -83,7 +78,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
           to="/transactions"
           className="flex items-center justify-center gap-1 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          View all transactions
+          {t('dashboard.viewAllTransactions')}
           <ArrowRight className="h-3 w-3" />
         </Link>
       </CardContent>

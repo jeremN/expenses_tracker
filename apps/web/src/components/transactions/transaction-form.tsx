@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '~/components/ui/form'
 import { parseToCents } from '~/lib/utils'
+import { useTranslation } from '~/i18n'
 
 // Form-level schema works with a decimal string for amount
 const transactionFormSchema = z.object({
@@ -58,6 +59,7 @@ interface TransactionFormProps {
 }
 
 export function TransactionForm({ categories, onSubmit, isSubmitting, defaultValues }: TransactionFormProps) {
+  const { t } = useTranslation()
   const today = new Date().toISOString().split('T')[0]
   const isEditing = !!defaultValues
 
@@ -95,7 +97,7 @@ export function TransactionForm({ categories, onSubmit, isSubmitting, defaultVal
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Type</FormLabel>
+              <FormLabel>{t('transactions.field.type')}</FormLabel>
               <div className="flex rounded-md border">
                 <Button
                   type="button"
@@ -103,7 +105,7 @@ export function TransactionForm({ categories, onSubmit, isSubmitting, defaultVal
                   className="flex-1 rounded-none rounded-l-md"
                   onClick={() => field.onChange('expense')}
                 >
-                  Expense
+                  {t('common.expense')}
                 </Button>
                 <Button
                   type="button"
@@ -111,7 +113,7 @@ export function TransactionForm({ categories, onSubmit, isSubmitting, defaultVal
                   className="flex-1 rounded-none rounded-r-md"
                   onClick={() => field.onChange('income')}
                 >
-                  Income
+                  {t('common.income')}
                 </Button>
               </div>
               <FormMessage />
@@ -125,7 +127,7 @@ export function TransactionForm({ categories, onSubmit, isSubmitting, defaultVal
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel>{t('transactions.field.amount')}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -151,7 +153,7 @@ export function TransactionForm({ categories, onSubmit, isSubmitting, defaultVal
           name="date"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Date</FormLabel>
+              <FormLabel>{t('transactions.field.date')}</FormLabel>
               <FormControl>
                 <Input type="date" {...field} />
               </FormControl>
@@ -166,9 +168,9 @@ export function TransactionForm({ categories, onSubmit, isSubmitting, defaultVal
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>{t('transactions.field.description')}</FormLabel>
               <FormControl>
-                <Input placeholder="e.g. Grocery run" {...field} />
+                <Input placeholder={t('transactions.form.descriptionPlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -181,18 +183,18 @@ export function TransactionForm({ categories, onSubmit, isSubmitting, defaultVal
           name="categoryId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel>{t('transactions.field.category')}</FormLabel>
               <Select
                 value={field.value ?? 'none'}
                 onValueChange={field.onChange}
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder={t('transactions.form.selectCategory')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="none">No Category</SelectItem>
+                  <SelectItem value="none">{t('common.noCategory')}</SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat.id} value={String(cat.id)}>
                       <span className="flex items-center gap-2">
@@ -214,12 +216,12 @@ export function TransactionForm({ categories, onSubmit, isSubmitting, defaultVal
         <div className="flex justify-end gap-2 pt-2">
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting
-              ? 'Saving...'
+              ? t('common.saving')
               : isEditing
-                ? 'Save Changes'
+                ? t('transactions.form.saveChanges')
                 : currentType === 'income'
-                  ? 'Add Income'
-                  : 'Add Expense'}
+                  ? t('transactions.form.addIncome')
+                  : t('transactions.form.addExpense')}
           </Button>
         </div>
       </form>
