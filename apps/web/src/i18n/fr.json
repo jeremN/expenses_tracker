@@ -33,6 +33,8 @@
   "settings.subtitle": "Gérez vos données et les préférences de l'application.",
   "settings.language.title": "Langue",
   "settings.language.description": "Choisissez la langue d'affichage.",
+  "settings.currency.title": "Devise",
+  "settings.currency.description": "Devise utilisée pour afficher tous les montants.",
   "settings.export.title": "Exporter les données",
   "settings.export.description": "Téléchargez une archive zip contenant chaque table au format CSV. Pour sauvegarde ou migration. Les montants sont stockés en centimes entiers.",
   "settings.export.button": "Tout exporter",

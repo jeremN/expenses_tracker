@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from '~/components/ui/select'
 import { Download, Loader2 } from 'lucide-react'
-import { useTranslation, useLocale, type Locale } from '~/i18n'
+import { useTranslation, useLocale, type Locale, type Currency, CURRENCIES } from '~/i18n'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsPage,
@@ -18,7 +18,7 @@ export const Route = createFileRoute('/settings')({
 
 function SettingsPage() {
   const { t } = useTranslation()
-  const { locale, setLocale } = useLocale()
+  const { locale, setLocale, currency, setCurrency } = useLocale()
   const [isPreparing, setIsPreparing] = useState(false)
 
   function handleExport() {
@@ -50,6 +50,30 @@ function SettingsPage() {
             <SelectContent>
               <SelectItem value="en">English</SelectItem>
               <SelectItem value="fr">Français</SelectItem>
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('settings.currency.title')}</CardTitle>
+          <CardDescription>{t('settings.currency.description')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Select
+            value={currency}
+            onValueChange={(v) => setCurrency(v as Currency)}
+          >
+            <SelectTrigger className="w-48" aria-label={t('settings.currency.title')}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CURRENCIES.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </CardContent>

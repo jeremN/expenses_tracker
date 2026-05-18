@@ -33,6 +33,8 @@
   "settings.subtitle": "Manage your data and app preferences.",
   "settings.language.title": "Language",
   "settings.language.description": "Choose the display language.",
+  "settings.currency.title": "Currency",
+  "settings.currency.description": "Currency used to display all amounts.",
   "settings.export.title": "Export data",
   "settings.export.description": "Download a zip containing every table as CSV. For backup or migration. Amounts are stored as integer cents.",
   "settings.export.button": "Export all data",
