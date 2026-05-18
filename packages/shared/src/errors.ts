@@ -14,3 +14,28 @@ export interface AppErrorBody {
 export function appError(message: string, code: AppErrorCode): AppErrorBody {
   return { error: message, code }
 }
+
+export class AppError extends Error {
+  readonly code: AppErrorCode
+  constructor(code: AppErrorCode, message: string) {
+    super(message)
+    this.code = code
+    this.name = 'AppError'
+  }
+}
+
+/**
+ * Single source of truth for classifying an unknown thrown value into an
+ * AppError. Reuses the SQLite UNIQUE-constraint signal already proven in
+ * the /api routes. Total — never throws.
+ */
+export function toAppError(error: unknown): AppError {
+  if (error instanceof AppError) return error
+  if (error instanceof Error) {
+    if (error.message.includes('UNIQUE constraint failed')) {
+      return new AppError('DUPLICATE_NAME', error.message)
+    }
+    return new AppError('INTERNAL', error.message)
+  }
+  return new AppError('INTERNAL', 'Unknown error')
+}
