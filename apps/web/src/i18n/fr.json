@@ -204,5 +204,14 @@
   "stats.uncategorized": "Sans catégorie",
   "stats.totalExpenses": "Total des dépenses",
   "error.title": "Une erreur s'est produite",
-  "error.tryAgain": "Réessayer"
+  "error.tryAgain": "Réessayer",
+  "error.generic": "Une erreur s'est produite. Veuillez réessayer.",
+  "error.code.NOT_FOUND": "L'élément demandé est introuvable.",
+  "error.code.INVALID_ID": "Cet identifiant n'est pas valide.",
+  "error.code.VALIDATION": "Certaines informations fournies sont invalides.",
+  "error.code.DUPLICATE_NAME": "Un élément portant ce nom existe déjà.",
+  "error.code.INTERNAL": "Une erreur interne s'est produite. Veuillez réessayer.",
+  "error.code.IMPORT_FAILED": "L'import n'a pas pu être effectué.",
+  "error.code.EXPORT_FAILED": "L'export n'a pas pu être effectué.",
+  "error.code.BAD_QUERY": "Les paramètres de la requête sont invalides."
 }

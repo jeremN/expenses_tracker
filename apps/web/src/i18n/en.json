@@ -204,5 +204,14 @@
   "stats.uncategorized": "Uncategorized",
   "stats.totalExpenses": "Total Expenses",
   "error.title": "Something went wrong",
-  "error.tryAgain": "Try Again"
+  "error.tryAgain": "Try Again",
+  "error.generic": "Something went wrong. Please try again.",
+  "error.code.NOT_FOUND": "The requested item was not found.",
+  "error.code.INVALID_ID": "That identifier is not valid.",
+  "error.code.VALIDATION": "Some of the information provided is invalid.",
+  "error.code.DUPLICATE_NAME": "An item with this name already exists.",
+  "error.code.INTERNAL": "Something went wrong on our side. Please try again.",
+  "error.code.IMPORT_FAILED": "The import could not be completed.",
+  "error.code.EXPORT_FAILED": "The export could not be completed.",
+  "error.code.BAD_QUERY": "The request parameters are invalid."
 }
