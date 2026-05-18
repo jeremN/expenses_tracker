@@ -1,4 +1,4 @@
-import type { AppErrorCode } from '@tracker/shared'
+import { appError, type AppErrorCode } from '@tracker/shared'
 
 export function jsonResponse(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -12,7 +12,8 @@ export function errorResponse(
   status = 400,
   code?: AppErrorCode,
 ) {
-  return new Response(JSON.stringify({ error: message, ...(code && { code }) }), {
+  const body = code ? appError(message, code) : { error: message }
+  return new Response(JSON.stringify(body), {
     status,
     headers: { 'Content-Type': 'application/json' },
   })
