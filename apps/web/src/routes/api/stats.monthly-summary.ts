@@ -12,14 +12,14 @@ export const Route = createFileRoute('/api/stats/monthly-summary')({
           const year = url.searchParams.get('year')
 
           if (!year || !/^\d{4}$/.test(year)) {
-            return errorResponse('year must be a 4-digit year (e.g., 2026)')
+            return errorResponse('year must be a 4-digit year (e.g., 2026)', 400, 'BAD_QUERY')
           }
 
           const db = getDB()
           const result = await getMonthlySummary(db, year)
           return jsonResponse(result.results ?? [])
         } catch {
-          return errorResponse('Failed to fetch monthly summary', 500)
+          return errorResponse('Failed to fetch monthly summary', 500, 'INTERNAL')
         }
       },
     },

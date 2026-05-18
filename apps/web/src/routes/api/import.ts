@@ -24,14 +24,14 @@ export const Route = createFileRoute('/api/import')({
           const parsed = importPayloadSchema.safeParse(body)
 
           if (!parsed.success) {
-            return errorResponse(parsed.error.issues[0].message)
+            return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
           }
 
           const result = await processImport(parsed.data)
           return jsonResponse(result, 201)
         } catch (error) {
           console.error('Import error:', error)
-          return errorResponse('Failed to import transactions', 500)
+          return errorResponse('Failed to import transactions', 500, 'IMPORT_FAILED')
         }
       },
     },

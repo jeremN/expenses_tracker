@@ -24,7 +24,7 @@ export const Route = createFileRoute('/api/transactions')({
           })
 
           if (!parsed.success) {
-            return errorResponse(parsed.error.issues[0].message)
+            return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
           }
 
           const db = getDB()
@@ -42,7 +42,7 @@ export const Route = createFileRoute('/api/transactions')({
 
           return jsonResponse(transactions)
         } catch {
-          return errorResponse('Failed to fetch transactions', 500)
+          return errorResponse('Failed to fetch transactions', 500, 'INTERNAL')
         }
       },
       POST: async ({ request }) => {
@@ -51,14 +51,14 @@ export const Route = createFileRoute('/api/transactions')({
           const parsed = createTransactionSchema.safeParse(body)
 
           if (!parsed.success) {
-            return errorResponse(parsed.error.issues[0].message)
+            return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
           }
 
           const db = getDB()
           const transaction = await createTransaction(db, parsed.data)
           return jsonResponse(transaction, 201)
         } catch {
-          return errorResponse('Failed to create transaction', 500)
+          return errorResponse('Failed to create transaction', 500, 'INTERNAL')
         }
       },
     },

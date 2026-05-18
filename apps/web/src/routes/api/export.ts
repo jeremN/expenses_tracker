@@ -26,7 +26,7 @@ export const Route = createFileRoute('/api/export')({
           })
         } catch (e) {
           console.error('export failed:', e)
-          return errorResponse('Failed to build export', 500)
+          return errorResponse('Failed to build export', 500, 'EXPORT_FAILED')
         }
       },
     },

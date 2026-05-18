@@ -17,7 +17,7 @@ export const Route = createFileRoute('/api/investments')({
           const snapshots = await getInvestmentSnapshots(db, { from, to })
           return jsonResponse(snapshots)
         } catch {
-          return errorResponse('Failed to fetch investment snapshots', 500)
+          return errorResponse('Failed to fetch investment snapshots', 500, 'INTERNAL')
         }
       },
       POST: async ({ request }) => {
@@ -26,14 +26,14 @@ export const Route = createFileRoute('/api/investments')({
           const parsed = createInvestmentSnapshotSchema.safeParse(body)
 
           if (!parsed.success) {
-            return errorResponse(parsed.error.issues[0].message)
+            return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
           }
 
           const db = getDB()
           const snapshot = await createInvestmentSnapshot(db, parsed.data)
           return jsonResponse(snapshot, 201)
         } catch {
-          return errorResponse('Failed to create investment snapshot', 500)
+          return errorResponse('Failed to create investment snapshot', 500, 'INTERNAL')
         }
       },
     },
