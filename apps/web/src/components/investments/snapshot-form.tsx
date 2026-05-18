@@ -16,7 +16,7 @@ import type { CreateInvestmentSnapshot } from '@tracker/shared'
 import { useTranslation } from '~/i18n'
 
 const formSchema = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'error.form.validDate'),
   totalValue: z.string().min(1, 'error.form.totalValueRequired'),
   note: z.string().optional(),
 })

@@ -141,6 +141,13 @@ const FormDescription = React.forwardRef<
 })
 FormDescription.displayName = "FormDescription"
 
+/**
+ * Renders the active field's error (or `children`). String messages are
+ * passed through i18n `t()` (messages are translation keys; non-key
+ * strings fall back to themselves). Requires a `LocaleProvider` ancestor
+ * — always satisfied via the root layout; isolated renders (unit tests,
+ * stories) must wrap in `LocaleProvider`.
+ */
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
