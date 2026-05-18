@@ -217,5 +217,13 @@
   "error.form.amountRequired": "Amount is required",
   "error.form.positiveNumber": "Must be a positive number",
   "error.form.validDate": "Valid date required",
-  "error.form.totalValueRequired": "Total value is required"
+  "error.form.totalValueRequired": "Total value is required",
+  "error.zod.required": "This field is required",
+  "error.zod.mustBeNumber": "Must be a number",
+  "error.zod.invalidType": "Invalid value",
+  "error.zod.tooShort": "Too short",
+  "error.zod.tooSmall": "Value is too small",
+  "error.zod.tooBig": "Value is too large",
+  "error.zod.invalidFormat": "Invalid format",
+  "error.zod.invalid": "Invalid value"
 }
