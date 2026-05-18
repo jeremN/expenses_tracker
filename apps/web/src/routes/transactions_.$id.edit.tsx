@@ -11,6 +11,8 @@ import { TransactionFormSkeleton } from '~/components/transactions/transaction-f
 import { RouteError } from '~/components/route-error'
 import { getServerCategories } from '~/server/shared-fns'
 import { useTranslation } from '~/i18n'
+import { toast } from 'sonner'
+import { translateApiError } from '~/i18n/errors'
 
 // --- Server Functions ---
 
@@ -62,9 +64,11 @@ function EditTransactionPage() {
     setIsSubmitting(true)
     try {
       await updateServerTransaction({ data: { ...data, id: transaction.id } })
+      toast.success(t('toast.updated'))
       router.navigate({ to: '/transactions' })
     } catch (error) {
       console.error('Failed to update transaction:', error)
+      toast.error(translateApiError(error, t))
     } finally {
       setIsSubmitting(false)
     }

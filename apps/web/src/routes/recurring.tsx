@@ -29,6 +29,8 @@ import { RecurringList } from '~/components/recurring/recurring-list'
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
 import { useTranslation } from '~/i18n'
+import { toast } from 'sonner'
+import { translateApiError } from '~/i18n/errors'
 
 // --- Server Functions ---
 
@@ -128,14 +130,17 @@ function RecurringPage() {
     try {
       if (editingRule) {
         await updateServerRecurringRule({ data: { ...data, id: editingRule.id } })
+        toast.success(t('toast.updated'))
       } else {
         await createServerRecurringRule({ data })
+        toast.success(t('toast.created'))
       }
       setFormOpen(false)
       setEditingRule(null)
       router.invalidate()
     } catch (error) {
       console.error('Failed to save recurring rule:', error)
+      toast.error(translateApiError(error, t))
     } finally {
       setIsSubmitting(false)
     }
@@ -146,10 +151,12 @@ function RecurringPage() {
     setIsSubmitting(true)
     try {
       await deleteServerRecurringRule({ data: { id: deleteTarget.id } })
+      toast.success(t('toast.deleted'))
       setDeleteTarget(null)
       router.invalidate()
     } catch (error) {
       console.error('Failed to delete recurring rule:', error)
+      toast.error(translateApiError(error, t))
     } finally {
       setIsSubmitting(false)
     }
@@ -160,9 +167,11 @@ function RecurringPage() {
       await toggleServerRecurringRule({
         data: { id: rule.id, isActive: !rule.isActive },
       })
+      toast.success(t('toast.updated'))
       router.invalidate()
     } catch (error) {
       console.error('Failed to toggle recurring rule:', error)
+      toast.error(translateApiError(error, t))
     }
   }
 

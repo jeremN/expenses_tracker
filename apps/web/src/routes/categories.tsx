@@ -21,6 +21,8 @@ import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
 import { getServerCategories } from '~/server/shared-fns'
 import { useTranslation } from '~/i18n'
+import { toast } from 'sonner'
+import { translateApiError } from '~/i18n/errors'
 
 // --- Server Functions ---
 
@@ -106,14 +108,17 @@ function CategoriesPage() {
     try {
       if (editingCategory) {
         await updateServerCategory({ data: { ...data, id: editingCategory.id } })
+        toast.success(t('toast.updated'))
       } else {
         await createServerCategory({ data })
+        toast.success(t('toast.created'))
       }
       setFormOpen(false)
       setEditingCategory(null)
       router.invalidate()
     } catch (error) {
       console.error('Failed to save category:', error)
+      toast.error(translateApiError(error, t))
     } finally {
       setIsSubmitting(false)
     }
@@ -124,10 +129,12 @@ function CategoriesPage() {
     setIsSubmitting(true)
     try {
       await deleteServerCategory({ data: { id: deleteTarget.id } })
+      toast.success(t('toast.deleted'))
       setDeleteTarget(null)
       router.invalidate()
     } catch (error) {
       console.error('Failed to delete category:', error)
+      toast.error(translateApiError(error, t))
     } finally {
       setIsSubmitting(false)
     }

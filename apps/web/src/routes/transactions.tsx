@@ -19,6 +19,8 @@ import { TransactionFilters, type TypeFilter } from '~/components/transactions/t
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
 import { useTranslation } from '~/i18n'
+import { toast } from 'sonner'
+import { translateApiError } from '~/i18n/errors'
 
 // --- Server Functions ---
 
@@ -114,10 +116,12 @@ function TransactionsPage() {
     setIsSubmitting(true)
     try {
       await deleteServerTransaction({ data: { id: deleteTarget.id } })
+      toast.success(t('toast.deleted'))
       setDeleteTarget(null)
       router.invalidate()
     } catch (error) {
       console.error('Failed to delete transaction:', error)
+      toast.error(translateApiError(error, t))
     } finally {
       setIsSubmitting(false)
     }

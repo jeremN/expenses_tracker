@@ -13,6 +13,8 @@ import { cn } from '~/lib/utils'
 import { RouteError } from '~/components/route-error'
 import { processImport, MAX_IMPORT_ROWS } from '~/server/import-helpers'
 import { useTranslation } from '~/i18n'
+import { toast } from 'sonner'
+import { translateApiError } from '~/i18n/errors'
 
 // --- Server Functions ---
 
@@ -368,8 +370,10 @@ function ImportPage() {
       })
 
       setImportResult(result)
+      toast.success(t('toast.imported'))
     } catch (error) {
       console.error('Failed to import:', error)
+      toast.error(translateApiError(error, t))
     } finally {
       setIsImporting(false)
     }

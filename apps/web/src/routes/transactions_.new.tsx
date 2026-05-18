@@ -10,6 +10,8 @@ import { TransactionFormSkeleton } from '~/components/transactions/transaction-f
 import { RouteError } from '~/components/route-error'
 import { getServerCategories } from '~/server/shared-fns'
 import { useTranslation } from '~/i18n'
+import { toast } from 'sonner'
+import { translateApiError } from '~/i18n/errors'
 
 const createServerTransaction = createServerFn({ method: 'POST' })
   .inputValidator(createTransactionSchema)
@@ -39,9 +41,11 @@ function NewTransactionPage() {
     setIsSubmitting(true)
     try {
       await createServerTransaction({ data })
+      toast.success(t('toast.created'))
       router.navigate({ to: '/transactions' })
     } catch (error) {
       console.error('Failed to create transaction:', error)
+      toast.error(translateApiError(error, t))
     } finally {
       setIsSubmitting(false)
     }
