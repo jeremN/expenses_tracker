@@ -52,3 +52,14 @@ const UNEXPECTED_CODES = new Set<AppErrorCode>([
 export function isUnexpectedError(code: AppErrorCode): boolean {
   return UNEXPECTED_CODES.has(code)
 }
+
+/**
+ * Throw an AppError(NOT_FOUND) if value is null/undefined; return the value
+ * otherwise (narrowed to NonNullable<T>). Used at mutation call sites where
+ * the underlying Drizzle `.returning().get()` returns undefined on a
+ * no-match update/delete.
+ */
+export function assertFound<T>(value: T | null | undefined, message: string): NonNullable<T> {
+  if (value == null) throw new AppError('NOT_FOUND', message)
+  return value as NonNullable<T>
+}

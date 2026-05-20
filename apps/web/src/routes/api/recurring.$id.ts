@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getDB } from '~/server/db'
 import { updateRecurringRule, deleteRecurringRule } from '@tracker/db'
-import { updateRecurringRuleSchema } from '@tracker/shared'
+import { updateRecurringRuleSchema, assertFound } from '@tracker/shared'
 import { jsonResponse, errorResponse } from '~/server/api-helpers'
 import { withApiHandler } from '~/server/logger'
 
@@ -33,10 +33,7 @@ export const Route = createFileRoute('/api/recurring/$id')({
           return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
         }
         const db = getDB()
-        const rule = await updateRecurringRule(db, id, parsed.data)
-        if (!rule) {
-          return errorResponse('Recurring rule not found', 404, 'NOT_FOUND')
-        }
+        const rule = assertFound(await updateRecurringRule(db, id, parsed.data), 'Recurring rule not found')
         return jsonResponse(rule)
       }),
       DELETE: withApiHandler('api:DELETE /api/recurring/$id', async ({ params }) => {
@@ -45,10 +42,7 @@ export const Route = createFileRoute('/api/recurring/$id')({
           return errorResponse('Invalid recurring rule ID', 400, 'INVALID_ID')
         }
         const db = getDB()
-        const rule = await deleteRecurringRule(db, id)
-        if (!rule) {
-          return errorResponse('Recurring rule not found', 404, 'NOT_FOUND')
-        }
+        assertFound(await deleteRecurringRule(db, id), 'Recurring rule not found')
         return jsonResponse({ success: true })
       }),
     },

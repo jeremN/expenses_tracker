@@ -34,7 +34,10 @@ export async function deleteCategory(db: DB, id: number) {
   await db.update(schema.recurringRules)
     .set({ categoryId: null })
     .where(eq(schema.recurringRules.categoryId, id))
-  return db.delete(schema.categories).where(eq(schema.categories.id, id))
+  return db.delete(schema.categories)
+    .where(eq(schema.categories.id, id))
+    .returning()
+    .get()
 }
 
 // --- Transactions ---
@@ -85,7 +88,10 @@ export function updateTransaction(db: DB, id: number, data: Partial<{
 }
 
 export function deleteTransaction(db: DB, id: number) {
-  return db.delete(schema.transactions).where(eq(schema.transactions.id, id))
+  return db.delete(schema.transactions)
+    .where(eq(schema.transactions.id, id))
+    .returning()
+    .get()
 }
 
 // --- Recurring Rules ---
@@ -151,7 +157,10 @@ export function getInvestmentSnapshotById(db: DB, id: number) {
 }
 
 export function deleteInvestmentSnapshot(db: DB, id: number) {
-  return db.delete(schema.investmentSnapshots).where(eq(schema.investmentSnapshots.id, id))
+  return db.delete(schema.investmentSnapshots)
+    .where(eq(schema.investmentSnapshots.id, id))
+    .returning()
+    .get()
 }
 
 // --- Bank Imports ---

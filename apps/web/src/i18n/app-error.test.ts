@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { AppError, toAppError, isUnexpectedError } from '@tracker/shared'
+import { AppError, toAppError, isUnexpectedError, assertFound } from '@tracker/shared'
 
 describe('AppError', () => {
   it('is an Error with a code', () => {
@@ -52,4 +52,25 @@ describe('isUnexpectedError', () => {
       expect(isUnexpectedError(code)).toBe(false)
     },
   )
+})
+
+describe('assertFound', () => {
+  it('returns the value when defined', () => {
+    expect(assertFound({ id: 1 }, 'not found')).toEqual({ id: 1 })
+  })
+  it('throws AppError(NOT_FOUND) on undefined', () => {
+    expect(() => assertFound(undefined, 'gone')).toThrow(AppError)
+    try { assertFound(undefined, 'gone') } catch (e) {
+      expect((e as AppError).code).toBe('NOT_FOUND')
+      expect((e as AppError).message).toBe('gone')
+    }
+  })
+  it('throws AppError(NOT_FOUND) on null', () => {
+    expect(() => assertFound(null, 'gone')).toThrow(AppError)
+  })
+  it('returns the unwrapped value when defined (compile-time narrowing)', () => {
+    const value: string | undefined = 'x'
+    const narrowed: string = assertFound(value, 'msg')
+    expect(narrowed).toBe('x')
+  })
 })

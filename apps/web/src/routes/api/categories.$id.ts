@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getDB } from '~/server/db'
 import { getCategoryById, updateCategory, deleteCategory } from '@tracker/db'
-import { updateCategorySchema } from '@tracker/shared'
+import { updateCategorySchema, assertFound } from '@tracker/shared'
 import { jsonResponse, errorResponse } from '~/server/api-helpers'
 import { withApiHandler } from '~/server/logger'
 
@@ -31,11 +31,7 @@ export const Route = createFileRoute('/api/categories/$id')({
           return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
         }
         const db = getDB()
-        const existing = await getCategoryById(db, id)
-        if (!existing) {
-          return errorResponse('Category not found', 404, 'NOT_FOUND')
-        }
-        const category = await updateCategory(db, id, parsed.data)
+        const category = assertFound(await updateCategory(db, id, parsed.data), 'Category not found')
         return jsonResponse(category)
       }),
       DELETE: withApiHandler('api:DELETE /api/categories/$id', async ({ params }) => {
@@ -44,11 +40,7 @@ export const Route = createFileRoute('/api/categories/$id')({
           return errorResponse('Invalid category ID', 400, 'INVALID_ID')
         }
         const db = getDB()
-        const existing = await getCategoryById(db, id)
-        if (!existing) {
-          return errorResponse('Category not found', 404, 'NOT_FOUND')
-        }
-        await deleteCategory(db, id)
+        assertFound(await deleteCategory(db, id), 'Category not found')
         return jsonResponse({ success: true })
       }),
     },
