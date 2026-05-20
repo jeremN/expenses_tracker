@@ -39,3 +39,16 @@ export function toAppError(error: unknown): AppError {
   }
   return new AppError('INTERNAL', 'Unknown error')
 }
+
+const UNEXPECTED_CODES = new Set<AppErrorCode>([
+  'INTERNAL', 'IMPORT_FAILED', 'EXPORT_FAILED', 'BAD_QUERY',
+])
+
+/**
+ * True for system-caused codes (DB outage, internal failure). False for
+ * user-caused codes (duplicate name, validation, missing record). Used by
+ * the server logger to decide whether an error is worth emitting to logs.
+ */
+export function isUnexpectedError(code: AppErrorCode): boolean {
+  return UNEXPECTED_CODES.has(code)
+}
