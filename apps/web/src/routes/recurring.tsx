@@ -31,47 +31,50 @@ import { RouteError } from '~/components/route-error'
 import { useTranslation } from '~/i18n'
 import { toast } from 'sonner'
 import { translateApiError } from '~/i18n/errors'
+import { withServerFn } from '~/server/logger'
 
 // --- Server Functions ---
 
-const getServerRecurringRules = createServerFn({ method: 'GET' }).handler(async () => {
-  const db = getDB()
-  const [rules, categories] = await Promise.all([
-    getRecurringRules(db),
-    getCategories(db),
-  ])
-  return { rules, categories }
-})
+const getServerRecurringRules = createServerFn({ method: 'GET' }).handler(
+  withServerFn('server-fn:getServerRecurringRules', async () => {
+    const db = getDB()
+    const [rules, categories] = await Promise.all([
+      getRecurringRules(db),
+      getCategories(db),
+    ])
+    return { rules, categories }
+  }),
+)
 
 const createServerRecurringRule = createServerFn({ method: 'POST' })
   .inputValidator(createRecurringRuleSchema)
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:createServerRecurringRule', async ({ data }) => {
     const db = getDB()
     return createRecurringRule(db, data)
-  })
+  }))
 
 const updateServerRecurringRule = createServerFn({ method: 'POST' })
   .inputValidator(updateRecurringRuleSchema.extend({ id: z.number() }))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:updateServerRecurringRule', async ({ data }) => {
     const { id, ...rest } = data
     const db = getDB()
     return updateRecurringRule(db, id, rest)
-  })
+  }))
 
 const deleteServerRecurringRule = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number() }))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:deleteServerRecurringRule', async ({ data }) => {
     const db = getDB()
     await deleteRecurringRule(db, data.id)
     return { success: true }
-  })
+  }))
 
 const toggleServerRecurringRule = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number(), isActive: z.boolean() }))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:toggleServerRecurringRule', async ({ data }) => {
     const db = getDB()
     return updateRecurringRule(db, data.id, { isActive: data.isActive })
-  })
+  }))
 
 // --- Route ---
 
