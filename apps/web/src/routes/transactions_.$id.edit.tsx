@@ -3,7 +3,7 @@ import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getDB } from '~/server/db'
 import { getTransactionById, updateTransaction } from '@tracker/db'
-import { updateTransactionSchema } from '@tracker/shared'
+import { updateTransactionSchema, AppError } from '@tracker/shared'
 import type { Category, Transaction, UpdateTransaction } from '@tracker/shared'
 import { z } from 'zod'
 import { TransactionForm } from '~/components/transactions/transaction-form'
@@ -13,25 +13,26 @@ import { getServerCategories } from '~/server/shared-fns'
 import { useTranslation } from '~/i18n'
 import { toast } from 'sonner'
 import { translateApiError } from '~/i18n/errors'
+import { withServerFn } from '~/server/logger'
 
 // --- Server Functions ---
 
 const getServerTransaction = createServerFn({ method: 'GET' })
   .inputValidator(z.object({ id: z.number() }))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:getServerTransaction', async ({ data }) => {
     const db = getDB()
     const row = await getTransactionById(db, data.id)
-    if (!row) throw new Error('Transaction not found')
+    if (!row) throw new AppError('NOT_FOUND', 'Transaction not found')
     return { ...row.transactions, category: row.categories }
-  })
+  }))
 
 const updateServerTransaction = createServerFn({ method: 'POST' })
   .inputValidator(updateTransactionSchema.extend({ id: z.number() }))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:updateServerTransaction', async ({ data }) => {
     const { id, ...rest } = data
     const db = getDB()
     return updateTransaction(db, id, rest)
-  })
+  }))
 
 // --- Route ---
 

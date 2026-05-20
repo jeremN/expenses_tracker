@@ -12,13 +12,14 @@ import { getServerCategories } from '~/server/shared-fns'
 import { useTranslation } from '~/i18n'
 import { toast } from 'sonner'
 import { translateApiError } from '~/i18n/errors'
+import { withServerFn } from '~/server/logger'
 
 const createServerTransaction = createServerFn({ method: 'POST' })
   .inputValidator(createTransactionSchema)
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:createServerTransaction', async ({ data }) => {
     const db = getDB()
     return createTransaction(db, data)
-  })
+  }))
 
 // --- Route ---
 

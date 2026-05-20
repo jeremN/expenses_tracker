@@ -21,6 +21,7 @@ import { RouteError } from '~/components/route-error'
 import { useTranslation } from '~/i18n'
 import { toast } from 'sonner'
 import { translateApiError } from '~/i18n/errors'
+import { withServerFn } from '~/server/logger'
 
 // --- Server Functions ---
 
@@ -32,7 +33,7 @@ const getServerTransactions = createServerFn({ method: 'GET' })
       type: z.string().optional(),
     }),
   )
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:getServerTransactions', async ({ data }) => {
     const db = getDB()
     const [rows, categories] = await Promise.all([
       getTransactions(db, data),
@@ -45,15 +46,15 @@ const getServerTransactions = createServerFn({ method: 'GET' })
     }))
 
     return { transactions, categories }
-  })
+  }))
 
 const deleteServerTransaction = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number() }))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:deleteServerTransaction', async ({ data }) => {
     const db = getDB()
     await deleteTransaction(db, data.id)
     return { success: true }
-  })
+  }))
 
 // --- Route ---
 
