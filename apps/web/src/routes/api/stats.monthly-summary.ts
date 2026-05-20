@@ -2,26 +2,21 @@ import { createFileRoute } from '@tanstack/react-router'
 import { getDB } from '~/server/db'
 import { getMonthlySummary } from '@tracker/db'
 import { jsonResponse, errorResponse } from '~/server/api-helpers'
+import { withApiHandler } from '~/server/logger'
 
 export const Route = createFileRoute('/api/stats/monthly-summary')({
   server: {
     handlers: {
-      GET: async ({ request }) => {
-        try {
-          const url = new URL(request.url)
-          const year = url.searchParams.get('year')
-
-          if (!year || !/^\d{4}$/.test(year)) {
-            return errorResponse('year must be a 4-digit year (e.g., 2026)', 400, 'BAD_QUERY')
-          }
-
-          const db = getDB()
-          const result = await getMonthlySummary(db, year)
-          return jsonResponse(result.results ?? [])
-        } catch {
-          return errorResponse('Failed to fetch monthly summary', 500, 'INTERNAL')
+      GET: withApiHandler('api:GET /api/stats/monthly-summary', async ({ request }) => {
+        const url = new URL(request.url)
+        const year = url.searchParams.get('year')
+        if (!year || !/^\d{4}$/.test(year)) {
+          return errorResponse('year must be a 4-digit year (e.g., 2026)', 400, 'BAD_QUERY')
         }
-      },
+        const db = getDB()
+        const result = await getMonthlySummary(db, year)
+        return jsonResponse(result.results ?? [])
+      }),
     },
   },
 })

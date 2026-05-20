@@ -18,3 +18,18 @@ export function errorResponse(
     headers: { 'Content-Type': 'application/json' },
   })
 }
+
+export function httpStatusForCode(code: AppErrorCode): number {
+  switch (code) {
+    case 'DUPLICATE_NAME': return 409
+    case 'NOT_FOUND': return 404
+    case 'VALIDATION':
+    case 'INVALID_ID':
+    case 'BAD_QUERY':
+      return 400
+    case 'INTERNAL':
+    case 'IMPORT_FAILED':
+    case 'EXPORT_FAILED':
+      return 500
+  }
+}

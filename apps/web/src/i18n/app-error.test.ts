@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { AppError, toAppError } from '@tracker/shared'
+import { AppError, toAppError, isUnexpectedError } from '@tracker/shared'
 
 describe('AppError', () => {
   it('is an Error with a code', () => {
@@ -36,4 +36,20 @@ describe('toAppError', () => {
   it('does not misclassify a non-constraint message containing the word UNIQUE', () => {
     expect(toAppError(new Error('The value must be UNIQUE across records')).code).toBe('INTERNAL')
   })
+})
+
+describe('isUnexpectedError', () => {
+  it.each(['INTERNAL', 'IMPORT_FAILED', 'EXPORT_FAILED', 'BAD_QUERY'] as const)(
+    'returns true for system code %s',
+    (code) => {
+      expect(isUnexpectedError(code)).toBe(true)
+    },
+  )
+
+  it.each(['DUPLICATE_NAME', 'VALIDATION', 'NOT_FOUND', 'INVALID_ID'] as const)(
+    'returns false for user-caused code %s',
+    (code) => {
+      expect(isUnexpectedError(code)).toBe(false)
+    },
+  )
 })

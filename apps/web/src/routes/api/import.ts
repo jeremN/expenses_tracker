@@ -1,7 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
+import { AppError } from '@tracker/shared'
 import { processImport } from '~/server/import-helpers'
 import { errorResponse, jsonResponse } from '~/server/api-helpers'
+import { withApiHandler } from '~/server/logger'
 
 const importTransactionSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -18,22 +20,25 @@ const importPayloadSchema = z.object({
 export const Route = createFileRoute('/api/import')({
   server: {
     handlers: {
-      POST: async ({ request }) => {
+      POST: withApiHandler('api:POST /api/import', async ({ request }) => {
+        const body = await request.json()
+        const parsed = importPayloadSchema.safeParse(body)
+        if (!parsed.success) {
+          return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
+        }
         try {
-          const body = await request.json()
-          const parsed = importPayloadSchema.safeParse(body)
-
-          if (!parsed.success) {
-            return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
-          }
-
           const result = await processImport(parsed.data)
           return jsonResponse(result, 201)
-        } catch (error) {
-          console.error('Import error:', error)
-          return errorResponse('Failed to import transactions', 500, 'IMPORT_FAILED')
+        } catch (e) {
+          // Re-throw as the specific code so the wrapper preserves the
+          // IMPORT_FAILED contract (logger picks up the message text).
+          if (e instanceof AppError) throw e
+          throw new AppError(
+            'IMPORT_FAILED',
+            e instanceof Error ? `Import failed: ${e.message}` : 'Failed to import transactions',
+          )
         }
-      },
+      }),
     },
   },
 })

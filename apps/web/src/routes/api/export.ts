@@ -1,12 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { AppError } from '@tracker/shared'
 import { getDB } from '~/server/db'
 import { buildExportZip } from '~/server/export'
-import { errorResponse } from '~/server/api-helpers'
+import { withApiHandler } from '~/server/logger'
 
 export const Route = createFileRoute('/api/export')({
   server: {
     handlers: {
-      GET: async () => {
+      GET: withApiHandler('api:GET /api/export', async () => {
         try {
           const db = getDB()
           const bytes = await buildExportZip(db)
@@ -25,10 +26,15 @@ export const Route = createFileRoute('/api/export')({
             },
           })
         } catch (e) {
-          console.error('export failed:', e)
-          return errorResponse('Failed to build export', 500, 'EXPORT_FAILED')
+          // Re-throw as the specific code so the wrapper preserves the
+          // EXPORT_FAILED contract (logger picks up the message text).
+          if (e instanceof AppError) throw e
+          throw new AppError(
+            'EXPORT_FAILED',
+            e instanceof Error ? `Export failed: ${e.message}` : 'Failed to build export',
+          )
         }
-      },
+      }),
     },
   },
 })
