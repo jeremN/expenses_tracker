@@ -73,15 +73,28 @@ export function parseCSV(
     const dateStr = raw[dateCol] ?? ''
     const descStr = descCol ? (raw[descCol] ?? '') : ''
 
-    let amountCents: number
+    let amountCents: number | null
     if (creditCol && debitCol) {
-      // Separate credit/debit columns
-      const credit = parseAmount(raw[creditCol] ?? '')
-      const debit = parseAmount(raw[debitCol] ?? '')
-      amountCents = credit !== 0 ? credit : -Math.abs(debit)
+      // Separate credit/debit columns. An empty cell is the *normal* case
+      // for the unused side, so treat empty as 0 (not "unparseable"). But
+      // if a non-empty cell fails to parse, skip the row — we can't trust
+      // the sign with one side garbage.
+      const creditRaw = raw[creditCol] ?? ''
+      const debitRaw = raw[debitCol] ?? ''
+      const credit = creditRaw.trim() === '' ? 0 : parseAmount(creditRaw)
+      const debit = debitRaw.trim() === '' ? 0 : parseAmount(debitRaw)
+      if (credit === null || debit === null) {
+        amountCents = null
+      } else if (credit === 0 && debit === 0) {
+        amountCents = null // both empty → no amount info, skip
+      } else {
+        amountCents = credit !== 0 ? credit : -Math.abs(debit)
+      }
     } else {
       amountCents = parseAmount(raw[amountCol] ?? '')
     }
+
+    if (amountCents === null) continue // Skip rows with unparseable amounts
 
     const date = parseDate(dateStr)
     if (!date) continue // Skip rows with unparseable dates
@@ -351,8 +364,19 @@ function parseDate(str: string): string | null {
   return null
 }
 
+// Math.round(value * 100) can only be trusted up to MAX_SAFE_INTEGER, which
+// is 9_007_199_254_740_992 cents (~€9 × 10^13). Comfortably above any real
+// bank balance; comfortably below the precision cliff where JS Number rounds
+// silently and we'd insert garbage rows.
+const MAX_SAFE_CENTS = Math.floor(Number.MAX_SAFE_INTEGER / 100)
+
 /**
  * Parse an amount string to cents.
+ *
+ * Returns `null` when the input is empty, contains no parseable digits, or
+ * the parsed magnitude exceeds MAX_SAFE_CENTS (scientific notation like
+ * `1e10` is reachable via parseFloat and produces garbage cents after
+ * multiplication — reject it). Callers should skip the row.
  *
  * Handles:
  * - Standard format: 1234.56 -> 123456
@@ -360,9 +384,15 @@ function parseDate(str: string): string | null {
  * - Negative amounts: -100.00, (100.00)
  * - Currency symbols: $100.00, 100.00 EUR
  */
-function parseAmount(str: string): number {
+function parseAmount(str: string): number | null {
   let s = str.trim()
-  if (!s) return 0
+  if (!s) return null
+
+  // Reject scientific notation (e.g. "1e10", "2.5E-3"). The currency-symbol
+  // strip below would silently delete the `e` and mangle the value (1e10 →
+  // "110" → 11000 cents). Catch it before that. Pattern: digit, e/E,
+  // optional sign, digit.
+  if (/\d[eE][+\-]?\d/.test(s)) return null
 
   // Detect if negative via parentheses: (100.00)
   const isParens = s.startsWith('(') && s.endsWith(')')
@@ -370,10 +400,11 @@ function parseAmount(str: string): number {
     s = s.slice(1, -1).trim()
   }
 
-  // Remove currency symbols and whitespace
+  // Remove currency symbols and whitespace. Keeps digits, separators, and
+  // signs; strips $ € £ alpha codes like "EUR" / "USD".
   s = s.replace(/[^0-9,.\-+]/g, '')
 
-  if (!s) return 0
+  if (!s) return null
 
   // Detect negative sign
   const isNegative = s.startsWith('-') || isParens
@@ -411,8 +442,10 @@ function parseAmount(str: string): number {
   }
 
   const value = parseFloat(normalized)
-  if (isNaN(value)) return 0
+  if (!isFinite(value)) return null
 
   const cents = Math.round(value * 100)
+  if (Math.abs(cents) > MAX_SAFE_CENTS) return null
+
   return isNegative ? -cents : cents
 }
