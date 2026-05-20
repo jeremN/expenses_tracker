@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { AppError } from '@tracker/shared'
-import { logServerError, withServerFn } from './logger'
+import { logServerError, withServerFn, withApiHandler } from './logger'
 
 describe('logServerError', () => {
   let errSpy: ReturnType<typeof vi.spyOn>
@@ -92,5 +92,64 @@ describe('withServerFn', () => {
     const original = new AppError('INTERNAL', 'orig')
     const wrapped = withServerFn('op', async () => { throw original })
     await expect(wrapped(undefined as never)).rejects.toBe(original)
+  })
+})
+
+describe('withApiHandler', () => {
+  let errSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    errSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  })
+  afterEach(() => {
+    errSpy.mockRestore()
+  })
+
+  const fakeReq = { request: new Request('http://x') }
+
+  it('passes the response through when no throw', async () => {
+    const ok = new Response('ok')
+    const wrapped = withApiHandler('op', async () => ok)
+    await expect(wrapped(fakeReq)).resolves.toBe(ok)
+    expect(errSpy).not.toHaveBeenCalled()
+  })
+
+  it('returns 409 errorResponse for DUPLICATE_NAME', async () => {
+    const wrapped = withApiHandler('op', async () => {
+      throw new AppError('DUPLICATE_NAME', 'dup')
+    })
+    const res = await wrapped(fakeReq)
+    expect(res.status).toBe(409)
+    const body = await res.json() as { code: string }
+    expect(body.code).toBe('DUPLICATE_NAME')
+    expect(errSpy).not.toHaveBeenCalled()
+  })
+
+  it('returns 404 for NOT_FOUND', async () => {
+    const wrapped = withApiHandler('op', async () => {
+      throw new AppError('NOT_FOUND', 'missing')
+    })
+    const res = await wrapped(fakeReq)
+    expect(res.status).toBe(404)
+  })
+
+  it('returns 500 and LOGS for INTERNAL', async () => {
+    const wrapped = withApiHandler('op', async () => {
+      throw new Error('boom')
+    })
+    const res = await wrapped(fakeReq)
+    expect(res.status).toBe(500)
+    const body = await res.json() as { code: string }
+    expect(body.code).toBe('INTERNAL')
+    expect(errSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns 400 for VALIDATION and does NOT log', async () => {
+    const wrapped = withApiHandler('op', async () => {
+      throw new AppError('VALIDATION', 'bad input')
+    })
+    const res = await wrapped(fakeReq)
+    expect(res.status).toBe(400)
+    expect(errSpy).not.toHaveBeenCalled()
   })
 })

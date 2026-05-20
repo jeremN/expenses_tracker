@@ -1,4 +1,5 @@
 import { type AppError, toAppError, isUnexpectedError } from '@tracker/shared'
+import { errorResponse, httpStatusForCode } from './api-helpers'
 
 type LogContext = { op: string }
 
@@ -42,6 +43,28 @@ export function withServerFn<A, R>(
         logServerError(ae, { op })
       }
       throw ae
+    }
+  }
+}
+
+/**
+ * Wrap a TanStack Start /api/* handler. On throw: classify, log if
+ * unexpected, return an errorResponse with status derived from the code.
+ * Pass-through when the handler returns normally.
+ */
+export function withApiHandler<Ctx extends { request: Request }>(
+  op: string,
+  fn: (ctx: Ctx) => Promise<Response>,
+): (ctx: Ctx) => Promise<Response> {
+  return async (ctx) => {
+    try {
+      return await fn(ctx)
+    } catch (e) {
+      const ae = toAppError(e)
+      if (isUnexpectedError(ae.code)) {
+        logServerError(ae, { op })
+      }
+      return errorResponse(ae.message, httpStatusForCode(ae.code), ae.code)
     }
   }
 }
