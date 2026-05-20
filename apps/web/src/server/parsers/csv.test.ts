@@ -211,6 +211,67 @@ not-a-date,100
     const result = parseCSV(csv, { date: 'Date', amount: 'Amount' })
     expect(result.rows).toHaveLength(2)
   })
+
+  it('skips rows with empty amount cells', () => {
+    const csv = `Date,Amount
+2026-01-15,
+2026-01-16,100`
+
+    const result = parseCSV(csv, { date: 'Date', amount: 'Amount' })
+    expect(result.rows).toHaveLength(1)
+    expect(result.rows[0].date).toBe('2026-01-16')
+  })
+
+  it('skips rows with non-numeric amount cells', () => {
+    const csv = `Date,Amount
+2026-01-15,abc
+2026-01-16,100`
+
+    const result = parseCSV(csv, { date: 'Date', amount: 'Amount' })
+    expect(result.rows).toHaveLength(1)
+    expect(result.rows[0].date).toBe('2026-01-16')
+  })
+
+  it('skips rows whose amount overflows MAX_SAFE_CENTS', () => {
+    // 99999999999999999 × 100 cents = ~1e19, far beyond MAX_SAFE_INTEGER (~9e15)
+    const csv = `Date,Amount
+2026-01-15,99999999999999999
+2026-01-16,100`
+
+    const result = parseCSV(csv, { date: 'Date', amount: 'Amount' })
+    expect(result.rows).toHaveLength(1)
+    expect(result.rows[0].date).toBe('2026-01-16')
+  })
+
+  it('skips rows with scientific-notation amounts (Infinity / overflow magnitude)', () => {
+    // parseFloat("1e308") is finite but |* 100| overflows MAX_SAFE_CENTS;
+    // parseFloat("1e400") is Infinity and rejected by isFinite.
+    const csv = `Date,Amount
+2026-01-15,1e308
+2026-01-16,1e400
+2026-01-17,100`
+
+    const result = parseCSV(csv, { date: 'Date', amount: 'Amount' })
+    expect(result.rows).toHaveLength(1)
+    expect(result.rows[0].date).toBe('2026-01-17')
+  })
+
+  it('skips credit/debit rows where either side is malformed', () => {
+    const csv = `Date,Description,Debit,Credit
+2026-01-15,bad row,abc,
+2026-01-16,good row,45.50,
+2026-01-17,bad row 2,,xyz`
+
+    const result = parseCSV(csv, {
+      date: 'Date',
+      description: 'Description',
+      debit: 'Debit',
+      credit: 'Credit',
+    })
+    expect(result.rows).toHaveLength(1)
+    expect(result.rows[0].description).toBe('good row')
+    expect(result.rows[0].amount).toBe(-4550)
+  })
 })
 
 describe('detectColumns', () => {
