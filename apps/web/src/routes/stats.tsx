@@ -25,24 +25,25 @@ import {
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
 import { useTranslation } from '~/i18n'
+import { withServerFn } from '~/server/logger'
 
 // --- Server Functions ---
 
 const getMonthlyStats = createServerFn({ method: 'GET' })
   .inputValidator(z.object({ year: z.string().regex(/^\d{4}$/) }))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:getMonthlyStats', async ({ data }) => {
     const db = getDB()
     const result = await getMonthlySummary(db, data.year)
     return (result.results ?? []) as unknown as MonthlySummaryRow[]
-  })
+  }))
 
 const getCategoryStats = createServerFn({ method: 'GET' })
   .inputValidator(z.object({ month: z.string().regex(/^\d{4}-\d{2}$/) }))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:getCategoryStats', async ({ data }) => {
     const db = getDB()
     const result = await getCategoryBreakdown(db, data.month)
     return (result.results ?? []) as unknown as CategoryBreakdownRow[]
-  })
+  }))
 
 // --- Helpers ---
 

@@ -34,27 +34,30 @@ import { RouteError } from '~/components/route-error'
 import { useTranslation } from '~/i18n'
 import { toast } from 'sonner'
 import { translateApiError } from '~/i18n/errors'
+import { withServerFn } from '~/server/logger'
 
 // --- Server Functions ---
 
-const getServerSnapshots = createServerFn({ method: 'GET' }).handler(async () => {
-  const db = getDB()
-  return getInvestmentSnapshots(db)
-})
+const getServerSnapshots = createServerFn({ method: 'GET' }).handler(
+  withServerFn('server-fn:getServerSnapshots', async () => {
+    const db = getDB()
+    return getInvestmentSnapshots(db)
+  }),
+)
 
 const createServerSnapshot = createServerFn({ method: 'POST' })
   .inputValidator(createInvestmentSnapshotSchema)
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:createServerSnapshot', async ({ data }) => {
     const db = getDB()
     return createInvestmentSnapshot(db, data)
-  })
+  }))
 
 const deleteServerSnapshot = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number() }))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:deleteServerSnapshot', async ({ data }) => {
     const db = getDB()
     return deleteInvestmentSnapshot(db, data.id)
-  })
+  }))
 
 // --- Route ---
 
