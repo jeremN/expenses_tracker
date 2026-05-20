@@ -1,4 +1,4 @@
-import type { AppError } from '@tracker/shared'
+import { type AppError, toAppError, isUnexpectedError } from '@tracker/shared'
 
 type LogContext = { op: string }
 
@@ -22,4 +22,26 @@ export function logServerError(err: AppError, ctx: LogContext): void {
     stack: stack && stack.length > STACK_MAX ? stack.slice(0, STACK_MAX) : stack,
     timestamp: new Date().toISOString(),
   }))
+}
+
+/**
+ * Wrap a TanStack Start server-fn handler. On throw: classify with
+ * toAppError, log if the resolved code is system-caused, re-throw the
+ * AppError so seroval preserves the .code on the wire to the client.
+ */
+export function withServerFn<A, R>(
+  op: string,
+  fn: (args: A) => Promise<R>,
+): (args: A) => Promise<R> {
+  return async (args) => {
+    try {
+      return await fn(args)
+    } catch (e) {
+      const ae = toAppError(e)
+      if (isUnexpectedError(ae.code)) {
+        logServerError(ae, { op })
+      }
+      throw ae
+    }
+  }
 }

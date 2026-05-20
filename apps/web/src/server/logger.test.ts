@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { AppError } from '@tracker/shared'
-import { logServerError } from './logger'
+import { logServerError, withServerFn } from './logger'
 
 describe('logServerError', () => {
   let errSpy: ReturnType<typeof vi.spyOn>
@@ -41,5 +41,56 @@ describe('logServerError', () => {
     logServerError(err, { op: 'op' })
     const payload = JSON.parse(errSpy.mock.calls[0][0] as string)
     expect(payload.stack.length).toBeLessThanOrEqual(2048)
+  })
+})
+
+describe('withServerFn', () => {
+  let errSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    errSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  })
+  afterEach(() => {
+    errSpy.mockRestore()
+  })
+
+  it('returns the handler value when no throw', async () => {
+    const wrapped = withServerFn('op', async (x: number) => x * 2)
+    await expect(wrapped(3)).resolves.toBe(6)
+    expect(errSpy).not.toHaveBeenCalled()
+  })
+
+  it('re-throws the classified AppError on raw throw', async () => {
+    const wrapped = withServerFn('op', async () => {
+      throw new Error('UNIQUE constraint failed: categories.name')
+    })
+    await expect(wrapped(undefined as never)).rejects.toMatchObject({
+      name: 'AppError', code: 'DUPLICATE_NAME',
+    })
+  })
+
+  it('does NOT log for user-caused codes', async () => {
+    const wrapped = withServerFn('op', async () => {
+      throw new AppError('DUPLICATE_NAME', 'dup')
+    })
+    await expect(wrapped(undefined as never)).rejects.toThrow()
+    expect(errSpy).not.toHaveBeenCalled()
+  })
+
+  it.each(['INTERNAL', 'IMPORT_FAILED', 'EXPORT_FAILED', 'BAD_QUERY'] as const)(
+    'logs unexpected code %s',
+    async (code) => {
+      const wrapped = withServerFn('op', async () => {
+        throw new AppError(code, 'boom')
+      })
+      await expect(wrapped(undefined as never)).rejects.toThrow()
+      expect(errSpy).toHaveBeenCalledTimes(1)
+    },
+  )
+
+  it('preserves the AppError reference (does not re-wrap)', async () => {
+    const original = new AppError('INTERNAL', 'orig')
+    const wrapped = withServerFn('op', async () => { throw original })
+    await expect(wrapped(undefined as never)).rejects.toBe(original)
   })
 })
