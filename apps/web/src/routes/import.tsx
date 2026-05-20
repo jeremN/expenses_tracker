@@ -15,6 +15,8 @@ import { processImport, MAX_IMPORT_ROWS } from '~/server/import-helpers'
 import { useTranslation } from '~/i18n'
 import { toast } from 'sonner'
 import { translateApiError } from '~/i18n/errors'
+import { withServerFn } from '~/server/logger'
+import { AppError } from '@tracker/shared'
 
 // --- Server Functions ---
 
@@ -28,10 +30,18 @@ const parseFileSchema = z.object({
 
 const parseFile = createServerFn({ method: 'POST' })
   .inputValidator((d: unknown) => parseFileSchema.parse(d))
-  .handler(async ({ data }) => {
-    const { parseCSV } = await import('~/server/parsers/csv')
-    return parseCSV(data.content, data.mapping)
-  })
+  .handler(withServerFn('server-fn:parseFile', async ({ data }) => {
+    try {
+      const { parseCSV } = await import('~/server/parsers/csv')
+      return parseCSV(data.content, data.mapping)
+    } catch (e) {
+      if (e instanceof AppError) throw e
+      throw new AppError(
+        'IMPORT_FAILED',
+        e instanceof Error ? `CSV parse failed: ${e.message}` : 'Failed to parse CSV',
+      )
+    }
+  }))
 
 const detectColumnsSchema = z.object({
   headers: z.array(z.string()).max(200),
@@ -39,10 +49,10 @@ const detectColumnsSchema = z.object({
 
 const detectFileColumns = createServerFn({ method: 'POST' })
   .inputValidator((d: unknown) => detectColumnsSchema.parse(d))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:detectFileColumns', async ({ data }) => {
     const { detectColumns } = await import('~/server/parsers/csv')
     return detectColumns(data.headers)
-  })
+  }))
 
 const checkDuplicatesSchema = z.object({
   rows: z
@@ -57,7 +67,7 @@ const checkDuplicatesSchema = z.object({
 
 const checkDuplicates = createServerFn({ method: 'POST' })
   .inputValidator((d: unknown) => checkDuplicatesSchema.parse(d))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:checkDuplicates', async ({ data }) => {
     const db = getDB()
 
     // Only query months relevant to the import data
@@ -83,7 +93,7 @@ const checkDuplicates = createServerFn({ method: 'POST' })
     }
 
     return duplicates
-  })
+  }))
 
 const suggestCategoriesSchema = z.object({
   descriptions: z.array(z.string()).max(MAX_IMPORT_ROWS),
@@ -96,7 +106,7 @@ const MIN_PARTIAL_MATCH_LEN = 4
 
 const suggestCategories = createServerFn({ method: 'POST' })
   .inputValidator((d: unknown) => suggestCategoriesSchema.parse(d))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:suggestCategories', async ({ data }) => {
     const db = getDB()
     const [descRows, categories] = await Promise.all([
       getCategorizedDescriptions(db),
@@ -183,7 +193,7 @@ const suggestCategories = createServerFn({ method: 'POST' })
     }
 
     return suggestions
-  })
+  }))
 
 const importTransactionsSchema = z.object({
   transactions: z
@@ -201,9 +211,17 @@ const importTransactionsSchema = z.object({
 
 const importTransactions = createServerFn({ method: 'POST' })
   .inputValidator((d: unknown) => importTransactionsSchema.parse(d))
-  .handler(async ({ data }) => {
-    return processImport(data)
-  })
+  .handler(withServerFn('server-fn:importTransactions', async ({ data }) => {
+    try {
+      return await processImport(data)
+    } catch (e) {
+      if (e instanceof AppError) throw e
+      throw new AppError(
+        'IMPORT_FAILED',
+        e instanceof Error ? `Import failed: ${e.message}` : 'Failed to import transactions',
+      )
+    }
+  }))
 
 // --- Route ---
 
