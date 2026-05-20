@@ -13,12 +13,13 @@ import { MobileNav } from '~/components/layout/mobile-nav'
 import { ThemeProvider } from '~/components/theme-provider'
 import { LocaleProvider, parseAcceptLanguage, type Locale } from '~/i18n'
 import { Toaster } from 'sonner'
+import { withServerFn } from '~/server/logger'
 
 const getInitialLocale = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Locale> => {
+  withServerFn('server-fn:getInitialLocale', async (): Promise<Locale> => {
     const request = getRequest()
     return parseAcceptLanguage(request?.headers.get('accept-language') ?? null)
-  },
+  }),
 )
 
 export const Route = createRootRoute({

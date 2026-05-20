@@ -10,10 +10,11 @@ import { RecentTransactions } from '~/components/dashboard/recent-transactions'
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
 import { useTranslation } from '~/i18n'
+import { withServerFn } from '~/server/logger'
 
 // --- Server Functions ---
 
-const getDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
+const getDashboardData = createServerFn({ method: 'GET' }).handler(withServerFn('server-fn:getDashboardData', async () => {
   const db = getDB()
 
   // Generate any missing recurring transactions first
@@ -71,7 +72,7 @@ const getDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
     recentTransactions: transactions.slice(0, 10),
     categories,
   }
-})
+}))
 
 // --- Route ---
 
