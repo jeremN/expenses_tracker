@@ -5,6 +5,7 @@ import { getDB } from '~/server/db'
 import { getTransactions, getCategories, deleteTransaction } from '@tracker/db'
 import { z } from 'zod'
 import type { Transaction, Category } from '@tracker/shared'
+import { assertFound } from '@tracker/shared'
 import { Plus } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import {
@@ -52,7 +53,7 @@ const deleteServerTransaction = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerTransaction', async ({ data }) => {
     const db = getDB()
-    await deleteTransaction(db, data.id)
+    assertFound(await deleteTransaction(db, data.id), 'Transaction not found')
     return { success: true }
   }))
 

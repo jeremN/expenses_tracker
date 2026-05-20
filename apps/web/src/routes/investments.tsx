@@ -8,7 +8,7 @@ import {
   createInvestmentSnapshot,
   deleteInvestmentSnapshot,
 } from '@tracker/db'
-import { createInvestmentSnapshotSchema } from '@tracker/shared'
+import { createInvestmentSnapshotSchema, assertFound } from '@tracker/shared'
 import type { InvestmentSnapshot } from '@tracker/shared'
 import { Plus, TrendingUp, TrendingDown } from 'lucide-react'
 import { Button } from '~/components/ui/button'
@@ -56,7 +56,8 @@ const deleteServerSnapshot = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerSnapshot', async ({ data }) => {
     const db = getDB()
-    return deleteInvestmentSnapshot(db, data.id)
+    assertFound(await deleteInvestmentSnapshot(db, data.id), 'Investment snapshot not found')
+    return { success: true }
   }))
 
 // --- Route ---

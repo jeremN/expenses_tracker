@@ -4,7 +4,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { getDB } from '~/server/db'
 import { createCategory, updateCategory, deleteCategory } from '@tracker/db'
 import { z } from 'zod'
-import { createCategorySchema, updateCategorySchema } from '@tracker/shared'
+import { createCategorySchema, updateCategorySchema, assertFound } from '@tracker/shared'
 import { withServerFn } from '~/server/logger'
 import type { Category, CreateCategory } from '@tracker/shared'
 import { Plus } from 'lucide-react'
@@ -39,14 +39,14 @@ const updateServerCategory = createServerFn({ method: 'POST' })
   .handler(withServerFn('server-fn:updateServerCategory', async ({ data }) => {
     const { id, ...rest } = data
     const db = getDB()
-    return await updateCategory(db, id, rest)
+    return assertFound(await updateCategory(db, id, rest), 'Category not found')
   }))
 
 const deleteServerCategory = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerCategory', async ({ data }) => {
     const db = getDB()
-    await deleteCategory(db, data.id)
+    assertFound(await deleteCategory(db, data.id), 'Category not found')
     return { success: true }
   }))
 

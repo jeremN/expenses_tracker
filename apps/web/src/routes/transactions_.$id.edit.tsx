@@ -3,7 +3,7 @@ import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getDB } from '~/server/db'
 import { getTransactionById, updateTransaction } from '@tracker/db'
-import { updateTransactionSchema, AppError } from '@tracker/shared'
+import { updateTransactionSchema, AppError, assertFound } from '@tracker/shared'
 import type { Category, Transaction, UpdateTransaction } from '@tracker/shared'
 import { z } from 'zod'
 import { TransactionForm } from '~/components/transactions/transaction-form'
@@ -31,7 +31,7 @@ const updateServerTransaction = createServerFn({ method: 'POST' })
   .handler(withServerFn('server-fn:updateServerTransaction', async ({ data }) => {
     const { id, ...rest } = data
     const db = getDB()
-    return updateTransaction(db, id, rest)
+    return assertFound(await updateTransaction(db, id, rest), 'Transaction not found')
   }))
 
 // --- Route ---

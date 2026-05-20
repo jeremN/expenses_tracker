@@ -26,7 +26,18 @@ function makeRecordingDb() {
       },
       delete: (table: unknown) => {
         log.push({ op: 'delete', table })
-        return { where: whereSpy }
+        // deleteCategory now uses .where(...).returning().get() so the
+        // caller can detect a no-match. Return a chain that resolves
+        // to undefined (simulating "row not found") — the existing
+        // assertions don't depend on the return value.
+        return {
+          where: (...args: unknown[]) => {
+            whereSpy(...args)
+            return {
+              returning: () => ({ get: () => undefined }),
+            }
+          },
+        }
       },
     } as any,
     log,

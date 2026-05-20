@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getDB } from '~/server/db'
 import { getTransactionById, updateTransaction, deleteTransaction } from '@tracker/db'
-import { updateTransactionSchema } from '@tracker/shared'
+import { updateTransactionSchema, assertFound } from '@tracker/shared'
 import { jsonResponse, errorResponse } from '~/server/api-helpers'
 import { withApiHandler } from '~/server/logger'
 
@@ -32,11 +32,7 @@ export const Route = createFileRoute('/api/transactions/$id')({
           return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
         }
         const db = getDB()
-        const existing = await getTransactionById(db, id)
-        if (!existing) {
-          return errorResponse('Transaction not found', 404, 'NOT_FOUND')
-        }
-        const transaction = await updateTransaction(db, id, parsed.data)
+        const transaction = assertFound(await updateTransaction(db, id, parsed.data), 'Transaction not found')
         return jsonResponse(transaction)
       }),
       DELETE: withApiHandler('api:DELETE /api/transactions/$id', async ({ params }) => {
@@ -45,11 +41,7 @@ export const Route = createFileRoute('/api/transactions/$id')({
           return errorResponse('Invalid transaction ID', 400, 'INVALID_ID')
         }
         const db = getDB()
-        const existing = await getTransactionById(db, id)
-        if (!existing) {
-          return errorResponse('Transaction not found', 404, 'NOT_FOUND')
-        }
-        await deleteTransaction(db, id)
+        assertFound(await deleteTransaction(db, id), 'Transaction not found')
         return jsonResponse({ success: true })
       }),
     },

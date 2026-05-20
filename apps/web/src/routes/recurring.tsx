@@ -13,6 +13,7 @@ import { z } from 'zod'
 import {
   createRecurringRuleSchema,
   updateRecurringRuleSchema,
+  assertFound,
 } from '@tracker/shared'
 import type { RecurringRule, CreateRecurringRule, Category } from '@tracker/shared'
 import { Plus } from 'lucide-react'
@@ -58,14 +59,14 @@ const updateServerRecurringRule = createServerFn({ method: 'POST' })
   .handler(withServerFn('server-fn:updateServerRecurringRule', async ({ data }) => {
     const { id, ...rest } = data
     const db = getDB()
-    return updateRecurringRule(db, id, rest)
+    return assertFound(await updateRecurringRule(db, id, rest), 'Recurring rule not found')
   }))
 
 const deleteServerRecurringRule = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerRecurringRule', async ({ data }) => {
     const db = getDB()
-    await deleteRecurringRule(db, data.id)
+    assertFound(await deleteRecurringRule(db, data.id), 'Recurring rule not found')
     return { success: true }
   }))
 
@@ -73,7 +74,10 @@ const toggleServerRecurringRule = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number(), isActive: z.boolean() }))
   .handler(withServerFn('server-fn:toggleServerRecurringRule', async ({ data }) => {
     const db = getDB()
-    return updateRecurringRule(db, data.id, { isActive: data.isActive })
+    return assertFound(
+      await updateRecurringRule(db, data.id, { isActive: data.isActive }),
+      'Recurring rule not found',
+    )
   }))
 
 // --- Route ---
