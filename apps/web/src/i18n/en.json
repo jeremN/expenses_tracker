@@ -214,6 +214,7 @@
   "error.code.IMPORT_FAILED": "The import could not be completed.",
   "error.code.EXPORT_FAILED": "The export could not be completed.",
   "error.code.BAD_QUERY": "The request parameters are invalid.",
+  "error.code.UNAUTHORIZED": "You need to sign in to access this resource.",
   "error.form.amountRequired": "Amount is required",
   "error.form.positiveNumber": "Must be a positive number",
   "error.form.validDate": "Valid date required",

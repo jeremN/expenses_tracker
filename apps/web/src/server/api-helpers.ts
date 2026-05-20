@@ -23,6 +23,7 @@ export function httpStatusForCode(code: AppErrorCode): number {
   switch (code) {
     case 'DUPLICATE_NAME': return 409
     case 'NOT_FOUND': return 404
+    case 'UNAUTHORIZED': return 401
     case 'VALIDATION':
     case 'INVALID_ID':
     case 'BAD_QUERY':

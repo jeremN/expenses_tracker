@@ -16,5 +16,5 @@ import * as schema from '@tracker/db'
  * ```
  */
 export function getDB() {
-  return drizzle(env.DB, { schema })
+  return drizzle(env.expenses_tracker_db, { schema })
 }

@@ -4,11 +4,16 @@
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  "vars": {
+    "CF_ACCESS_TEAM_DOMAIN": "jeremn-code.cloudflareaccess.com",
+    "CF_ACCESS_AUD": "2b47eb3fbc9d7ac058f2d5851c07b44d5d57ed51af30ab1dbce2835579e46a03",
+  },
   "d1_databases": [
     {
-      "binding": "DB",
+      "binding": "expenses_tracker_db",
       "database_name": "expenses-tracker-db",
-      "database_id": "placeholder-fill-after-creation"
-    }
-  ]
+      "database_id": "e26ee408-840b-478c-b71d-c881df75944b",
+      "migrations_dir": "../../packages/db/drizzle",
+    },
+  ],
 }

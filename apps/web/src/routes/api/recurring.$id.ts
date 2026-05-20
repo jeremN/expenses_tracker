@@ -3,12 +3,12 @@ import { getDB } from '~/server/db'
 import { updateRecurringRule, deleteRecurringRule } from '@tracker/db'
 import { updateRecurringRuleSchema, assertFound } from '@tracker/shared'
 import { jsonResponse, errorResponse } from '~/server/api-helpers'
-import { withApiHandler } from '~/server/logger'
+import { withAuthApiHandler } from '~/server/logger'
 
 export const Route = createFileRoute('/api/recurring/$id')({
   server: {
     handlers: {
-      GET: withApiHandler('api:GET /api/recurring/$id', async ({ params }) => {
+      GET: withAuthApiHandler('api:GET /api/recurring/$id', async ({ params }) => {
         const id = Number(params.id)
         if (Number.isNaN(id)) {
           return errorResponse('Invalid recurring rule ID', 400, 'INVALID_ID')
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/api/recurring/$id')({
         }
         return jsonResponse(rule)
       }),
-      PUT: withApiHandler('api:PUT /api/recurring/$id', async ({ request, params }) => {
+      PUT: withAuthApiHandler('api:PUT /api/recurring/$id', async ({ request, params }) => {
         const id = Number(params.id)
         if (Number.isNaN(id)) {
           return errorResponse('Invalid recurring rule ID', 400, 'INVALID_ID')
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/api/recurring/$id')({
         const rule = assertFound(await updateRecurringRule(db, id, parsed.data), 'Recurring rule not found')
         return jsonResponse(rule)
       }),
-      DELETE: withApiHandler('api:DELETE /api/recurring/$id', async ({ params }) => {
+      DELETE: withAuthApiHandler('api:DELETE /api/recurring/$id', async ({ params }) => {
         const id = Number(params.id)
         if (Number.isNaN(id)) {
           return errorResponse('Invalid recurring rule ID', 400, 'INVALID_ID')

@@ -3,12 +3,12 @@ import { getDB } from '~/server/db'
 import { getInvestmentSnapshots, createInvestmentSnapshot } from '@tracker/db'
 import { createInvestmentSnapshotSchema } from '@tracker/shared'
 import { jsonResponse, errorResponse } from '~/server/api-helpers'
-import { withApiHandler } from '~/server/logger'
+import { withAuthApiHandler } from '~/server/logger'
 
 export const Route = createFileRoute('/api/investments')({
   server: {
     handlers: {
-      GET: withApiHandler('api:GET /api/investments', async ({ request }) => {
+      GET: withAuthApiHandler('api:GET /api/investments', async ({ request }) => {
         const url = new URL(request.url)
         const from = url.searchParams.get('from') ?? undefined
         const to = url.searchParams.get('to') ?? undefined
@@ -16,7 +16,7 @@ export const Route = createFileRoute('/api/investments')({
         const snapshots = await getInvestmentSnapshots(db, { from, to })
         return jsonResponse(snapshots)
       }),
-      POST: withApiHandler('api:POST /api/investments', async ({ request }) => {
+      POST: withAuthApiHandler('api:POST /api/investments', async ({ request }) => {
         const body = await request.json()
         const parsed = createInvestmentSnapshotSchema.safeParse(body)
         if (!parsed.success) {

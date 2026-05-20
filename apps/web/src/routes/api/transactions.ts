@@ -4,7 +4,7 @@ import { getDB } from '~/server/db'
 import { getTransactions, createTransaction } from '@tracker/db'
 import { createTransactionSchema, transactionTypeSchema } from '@tracker/shared'
 import { jsonResponse, errorResponse } from '~/server/api-helpers'
-import { withApiHandler } from '~/server/logger'
+import { withAuthApiHandler } from '~/server/logger'
 
 const transactionsQuerySchema = z.object({
   month: z.string().regex(/^\d{4}-\d{2}$/).optional(),
@@ -15,7 +15,7 @@ const transactionsQuerySchema = z.object({
 export const Route = createFileRoute('/api/transactions')({
   server: {
     handlers: {
-      GET: withApiHandler('api:GET /api/transactions', async ({ request }) => {
+      GET: withAuthApiHandler('api:GET /api/transactions', async ({ request }) => {
         const url = new URL(request.url)
         const parsed = transactionsQuerySchema.safeParse({
           month: url.searchParams.get('month') ?? undefined,
@@ -37,7 +37,7 @@ export const Route = createFileRoute('/api/transactions')({
         }))
         return jsonResponse(transactions)
       }),
-      POST: withApiHandler('api:POST /api/transactions', async ({ request }) => {
+      POST: withAuthApiHandler('api:POST /api/transactions', async ({ request }) => {
         const body = await request.json()
         const parsed = createTransactionSchema.safeParse(body)
         if (!parsed.success) {

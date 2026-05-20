@@ -2,12 +2,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { getDB } from '~/server/db'
 import { getMonthlySummary } from '@tracker/db'
 import { jsonResponse, errorResponse } from '~/server/api-helpers'
-import { withApiHandler } from '~/server/logger'
+import { withAuthApiHandler } from '~/server/logger'
 
 export const Route = createFileRoute('/api/stats/monthly-summary')({
   server: {
     handlers: {
-      GET: withApiHandler('api:GET /api/stats/monthly-summary', async ({ request }) => {
+      GET: withAuthApiHandler('api:GET /api/stats/monthly-summary', async ({ request }) => {
         const url = new URL(request.url)
         const year = url.searchParams.get('year')
         if (!year || !/^\d{4}$/.test(year)) {

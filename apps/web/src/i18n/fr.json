@@ -214,6 +214,7 @@
   "error.code.IMPORT_FAILED": "L'import n'a pas pu être effectué.",
   "error.code.EXPORT_FAILED": "L'export n'a pas pu être effectué.",
   "error.code.BAD_QUERY": "Les paramètres de la requête sont invalides.",
+  "error.code.UNAUTHORIZED": "Vous devez vous connecter pour accéder à cette ressource.",
   "error.form.amountRequired": "Le montant est requis",
   "error.form.positiveNumber": "Doit être un nombre positif",
   "error.form.validDate": "Date valide requise",

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { AppError } from '@tracker/shared'
 import { processImport } from '~/server/import-helpers'
 import { errorResponse, jsonResponse } from '~/server/api-helpers'
-import { withApiHandler } from '~/server/logger'
+import { withAuthApiHandler } from '~/server/logger'
 
 const importTransactionSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -20,7 +20,7 @@ const importPayloadSchema = z.object({
 export const Route = createFileRoute('/api/import')({
   server: {
     handlers: {
-      POST: withApiHandler('api:POST /api/import', async ({ request }) => {
+      POST: withAuthApiHandler('api:POST /api/import', async ({ request }) => {
         const body = await request.json()
         const parsed = importPayloadSchema.safeParse(body)
         if (!parsed.success) {

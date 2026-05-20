@@ -2,12 +2,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { AppError } from '@tracker/shared'
 import { getDB } from '~/server/db'
 import { buildExportZip } from '~/server/export'
-import { withApiHandler } from '~/server/logger'
+import { withAuthApiHandler } from '~/server/logger'
 
 export const Route = createFileRoute('/api/export')({
   server: {
     handlers: {
-      GET: withApiHandler('api:GET /api/export', async () => {
+      GET: withAuthApiHandler('api:GET /api/export', async () => {
         try {
           const db = getDB()
           const bytes = await buildExportZip(db)

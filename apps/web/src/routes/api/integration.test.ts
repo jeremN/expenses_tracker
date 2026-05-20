@@ -35,6 +35,16 @@ vi.mock('~/server/import-helpers', () => ({
   MAX_IMPORT_ROWS: 1000,
 }))
 
+// Bypass the Access JWT check. These tests target route wiring, not auth.
+// Auth behavior is unit-tested separately in `src/server/access.test.ts`.
+vi.mock('~/server/access', () => ({
+  requireUser: vi.fn(async () => ({
+    email: 'test@example.com',
+    sub: 'test-sub',
+    raw: {},
+  })),
+}))
+
 // Silence the structured-log line emitted by the wrapper on unexpected errors.
 let errSpy: ReturnType<typeof vi.spyOn>
 beforeEach(() => {

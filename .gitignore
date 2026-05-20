@@ -11,4 +11,5 @@ dist
 .wrangler
 .env
 .env.local
+.dev.vars
 *.db

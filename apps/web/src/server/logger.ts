@@ -1,5 +1,6 @@
 import { type AppError, toAppError, isUnexpectedError } from '@tracker/shared'
 import { errorResponse, httpStatusForCode } from './api-helpers'
+import { requireUser, type AccessUser } from './access'
 
 type LogContext = { op: string }
 
@@ -73,4 +74,25 @@ export function withApiHandler<Ctx = any>(
       return errorResponse(ae.message, httpStatusForCode(ae.code), ae.code)
     }
   }
+}
+
+/**
+ * Auth-gated variant of withApiHandler. Verifies the Cloudflare Access JWT
+ * before invoking the handler and injects the resolved user as a second
+ * argument. UNAUTHORIZED rebounds through the same error pipeline → 401.
+ *
+ * Use for every /api/* route that should be user-scoped. Bypass only if
+ * the route must be publicly reachable (e.g., a health check).
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function withAuthApiHandler<Ctx = any>(
+  op: string,
+  fn: (ctx: Ctx, user: AccessUser) => Promise<Response>,
+): (ctx: Ctx) => Promise<Response> {
+  return withApiHandler<Ctx>(op, async (ctx) => {
+    // Every TanStack Start route ctx exposes `request`; the type is widened
+    // here for the same reason as withApiHandler (varying ctx shapes per route).
+    const user = await requireUser((ctx as { request: Request }).request)
+    return fn(ctx, user)
+  })
 }

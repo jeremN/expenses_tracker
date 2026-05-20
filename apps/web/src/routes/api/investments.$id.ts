@@ -3,12 +3,12 @@ import { getDB } from '~/server/db'
 import { deleteInvestmentSnapshot } from '@tracker/db'
 import { assertFound } from '@tracker/shared'
 import { jsonResponse, errorResponse } from '~/server/api-helpers'
-import { withApiHandler } from '~/server/logger'
+import { withAuthApiHandler } from '~/server/logger'
 
 export const Route = createFileRoute('/api/investments/$id')({
   server: {
     handlers: {
-      DELETE: withApiHandler('api:DELETE /api/investments/$id', async ({ params }) => {
+      DELETE: withAuthApiHandler('api:DELETE /api/investments/$id', async ({ params }) => {
         const id = Number(params.id)
         if (Number.isNaN(id)) {
           return errorResponse('Invalid snapshot ID', 400, 'INVALID_ID')

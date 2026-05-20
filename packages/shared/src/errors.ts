@@ -1,6 +1,7 @@
 export const APP_ERROR_CODES = [
   'NOT_FOUND', 'INVALID_ID', 'VALIDATION', 'DUPLICATE_NAME',
   'INTERNAL', 'IMPORT_FAILED', 'EXPORT_FAILED', 'BAD_QUERY',
+  'UNAUTHORIZED',
 ] as const
 
 export type AppErrorCode = (typeof APP_ERROR_CODES)[number]
