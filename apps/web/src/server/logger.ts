@@ -52,7 +52,13 @@ export function withServerFn<A, R>(
  * unexpected, return an errorResponse with status derived from the code.
  * Pass-through when the handler returns normally.
  */
-export function withApiHandler<Ctx extends { request: Request }>(
+// Ctx defaults to `any` so destructuring `{ params }`, `{ request }`, or
+// `{ params, request }` all type-check at the call site. The wrapper does
+// not inspect ctx — it only passes it through to the handler. TanStack
+// Start's per-route handler context shape varies, and constraining Ctx
+// here narrowly would force casts at every call site.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function withApiHandler<Ctx = any>(
   op: string,
   fn: (ctx: Ctx) => Promise<Response>,
 ): (ctx: Ctx) => Promise<Response> {
