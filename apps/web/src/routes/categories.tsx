@@ -4,7 +4,8 @@ import { createServerFn } from '@tanstack/react-start'
 import { getDB } from '~/server/db'
 import { createCategory, updateCategory, deleteCategory } from '@tracker/db'
 import { z } from 'zod'
-import { createCategorySchema, updateCategorySchema, toAppError } from '@tracker/shared'
+import { createCategorySchema, updateCategorySchema } from '@tracker/shared'
+import { withServerFn } from '~/server/logger'
 import type { Category, CreateCategory } from '@tracker/shared'
 import { Plus } from 'lucide-react'
 import { Button } from '~/components/ui/button'
@@ -28,34 +29,26 @@ import { translateApiError } from '~/i18n/errors'
 
 const createServerCategory = createServerFn({ method: 'POST' })
   .inputValidator(createCategorySchema)
-  .handler(async ({ data }) => {
-    try {
-      const db = getDB()
-      return await createCategory(db, data)
-    } catch (e) {
-      throw toAppError(e)
-    }
-  })
+  .handler(withServerFn('server-fn:createServerCategory', async ({ data }) => {
+    const db = getDB()
+    return await createCategory(db, data)
+  }))
 
 const updateServerCategory = createServerFn({ method: 'POST' })
   .inputValidator(updateCategorySchema.extend({ id: z.number() }))
-  .handler(async ({ data }) => {
-    try {
-      const { id, ...rest } = data
-      const db = getDB()
-      return await updateCategory(db, id, rest)
-    } catch (e) {
-      throw toAppError(e)
-    }
-  })
+  .handler(withServerFn('server-fn:updateServerCategory', async ({ data }) => {
+    const { id, ...rest } = data
+    const db = getDB()
+    return await updateCategory(db, id, rest)
+  }))
 
 const deleteServerCategory = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number() }))
-  .handler(async ({ data }) => {
+  .handler(withServerFn('server-fn:deleteServerCategory', async ({ data }) => {
     const db = getDB()
     await deleteCategory(db, data.id)
     return { success: true }
-  })
+  }))
 
 // --- Route ---
 
