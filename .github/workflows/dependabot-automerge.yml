@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Read update metadata
         id: meta
-        uses: dependabot/fetch-metadata@v2
+        uses: dependabot/fetch-metadata@v3
 
       # For grouped PRs, update-type is the highest semver bump in the group.
       # The dependabot.yml group only contains minor+patch, so majors always
