@@ -1,0 +1,32 @@
+version: 2
+updates:
+  # pnpm workspace (root lockfile covers every package in the monorepo).
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    # Collapse all non-breaking bumps into a single PR to cut review noise.
+    # Majors are deliberately left out so they arrive as individual PRs and
+    # get a human review (the auto-merge workflow only merges this group).
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Keep the Actions used in ci.yml / this file's workflow up to date too.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        update-types:
+          - "minor"
+          - "patch"
