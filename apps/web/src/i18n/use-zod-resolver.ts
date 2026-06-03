@@ -1,24 +1,24 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { FieldValues } from 'react-hook-form'
 import type { z } from 'zod'
 import { useTranslation } from '~/i18n'
 import { makeZodErrorMap } from '~/i18n/zod-error-map'
 
 /**
  * Drop-in replacement for `zodResolver(schema)` that injects the
- * locale-bound errorMap so zod-default messages are localized. Explicit
+ * locale-bound error map so zod-default messages are localized. Explicit
  * per-field messages in the schema still take precedence.
  *
- * Type note: @hookform/resolvers v5 + zod v3.25.76 types the second arg of
- * the zod v3 overload as the full `z.ParseParams` (path + async required).
- * The internal `Zod3ParseParams` uses `InexactPartial<ParseParams>` (all
- * optional), but that type is not exported. Narrower casts such as
- * `Parameters<typeof zodResolver>[1]`, `Pick<z.ParseParams, 'errorMap'>`, or
- * `{ errorMap: z.ZodErrorMap }` all fail TS2769 because the assertion target
- * is not assignable to the overload's parameter type. `as z.ParseParams` is
- * therefore the smallest cast that compiles; only errorMap is consulted at
- * runtime, path/async are ignored.
+ * zod v4 note: error customization moved from the v3 `{ errorMap }` parse
+ * param to `{ error }`. `@hookform/resolvers` v5 forwards it straight to the
+ * zod-v4 resolver overload, so unlike the v3 code this needs no cast — but the
+ * generics must mirror that overload (schema input constrained to
+ * `FieldValues`) or inference falls back to `Resolver<FieldValues, …>` and
+ * every consuming form fails to typecheck.
  */
-export function useZodResolver<T extends z.ZodTypeAny>(schema: T) {
+export function useZodResolver<TOutput, TInput extends FieldValues>(
+  schema: z.ZodType<TOutput, TInput>,
+) {
   const { t } = useTranslation()
-  return zodResolver(schema, { errorMap: makeZodErrorMap(t) } as z.ParseParams)
+  return zodResolver(schema, { error: makeZodErrorMap(t) })
 }
