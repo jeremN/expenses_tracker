@@ -13,6 +13,8 @@ import {
   FormMessage,
 } from '~/components/ui/form'
 import { useTranslation } from '~/i18n'
+import { CategoryIcon, CATEGORY_ICON_NAMES } from '~/lib/category-icon'
+import { cn } from '~/lib/utils'
 
 const PRESET_COLORS = [
   '#ef4444', // red
@@ -114,11 +116,38 @@ export function CategoryForm({ defaultValues, onSubmit, isSubmitting }: Category
             <FormItem>
               <FormLabel>{t('categories.form.icon')}</FormLabel>
               <FormControl>
-                <Input
-                  placeholder={t('categories.form.iconPlaceholder')}
-                  {...field}
-                  value={field.value ?? ''}
-                />
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    aria-pressed={!field.value}
+                    aria-label={t('categories.form.iconNone')}
+                    onClick={() => field.onChange('')}
+                    className={cn(
+                      'flex h-9 w-9 items-center justify-center rounded-md border text-xs text-muted-foreground transition-colors',
+                      !field.value ? 'border-primary bg-primary/10' : 'hover:bg-muted',
+                    )}
+                  >
+                    {t('categories.form.iconNone')}
+                  </button>
+                  {CATEGORY_ICON_NAMES.map((name) => {
+                    const active = field.value === name
+                    return (
+                      <button
+                        key={name}
+                        type="button"
+                        aria-pressed={active}
+                        aria-label={name}
+                        onClick={() => field.onChange(name)}
+                        className={cn(
+                          'flex h-9 w-9 items-center justify-center rounded-md border transition-colors',
+                          active ? 'border-primary bg-primary/10 text-foreground' : 'text-muted-foreground hover:bg-muted',
+                        )}
+                      >
+                        <CategoryIcon name={name} className="h-4 w-4" />
+                      </button>
+                    )
+                  })}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>

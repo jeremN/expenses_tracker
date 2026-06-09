@@ -217,7 +217,7 @@
   "categories.form.namePlaceholder": "ex. Courses",
   "categories.form.color": "Couleur",
   "categories.form.icon": "Icône (facultatif)",
-  "categories.form.iconPlaceholder": "ex. shopping-cart",
+  "categories.form.iconNone": "Aucune",
   "categories.form.create": "Créer la catégorie",
   "categories.form.update": "Mettre à jour la catégorie",
   "categories.editAction": "Modifier {name}",

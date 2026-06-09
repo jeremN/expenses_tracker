@@ -2,6 +2,7 @@ import type { Category } from '@tracker/shared'
 import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { useTranslation } from '~/i18n'
+import { CategoryIcon } from '~/lib/category-icon'
 
 interface CategoryListProps {
   categories: Category[]
@@ -32,15 +33,12 @@ export function CategoryList({ categories, onEdit, onDelete }: CategoryListProps
         >
           <div className="flex items-center gap-3">
             <span
-              className="h-4 w-4 shrink-0 rounded-full"
-              style={{ backgroundColor: category.color ?? '#6b7280' }}
-            />
-            <div>
-              <p className="font-medium">{category.name}</p>
-              {category.icon && (
-                <p className="text-xs text-muted-foreground">{category.icon}</p>
-              )}
-            </div>
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+              style={{ backgroundColor: (category.color ?? '#6b7280') + '20', color: category.color ?? '#6b7280' }}
+            >
+              <CategoryIcon name={category.icon} className="h-4 w-4" />
+            </span>
+            <p className="font-medium">{category.name}</p>
           </div>
 
           <div className="flex items-center gap-1">
