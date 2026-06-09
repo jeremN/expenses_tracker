@@ -45,7 +45,13 @@ export function BudgetSummary({ items }: { items: BudgetOverviewItem[] }) {
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: c.categoryColor }} />
               )}
               <span className="truncate">{c.categoryName}</span>
-              {c.over && <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-expense" />}
+              {c.over && (
+                <AlertTriangle
+                  role="img"
+                  aria-label={t('dashboard.budgets.over')}
+                  className="h-3.5 w-3.5 shrink-0 text-expense"
+                />
+              )}
             </span>
             <span className="text-right text-sm tabular-nums text-muted-foreground">
               <Amount cents={c.spent} tone="neutral" /> / {formatMoney(c.budget)}

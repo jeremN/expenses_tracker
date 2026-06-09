@@ -44,6 +44,7 @@
   "dashboard.onboarding.subtitle": "Ajoutez votre première transaction ou importez un relevé bancaire, et votre tableau de bord se remplira.",
   "dashboard.budgets.title": "Budgets du mois",
   "dashboard.budgets.viewAll": "Voir tout",
+  "dashboard.budgets.over": "Dépassé",
   "import.result": "{imported} transactions sur {total} importées depuis {filename}.",
   "settings.title": "Paramètres",
   "settings.subtitle": "Gérez vos données et les préférences de l'application.",
