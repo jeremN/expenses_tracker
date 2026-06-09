@@ -57,16 +57,21 @@ export function GrowthChart({ snapshots }: GrowthChartProps) {
   const [hover, setHover] = useState<{ i: number; px: number; py: number } | null>(null)
 
   function handleMove(e: React.MouseEvent<SVGSVGElement>) {
-    const rect = e.currentTarget.getBoundingClientRect()
+    const wrap = wrapRef.current
+    if (!wrap) return
+    const svgRect = e.currentTarget.getBoundingClientRect()
+    const wrapRect = wrap.getBoundingClientRect()
     // Map the cursor's client x into the SVG's viewBox coordinate space.
-    const svgX = ((e.clientX - rect.left) / rect.width) * chartWidth
+    const svgX = ((e.clientX - svgRect.left) / svgRect.width) * chartWidth
     let nearest = 0
     for (let i = 1; i < points.length; i++) {
       if (Math.abs(points[i].x - svgX) < Math.abs(points[nearest].x - svgX)) nearest = i
     }
-    // Convert the nearest point's viewBox coords back into container pixels.
-    const px = (points[nearest].x / chartWidth) * rect.width
-    const py = (points[nearest].y / chartHeight) * rect.height
+    // Anchor to the wrapper (the positioned ancestor): convert the nearest
+    // point's viewBox coords to client px, then to wrapper-local px so the
+    // wrapper's padding never offsets the tooltip.
+    const px = svgRect.left + (points[nearest].x / chartWidth) * svgRect.width - wrapRect.left
+    const py = svgRect.top + (points[nearest].y / chartHeight) * svgRect.height - wrapRect.top
     setHover({ i: nearest, px, py })
   }
 
@@ -102,7 +107,10 @@ export function GrowthChart({ snapshots }: GrowthChartProps) {
   }
 
   return (
-    <div ref={wrapRef} className="relative w-full overflow-x-auto rounded-lg border bg-card p-4">
+    <div ref={wrapRef} className="relative w-full rounded-lg border bg-card p-4">
+      {/* Scroll lives on an inner element so the tooltip (a child of the
+          non-overflow wrapper) is never clipped at the top edge. */}
+      <div className="overflow-x-auto">
       <svg
         viewBox={`0 0 ${chartWidth} ${chartHeight}`}
         className="h-auto w-full"
@@ -191,6 +199,7 @@ export function GrowthChart({ snapshots }: GrowthChartProps) {
           />
         ))}
       </svg>
+      </div>
       {hover && (
         <ChartTooltip visible x={hover.px} y={hover.py}>
           <span className="font-medium">{formatDate(sorted[hover.i].date)}</span>
