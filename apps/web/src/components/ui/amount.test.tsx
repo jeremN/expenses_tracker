@@ -35,8 +35,10 @@ describe('Amount', () => {
     expect(el).not.toHaveClass('text-expense')
   })
 
-  it('explicit sign=false suppresses the sign even for typed tones', () => {
+  it('explicit sign=false suppresses the sign but keeps the tone color', () => {
     render(<Amount cents={1000} tone="income" sign={false} />)
-    expect(screen.getByText('$10.00')).toBeInTheDocument()
+    // No leading '+', but income color still applies — sign controls only the prefix.
+    const el = screen.getByText('$10.00')
+    expect(el).toHaveClass('text-income')
   })
 })

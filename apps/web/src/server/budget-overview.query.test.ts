@@ -7,8 +7,9 @@ import {
   getBudgetOverview,
 } from '@tracker/db'
 
-// libsql `.run()` returns `{ rows }` (the app reads `.results` from D1's
-// driver). Either way the SQL semantics are what we assert here.
+// `db.run(sql\`...\`)` is typed as returning `unknown`, and the row container
+// key differs by driver: libsql (this test) → `.rows`; the production D1 driver
+// → `.results`. We assert the SQL semantics, so we read `.rows` here.
 type Row = {
   category_id: number
   category_name: string
