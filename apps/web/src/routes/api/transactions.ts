@@ -10,6 +10,9 @@ const transactionsQuerySchema = z.object({
   month: z.string().regex(/^\d{4}-\d{2}$/).optional(),
   category: z.string().regex(/^\d+$/).transform(Number).optional(),
   type: transactionTypeSchema.optional(),
+  search: z.string().optional(),
+  limit: z.string().regex(/^\d+$/).transform(Number).optional(),
+  offset: z.string().regex(/^\d+$/).transform(Number).optional(),
 })
 
 export const Route = createFileRoute('/api/transactions')({
@@ -21,6 +24,9 @@ export const Route = createFileRoute('/api/transactions')({
           month: url.searchParams.get('month') ?? undefined,
           category: url.searchParams.get('category') ?? undefined,
           type: url.searchParams.get('type') ?? undefined,
+          search: url.searchParams.get('search') ?? undefined,
+          limit: url.searchParams.get('limit') ?? undefined,
+          offset: url.searchParams.get('offset') ?? undefined,
         })
         if (!parsed.success) {
           return errorResponse(parsed.error.issues[0].message, 400, 'VALIDATION')
@@ -30,6 +36,9 @@ export const Route = createFileRoute('/api/transactions')({
           month: parsed.data.month,
           categoryId: parsed.data.category,
           type: parsed.data.type,
+          search: parsed.data.search,
+          limit: parsed.data.limit,
+          offset: parsed.data.offset,
         })
         const transactions = rows.map((row) => ({
           ...row.transactions,
