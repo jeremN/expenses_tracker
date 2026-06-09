@@ -53,7 +53,7 @@ export function RecurringList({ rules, onEdit, onDelete, onToggle }: RecurringLi
                 <p className="font-medium truncate">
                   {rule.description || t('recurring.untitled')}
                 </p>
-                <Badge variant={rule.isActive ? 'default' : 'secondary'}>
+                <Badge variant={rule.isActive ? 'income' : 'secondary'}>
                   {rule.isActive ? t('recurring.status.active') : t('recurring.status.paused')}
                 </Badge>
               </div>

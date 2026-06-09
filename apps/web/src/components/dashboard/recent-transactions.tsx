@@ -15,7 +15,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
   const { formatDate } = useFormat()
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex h-full flex-col">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">{t('dashboard.recentTransactions')}</CardTitle>
       </CardHeader>

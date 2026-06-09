@@ -45,7 +45,7 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
   const maxValue = Math.max(...months.flatMap((m) => [m.income, m.expenses]), 1)
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex h-full flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle className="text-base">{t('dashboard.monthlyOverview')}</CardTitle>
         <div className="flex items-center gap-3">
@@ -53,8 +53,8 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
           <Swatch className="bg-expense" label={t('dashboard.expenses')} />
         </div>
       </CardHeader>
-      <CardContent className="flex-1">
-        <div className="flex h-[200px] items-end gap-2 border-b border-border sm:gap-4">
+      <CardContent className="flex flex-1 flex-col">
+        <div className="flex min-h-[200px] flex-1 items-end gap-2 border-b border-border sm:gap-4">
           {months.map((month, i) => {
             const incomeHeight = Math.max((month.income / maxValue) * 100, month.income > 0 ? 1.5 : 0)
             const expenseHeight = Math.max((month.expenses / maxValue) * 100, month.expenses > 0 ? 1.5 : 0)

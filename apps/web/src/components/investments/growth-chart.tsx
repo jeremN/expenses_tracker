@@ -152,7 +152,7 @@ export function GrowthChart({ snapshots }: GrowthChartProps) {
             cy={p.y}
             r="4"
             fill="currentColor"
-            className="text-investment"
+            className="text-investment cursor-pointer transition-[r] duration-150 ease-out hover:[r:6]"
           >
             <title>{`${formatDate(p.snapshot.date)}: ${formatMoney(p.snapshot.totalValue)}`}</title>
           </circle>
