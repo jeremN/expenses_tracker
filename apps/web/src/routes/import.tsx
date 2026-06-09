@@ -415,7 +415,7 @@ function ImportPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{t('import.title')}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('import.title')}</h1>
           <p className="text-sm text-muted-foreground">
             {t('import.subtitle')}
           </p>
@@ -425,8 +425,8 @@ function ImportPage() {
       {/* Success state */}
       {importResult ? (
         <div className="rounded-lg border bg-card p-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-            <Check className="h-6 w-6 text-emerald-600" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-income-subtle">
+            <Check className="h-6 w-6 text-income" />
           </div>
           <h2 className="text-lg font-semibold">{t('import.complete.title')}</h2>
           <p className="mt-1 text-sm text-muted-foreground">

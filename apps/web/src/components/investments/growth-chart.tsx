@@ -131,14 +131,14 @@ export function GrowthChart({ snapshots }: GrowthChartProps) {
         ))}
 
         {/* Area fill */}
-        <path d={areaPath} fill="currentColor" className="text-primary/10" />
+        <path d={areaPath} fill="currentColor" className="text-investment/10" />
 
         {/* Line */}
         <path
           d={linePath}
           fill="none"
           stroke="currentColor"
-          className="text-primary"
+          className="text-investment"
           strokeWidth="2"
           strokeLinejoin="round"
           strokeLinecap="round"
@@ -152,11 +152,9 @@ export function GrowthChart({ snapshots }: GrowthChartProps) {
             cy={p.y}
             r="4"
             fill="currentColor"
-            className="text-primary"
+            className="text-investment"
           >
-            <title>
-              {formatDate(p.snapshot.date)}: {formatMoney(p.snapshot.totalValue)}
-            </title>
+            <title>{`${formatDate(p.snapshot.date)}: ${formatMoney(p.snapshot.totalValue)}`}</title>
           </circle>
         ))}
       </svg>

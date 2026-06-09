@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '~/components/ui/form'
 import { parseToCents } from '~/lib/utils'
+import { useFormat } from '~/lib/format'
 import { useTranslation } from '~/i18n'
 
 // Form-level schema works with a decimal string for amount
@@ -60,6 +61,7 @@ interface TransactionFormProps {
 
 export function TransactionForm({ categories, onSubmit, isSubmitting, defaultValues }: TransactionFormProps) {
   const { t } = useTranslation()
+  const { currencySymbol } = useFormat()
   const today = new Date().toISOString().split('T')[0]
   const isEditing = !!defaultValues
 
@@ -130,14 +132,14 @@ export function TransactionForm({ categories, onSubmit, isSubmitting, defaultVal
               <FormLabel>{t('transactions.field.amount')}</FormLabel>
               <FormControl>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                    $
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    {currencySymbol}
                   </span>
                   <Input
                     type="text"
                     inputMode="decimal"
                     placeholder="0.00"
-                    className="pl-7"
+                    className="pl-8 font-mono tabular-nums"
                     {...field}
                   />
                 </div>

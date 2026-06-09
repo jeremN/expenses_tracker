@@ -57,7 +57,7 @@ function RootDocument({
   children,
 }: Readonly<{ locale: Locale; children: ReactNode }>) {
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

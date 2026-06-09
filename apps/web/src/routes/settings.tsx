@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '~/components/ui/select'
 import { Download, Loader2 } from 'lucide-react'
+import { ThemeSwitch } from '~/components/theme-switch'
 import { useTranslation, useLocale, type Locale, type Currency, CURRENCIES } from '~/i18n'
 
 export const Route = createFileRoute('/settings')({
@@ -30,9 +31,19 @@ function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t('settings.title')}</h1>
         <p className="text-sm text-muted-foreground">{t('settings.subtitle')}</p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('settings.appearance.title')}</CardTitle>
+          <CardDescription>{t('settings.appearance.description')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ThemeSwitch />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

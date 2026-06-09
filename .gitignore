@@ -13,3 +13,6 @@ dist
 .env.local
 .dev.vars
 *.db
+
+# Playwright MCP scratch output
+.playwright-mcp/

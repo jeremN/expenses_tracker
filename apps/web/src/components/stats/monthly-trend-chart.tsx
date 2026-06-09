@@ -37,11 +37,11 @@ export function MonthlyTrendChart({ data }: { data: MonthlySummaryRow[] }) {
       {/* Legend */}
       <div className="flex items-center gap-4 text-sm text-muted-foreground pb-2">
         <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded-sm bg-emerald-500" />
+          <div className="h-3 w-3 rounded-sm bg-income" />
           <span>{t('common.income')}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded-sm bg-red-500" />
+          <div className="h-3 w-3 rounded-sm bg-expense" />
           <span>{t('common.expense')}</span>
         </div>
       </div>
@@ -64,11 +64,11 @@ export function MonthlyTrendChart({ data }: { data: MonthlySummaryRow[] }) {
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-full rounded-sm bg-muted overflow-hidden">
                     <div
-                      className="h-full rounded-sm bg-emerald-500 transition-all"
+                      className="h-full rounded-sm bg-income transition-all"
                       style={{ width: `${incomePercent}%` }}
                     />
                   </div>
-                  <span className="text-xs text-muted-foreground w-20 text-right tabular-nums">
+                  <span className="w-20 text-right font-mono text-xs tabular-nums text-muted-foreground">
                     {formatMoney(row.income)}
                   </span>
                 </div>
@@ -76,22 +76,22 @@ export function MonthlyTrendChart({ data }: { data: MonthlySummaryRow[] }) {
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-full rounded-sm bg-muted overflow-hidden">
                     <div
-                      className="h-full rounded-sm bg-red-500 transition-all"
+                      className="h-full rounded-sm bg-expense transition-all"
                       style={{ width: `${expensePercent}%` }}
                     />
                   </div>
-                  <span className="text-xs text-muted-foreground w-20 text-right tabular-nums">
+                  <span className="w-20 text-right font-mono text-xs tabular-nums text-muted-foreground">
                     {formatMoney(row.expenses)}
                   </span>
                 </div>
               </div>
 
               <span
-                className={`text-sm font-medium text-right tabular-nums ${
-                  net >= 0 ? 'text-emerald-600' : 'text-red-600'
+                className={`text-right font-mono text-sm font-medium tabular-nums ${
+                  net >= 0 ? 'text-income' : 'text-expense'
                 }`}
               >
-                {net >= 0 ? '+' : '-'}{formatMoney(Math.abs(net))}
+                {net >= 0 ? '+' : '−'}{formatMoney(Math.abs(net))}
               </span>
             </div>
           )
