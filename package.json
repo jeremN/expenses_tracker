@@ -9,7 +9,7 @@
     "test": "turbo test"
   },
   "devDependencies": {
-    "turbo": "^2.9.16",
+    "turbo": "^2.9.17",
     "typescript": "^6.0.3"
   },
   "pnpm": {
