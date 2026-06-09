@@ -1,4 +1,6 @@
+import { useRef, useState } from 'react'
 import type { InvestmentSnapshot } from '@tracker/shared'
+import { ChartTooltip } from '~/components/ui/chart-tooltip'
 import { useFormat } from '~/lib/format'
 import { useTranslation } from '~/i18n'
 
@@ -9,6 +11,11 @@ interface GrowthChartProps {
 export function GrowthChart({ snapshots }: GrowthChartProps) {
   const { t } = useTranslation()
   const { formatMoney } = useFormat()
+  // Hooks must precede the early return below (Rules of Hooks): when the
+  // snapshot count crosses the <2 boundary on a re-render, hook count must
+  // stay constant or React throws.
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const [hover, setHover] = useState<{ i: number; px: number; py: number } | null>(null)
 
   if (snapshots.length < 2) {
     return (
@@ -51,6 +58,25 @@ export function GrowthChart({ snapshots }: GrowthChartProps) {
     return { x, y, snapshot: s }
   })
 
+  function handleMove(e: React.MouseEvent<SVGSVGElement>) {
+    const wrap = wrapRef.current
+    if (!wrap) return
+    const svgRect = e.currentTarget.getBoundingClientRect()
+    const wrapRect = wrap.getBoundingClientRect()
+    // Map the cursor's client x into the SVG's viewBox coordinate space.
+    const svgX = ((e.clientX - svgRect.left) / svgRect.width) * chartWidth
+    let nearest = 0
+    for (let i = 1; i < points.length; i++) {
+      if (Math.abs(points[i].x - svgX) < Math.abs(points[nearest].x - svgX)) nearest = i
+    }
+    // Anchor to the wrapper (the positioned ancestor): convert the nearest
+    // point's viewBox coords to client px, then to wrapper-local px so the
+    // wrapper's padding never offsets the tooltip.
+    const px = svgRect.left + (points[nearest].x / chartWidth) * svgRect.width - wrapRect.left
+    const py = svgRect.top + (points[nearest].y / chartHeight) * svgRect.height - wrapRect.top
+    setHover({ i: nearest, px, py })
+  }
+
   // SVG path for the line
   const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
 
@@ -83,11 +109,16 @@ export function GrowthChart({ snapshots }: GrowthChartProps) {
   }
 
   return (
-    <div className="w-full overflow-x-auto rounded-lg border bg-card p-4">
+    <div ref={wrapRef} className="relative w-full rounded-lg border bg-card p-4">
+      {/* Scroll lives on an inner element so the tooltip (a child of the
+          non-overflow wrapper) is never clipped at the top edge. */}
+      <div className="overflow-x-auto">
       <svg
         viewBox={`0 0 ${chartWidth} ${chartHeight}`}
         className="h-auto w-full"
         preserveAspectRatio="xMidYMid meet"
+        onMouseMove={handleMove}
+        onMouseLeave={() => setHover(null)}
       >
         {/* Grid lines */}
         {yTicks.map((tick) => (
@@ -144,20 +175,40 @@ export function GrowthChart({ snapshots }: GrowthChartProps) {
           strokeLinecap="round"
         />
 
+        {/* Hover crosshair */}
+        {hover && (
+          <line
+            x1={points[hover.i].x}
+            y1={paddingY}
+            x2={points[hover.i].x}
+            y2={paddingY + innerHeight}
+            stroke="currentColor"
+            strokeOpacity={0.25}
+            strokeDasharray="3 3"
+            className="text-muted-foreground"
+          />
+        )}
+
         {/* Data points */}
-        {points.map((p) => (
+        {points.map((p, i) => (
           <circle
             key={p.snapshot.id}
             cx={p.x}
             cy={p.y}
-            r="4"
+            r={hover?.i === i ? 6 : 4}
             fill="currentColor"
-            className="text-investment cursor-pointer transition-[r] duration-150 ease-out hover:[r:6]"
-          >
-            <title>{`${formatDate(p.snapshot.date)}: ${formatMoney(p.snapshot.totalValue)}`}</title>
-          </circle>
+            className="text-investment transition-[r] duration-150 ease-out"
+          />
         ))}
       </svg>
+      </div>
+      {hover && (
+        <ChartTooltip visible x={hover.px} y={hover.py}>
+          <span className="font-medium">{formatDate(sorted[hover.i].date)}</span>
+          {' · '}
+          <span className="font-mono tabular-nums">{formatMoney(sorted[hover.i].totalValue)}</span>
+        </ChartTooltip>
+      )}
     </div>
   )
 }
