@@ -2,8 +2,8 @@ import { Link } from '@tanstack/react-router'
 import {
   LayoutDashboard,
   ArrowLeftRight,
+  Target,
   RefreshCw,
-  Tags,
   BarChart3,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
@@ -12,8 +12,8 @@ import { useTranslation } from '~/i18n'
 const mobileNavItems = [
   { to: '/' as const, labelKey: 'nav.dashboard', icon: LayoutDashboard },
   { to: '/transactions' as const, labelKey: 'nav.transactions', icon: ArrowLeftRight },
+  { to: '/budgets' as const, labelKey: 'nav.budgets', icon: Target },
   { to: '/recurring' as const, labelKey: 'nav.recurring', icon: RefreshCw },
-  { to: '/categories' as const, labelKey: 'nav.categories', icon: Tags },
   { to: '/stats' as const, labelKey: 'nav.stats', icon: BarChart3 },
 ]
 

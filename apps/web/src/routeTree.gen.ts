@@ -16,6 +16,7 @@ import { Route as RecurringRouteImport } from './routes/recurring'
 import { Route as InvestmentsRouteImport } from './routes/investments'
 import { Route as ImportRouteImport } from './routes/import'
 import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as BudgetsRouteImport } from './routes/budgets'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TransactionsNewRouteImport } from './routes/transactions_.new'
 import { Route as ApiTransactionsRouteImport } from './routes/api/transactions'
@@ -65,6 +66,11 @@ const ImportRoute = ImportRouteImport.update({
 const CategoriesRoute = CategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BudgetsRoute = BudgetsRouteImport.update({
+  id: '/budgets',
+  path: '/budgets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -146,6 +152,7 @@ const ApiCategoriesIdRoute = ApiCategoriesIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/budgets': typeof BudgetsRoute
   '/categories': typeof CategoriesRoute
   '/import': typeof ImportRoute
   '/investments': typeof InvestmentsRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/budgets': typeof BudgetsRoute
   '/categories': typeof CategoriesRoute
   '/import': typeof ImportRoute
   '/investments': typeof InvestmentsRoute
@@ -195,6 +203,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/budgets': typeof BudgetsRoute
   '/categories': typeof CategoriesRoute
   '/import': typeof ImportRoute
   '/investments': typeof InvestmentsRoute
@@ -221,6 +230,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/budgets'
     | '/categories'
     | '/import'
     | '/investments'
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/budgets'
     | '/categories'
     | '/import'
     | '/investments'
@@ -269,6 +280,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/budgets'
     | '/categories'
     | '/import'
     | '/investments'
@@ -294,6 +306,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BudgetsRoute: typeof BudgetsRoute
   CategoriesRoute: typeof CategoriesRoute
   ImportRoute: typeof ImportRoute
   InvestmentsRoute: typeof InvestmentsRoute
@@ -362,6 +375,13 @@ declare module '@tanstack/react-router' {
       path: '/categories'
       fullPath: '/categories'
       preLoaderRoute: typeof CategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/budgets': {
+      id: '/budgets'
+      path: '/budgets'
+      fullPath: '/budgets'
+      preLoaderRoute: typeof BudgetsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -522,6 +542,7 @@ const ApiTransactionsRouteWithChildren = ApiTransactionsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BudgetsRoute: BudgetsRoute,
   CategoriesRoute: CategoriesRoute,
   ImportRoute: ImportRoute,
   InvestmentsRoute: InvestmentsRoute,

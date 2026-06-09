@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { deleteCategory, transactions, recurringRules, categories } from '@tracker/db'
+import { deleteCategory, transactions, recurringRules, categories, budgets } from '@tracker/db'
 
 /**
  * Build a fluent fake-db that records every call into a flat list of
@@ -52,14 +52,16 @@ describe('deleteCategory (I1 regression)', () => {
 
     await deleteCategory(db, 42)
 
-    // Three operations in this exact order:
-    //   1. update transactions  set categoryId = null
-    //   2. update recurring_rules set categoryId = null  ← the I1 fix
-    //   3. delete from categories
-    expect(log).toHaveLength(3)
+    // Four operations in this exact order:
+    //   1. update transactions     set categoryId = null
+    //   2. update recurring_rules   set categoryId = null  ← the I1 fix
+    //   3. delete from budgets      (the category's monthly budget)
+    //   4. delete from categories
+    expect(log).toHaveLength(4)
     expect(log[0]).toMatchObject({ op: 'update', table: transactions })
     expect(log[1]).toMatchObject({ op: 'update', table: recurringRules })
-    expect(log[2]).toMatchObject({ op: 'delete', table: categories })
+    expect(log[2]).toMatchObject({ op: 'delete', table: budgets })
+    expect(log[3]).toMatchObject({ op: 'delete', table: categories })
 
     // Both update calls set categoryId to null (not some other field).
     expect(setSpy).toHaveBeenCalledTimes(2)

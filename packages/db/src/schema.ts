@@ -48,6 +48,17 @@ export const investmentSnapshots = sqliteTable('investment_snapshots', {
   createdAt: text('created_at').default(sql`(current_timestamp)`).notNull(),
 })
 
+export const budgets = sqliteTable('budgets', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  categoryId: integer('category_id')
+    .notNull()
+    .unique()
+    .references(() => categories.id),
+  amount: integer('amount').notNull(), // monthly limit in cents
+  createdAt: text('created_at').default(sql`(current_timestamp)`).notNull(),
+  updatedAt: text('updated_at').default(sql`(current_timestamp)`).notNull(),
+})
+
 export const bankImports = sqliteTable('bank_imports', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   filename: text('filename').notNull(),

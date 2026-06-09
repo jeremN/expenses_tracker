@@ -7,6 +7,7 @@ import type {
   createRecurringRuleSchema,
   updateRecurringRuleSchema,
   createInvestmentSnapshotSchema,
+  upsertBudgetSchema,
 } from './validators'
 
 export type CreateTransaction = z.infer<typeof createTransactionSchema>
@@ -16,6 +17,7 @@ export type UpdateCategory = z.infer<typeof updateCategorySchema>
 export type CreateRecurringRule = z.infer<typeof createRecurringRuleSchema>
 export type UpdateRecurringRule = z.infer<typeof updateRecurringRuleSchema>
 export type CreateInvestmentSnapshot = z.infer<typeof createInvestmentSnapshotSchema>
+export type UpsertBudget = z.infer<typeof upsertBudgetSchema>
 
 export type TransactionType = 'income' | 'expense'
 export type Frequency = 'weekly' | 'monthly' | 'yearly'
@@ -78,4 +80,20 @@ export interface CategoryBreakdown {
   categoryColor: string | null
   total: number
   percentage: number
+}
+
+export interface Budget {
+  id: number
+  categoryId: number
+  amount: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface BudgetOverviewItem {
+  categoryId: number
+  categoryName: string
+  categoryColor: string | null
+  budget: number | null
+  spent: number
 }
