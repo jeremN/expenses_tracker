@@ -11,6 +11,11 @@ interface GrowthChartProps {
 export function GrowthChart({ snapshots }: GrowthChartProps) {
   const { t } = useTranslation()
   const { formatMoney } = useFormat()
+  // Hooks must precede the early return below (Rules of Hooks): when the
+  // snapshot count crosses the <2 boundary on a re-render, hook count must
+  // stay constant or React throws.
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const [hover, setHover] = useState<{ i: number; px: number; py: number } | null>(null)
 
   if (snapshots.length < 2) {
     return (
@@ -52,9 +57,6 @@ export function GrowthChart({ snapshots }: GrowthChartProps) {
       ((s.totalValue - minValue) / valueRange) * innerHeight
     return { x, y, snapshot: s }
   })
-
-  const wrapRef = useRef<HTMLDivElement>(null)
-  const [hover, setHover] = useState<{ i: number; px: number; py: number } | null>(null)
 
   function handleMove(e: React.MouseEvent<SVGSVGElement>) {
     const wrap = wrapRef.current

@@ -15,6 +15,9 @@ const DEFAULT_COLOR = '#94a3b8' // slate-400
 export function CategoryBreakdownChart({ data }: { data: CategoryBreakdownRow[] }) {
   const { t } = useTranslation()
   const { formatMoney } = useFormat()
+  // Hooks must precede the early return below (Rules of Hooks).
+  const barRef = useRef<HTMLDivElement>(null)
+  const [hover, setHover] = useState<{ x: number; y: number; label: string } | null>(null)
 
   if (data.length === 0) {
     return (
@@ -26,9 +29,6 @@ export function CategoryBreakdownChart({ data }: { data: CategoryBreakdownRow[] 
 
   const grandTotal = data.reduce((sum, row) => sum + row.total, 0)
   const maxTotal = Math.max(...data.map((row) => row.total), 1)
-
-  const barRef = useRef<HTMLDivElement>(null)
-  const [hover, setHover] = useState<{ x: number; y: number; label: string } | null>(null)
 
   function show(e: React.MouseEvent<HTMLDivElement>, label: string) {
     const bar = barRef.current
