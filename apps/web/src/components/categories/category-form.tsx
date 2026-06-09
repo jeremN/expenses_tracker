@@ -123,7 +123,9 @@ export function CategoryForm({ defaultValues, onSubmit, isSubmitting }: Category
                     aria-label={t('categories.form.iconNone')}
                     onClick={() => field.onChange('')}
                     className={cn(
-                      'flex h-9 w-9 items-center justify-center rounded-md border text-xs text-muted-foreground transition-colors',
+                      // Auto-width (min one icon-button wide) so longer labels
+                      // like the French "Aucune" don't overflow the box.
+                      'flex h-9 min-w-9 items-center justify-center rounded-md border px-2 text-xs text-muted-foreground transition-colors',
                       !field.value ? 'border-primary bg-primary/10' : 'hover:bg-muted',
                     )}
                   >

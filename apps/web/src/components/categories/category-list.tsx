@@ -32,12 +32,22 @@ export function CategoryList({ categories, onEdit, onDelete }: CategoryListProps
           className="flex items-center justify-between rounded-lg border bg-card p-4 shadow-sm"
         >
           <div className="flex items-center gap-3">
-            <span
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-              style={{ backgroundColor: (category.color ?? '#6b7280') + '20', color: category.color ?? '#6b7280' }}
-            >
-              <CategoryIcon name={category.icon} className="h-4 w-4" />
-            </span>
+            {(() => {
+              // Guard the hex-alpha suffix: only a 6-digit hex takes the '20'
+              // alpha; anything else falls back so a stray value can't render a
+              // wrong color.
+              const color = /^#[0-9a-fA-F]{6}$/.test(category.color ?? '')
+                ? (category.color as string)
+                : '#6b7280'
+              return (
+                <span
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+                  style={{ backgroundColor: color + '20', color }}
+                >
+                  <CategoryIcon name={category.icon} className="h-4 w-4" />
+                </span>
+              )
+            })()}
             <p className="font-medium">{category.name}</p>
           </div>
 
