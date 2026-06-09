@@ -217,7 +217,7 @@
   "categories.form.namePlaceholder": "e.g. Groceries",
   "categories.form.color": "Color",
   "categories.form.icon": "Icon (optional)",
-  "categories.form.iconPlaceholder": "e.g. shopping-cart",
+  "categories.form.iconNone": "None",
   "categories.form.create": "Create Category",
   "categories.form.update": "Update Category",
   "categories.editAction": "Edit {name}",
