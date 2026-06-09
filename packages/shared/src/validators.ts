@@ -39,6 +39,11 @@ export const createInvestmentSnapshotSchema = z.object({
   note: z.string().optional(),
 })
 
+export const upsertBudgetSchema = z.object({
+  categoryId: z.number().int().positive(),
+  amount: z.number().int().positive(), // monthly limit in cents
+})
+
 export const monthQuerySchema = z.object({
   month: z.string().regex(/^\d{4}-\d{2}$/).optional(),
 })

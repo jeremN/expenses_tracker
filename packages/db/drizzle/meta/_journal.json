@@ -15,6 +15,13 @@
       "when": 1778840012997,
       "tag": "0001_slim_dragon_lord",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1781026370574,
+      "tag": "0002_nosy_aqueduct",
+      "breakpoints": true
     }
   ]
 }

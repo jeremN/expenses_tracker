@@ -34,10 +34,57 @@ export async function deleteCategory(db: DB, id: number) {
   await db.update(schema.recurringRules)
     .set({ categoryId: null })
     .where(eq(schema.recurringRules.categoryId, id))
+  // Remove the category's budget (FK has no DB-level cascade here).
+  await db.delete(schema.budgets).where(eq(schema.budgets.categoryId, id))
   return db.delete(schema.categories)
     .where(eq(schema.categories.id, id))
     .returning()
     .get()
+}
+
+// --- Budgets ---
+export function getBudgets(db: DB) {
+  return db.select().from(schema.budgets)
+}
+
+export function upsertBudget(db: DB, categoryId: number, amount: number) {
+  return db.insert(schema.budgets)
+    .values({ categoryId, amount })
+    .onConflictDoUpdate({
+      target: schema.budgets.categoryId,
+      set: { amount, updatedAt: sql`(current_timestamp)` },
+    })
+    .returning()
+    .get()
+}
+
+export function deleteBudget(db: DB, categoryId: number) {
+  return db.delete(schema.budgets)
+    .where(eq(schema.budgets.categoryId, categoryId))
+    .returning()
+    .get()
+}
+
+/**
+ * Every category with its monthly budget (null if unset) and the total
+ * expense spend for the given `YYYY-MM` month. One query so the budgets page
+ * has spend + limit per category without N round-trips.
+ */
+export function getBudgetOverview(db: DB, month: string) {
+  return db.run(sql`
+    SELECT
+      c.id as category_id,
+      c.name as category_name,
+      c.color as category_color,
+      b.amount as budget,
+      COALESCE((
+        SELECT SUM(t.amount) FROM transactions t
+        WHERE t.category_id = c.id AND t.type = 'expense' AND t.date LIKE ${month + '%'}
+      ), 0) as spent
+    FROM categories c
+    LEFT JOIN budgets b ON b.category_id = c.id
+    ORDER BY c.name
+  `)
 }
 
 // --- Transactions ---
