@@ -151,7 +151,7 @@ function StatsPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold">{t('stats.title')}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t('stats.title')}</h1>
         <p className="text-sm text-muted-foreground">
           {t('stats.subtitle')}
         </p>

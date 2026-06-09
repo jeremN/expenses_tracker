@@ -15,10 +15,18 @@ function formatMonthLabel(month: string, locale: 'en' | 'fr'): string {
   return date.toLocaleDateString(LOCALE_TAGS[locale], { month: 'short' })
 }
 
+function Swatch({ className, label }: { className: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+      <span className={`h-2.5 w-2.5 rounded-[3px] ${className}`} />
+      {label}
+    </span>
+  )
+}
+
 export function MonthlyChart({ data }: MonthlyChartProps) {
   const { t, locale } = useTranslation()
   const { formatMoney } = useFormat()
-  // Take the last 6 months of data
   const months = data.slice(-6)
 
   if (months.length === 0) {
@@ -34,63 +42,48 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
     )
   }
 
-  // Find the max value to scale bars proportionally
-  const maxValue = Math.max(
-    ...months.flatMap((m) => [m.income, m.expenses]),
-    1 // avoid division by zero
-  )
+  const maxValue = Math.max(...months.flatMap((m) => [m.income, m.expenses]), 1)
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle className="text-base">{t('dashboard.monthlyOverview')}</CardTitle>
+        <div className="flex items-center gap-3">
+          <Swatch className="bg-income" label={t('dashboard.income')} />
+          <Swatch className="bg-expense" label={t('dashboard.expenses')} />
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="flex items-end gap-3 sm:gap-6" style={{ height: '200px' }}>
+      <CardContent className="flex-1">
+        <div className="flex h-[200px] items-end gap-2 border-b border-border sm:gap-4">
           {months.map((month) => {
-            const incomeHeight = (month.income / maxValue) * 100
-            const expenseHeight = (month.expenses / maxValue) * 100
+            const incomeHeight = Math.max((month.income / maxValue) * 100, month.income > 0 ? 1.5 : 0)
+            const expenseHeight = Math.max((month.expenses / maxValue) * 100, month.expenses > 0 ? 1.5 : 0)
 
             return (
-              <div key={month.month} className="flex flex-1 flex-col items-center gap-1">
-                {/* Bars container */}
-                <div className="flex w-full items-end justify-center gap-1" style={{ height: '170px' }}>
-                  {/* Income bar */}
-                  <div className="group relative flex w-full max-w-[28px] flex-col items-center">
-                    <div
-                      className="w-full rounded-t bg-emerald-500 transition-all hover:bg-emerald-400"
-                      style={{ height: `${Math.max(incomeHeight, 2)}%` }}
-                      title={t('dashboard.income') + ': ' + formatMoney(month.income)}
-                    />
-                  </div>
-                  {/* Expense bar */}
-                  <div className="group relative flex w-full max-w-[28px] flex-col items-center">
-                    <div
-                      className="w-full rounded-t bg-red-500 transition-all hover:bg-red-400"
-                      style={{ height: `${Math.max(expenseHeight, 2)}%` }}
-                      title={t('dashboard.expenses') + ': ' + formatMoney(month.expenses)}
-                    />
-                  </div>
-                </div>
-                {/* Month label */}
-                <span className="text-xs text-muted-foreground">
-                  {formatMonthLabel(month.month, locale)}
-                </span>
+              <div key={month.month} className="group flex h-full flex-1 items-end justify-center gap-1">
+                <div
+                  className="w-full max-w-[22px] rounded-t-sm bg-income opacity-90 transition-opacity duration-200 group-hover:opacity-100"
+                  style={{ height: `${incomeHeight}%` }}
+                  title={`${t('dashboard.income')}: ${formatMoney(month.income)}`}
+                />
+                <div
+                  className="w-full max-w-[22px] rounded-t-sm bg-expense opacity-90 transition-opacity duration-200 group-hover:opacity-100"
+                  style={{ height: `${expenseHeight}%` }}
+                  title={`${t('dashboard.expenses')}: ${formatMoney(month.expenses)}`}
+                />
               </div>
             )
           })}
         </div>
-
-        {/* Legend */}
-        <div className="mt-4 flex items-center justify-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <div className="h-3 w-3 rounded-sm bg-emerald-500" />
-            <span className="text-xs text-muted-foreground">{t('dashboard.income')}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="h-3 w-3 rounded-sm bg-red-500" />
-            <span className="text-xs text-muted-foreground">{t('dashboard.expenses')}</span>
-          </div>
+        <div className="mt-2 flex gap-2 sm:gap-4">
+          {months.map((month) => (
+            <span
+              key={month.month}
+              className="flex-1 text-center text-xs capitalize text-muted-foreground"
+            >
+              {formatMonthLabel(month.month, locale)}
+            </span>
+          ))}
         </div>
       </CardContent>
     </Card>

@@ -1,8 +1,17 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
+@import "@fontsource/ibm-plex-mono/latin-600.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, 'SF Mono',
+    Menlo, Consolas, monospace;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -22,71 +31,125 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+
+  /* Semantic finance roles. Always paired with sign/icon, never hue alone. */
+  --color-income: var(--income);
+  --color-income-foreground: var(--income-foreground);
+  --color-income-subtle: var(--income-subtle);
+  --color-expense: var(--expense);
+  --color-expense-foreground: var(--expense-foreground);
+  --color-expense-subtle: var(--expense-subtle);
+  --color-investment: var(--investment);
+  --color-investment-foreground: var(--investment-foreground);
+  --color-investment-subtle: var(--investment-subtle);
+
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-soft: 0 1px 2px -1px oklch(0.2 0.02 262 / 0.08),
+    0 2px 8px -2px oklch(0.2 0.02 262 / 0.06);
+  --shadow-raised: 0 2px 4px -2px oklch(0.2 0.02 262 / 0.1),
+    0 8px 24px -6px oklch(0.2 0.02 262 / 0.1);
+
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
   :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.985 0 0);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    --background: oklch(0.985 0.003 255);
+    --foreground: oklch(0.205 0.012 261);
+    --card: oklch(0.999 0.001 255);
+    --card-foreground: oklch(0.205 0.012 261);
+    --popover: oklch(0.999 0.001 255);
+    --popover-foreground: oklch(0.205 0.012 261);
+    --primary: oklch(0.47 0.115 262);
+    --primary-foreground: oklch(0.99 0.002 255);
+    --secondary: oklch(0.965 0.005 258);
+    --secondary-foreground: oklch(0.27 0.012 261);
+    --muted: oklch(0.965 0.005 258);
+    --muted-foreground: oklch(0.482 0.016 258);
+    --accent: oklch(0.955 0.008 258);
+    --accent-foreground: oklch(0.27 0.012 261);
+    --destructive: oklch(0.535 0.2 25);
+    --destructive-foreground: oklch(0.99 0.002 255);
+    --border: oklch(0.916 0.006 256);
+    --input: oklch(0.916 0.006 256);
+    --ring: oklch(0.55 0.15 262);
     --radius: 0.625rem;
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.714);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
+
+    --sidebar: oklch(0.97 0.004 258);
+    --sidebar-foreground: oklch(0.205 0.012 261);
+
+    --income: oklch(0.5 0.135 150);
+    --income-foreground: oklch(0.99 0.01 150);
+    --income-subtle: oklch(0.95 0.03 150);
+    --expense: oklch(0.525 0.185 25);
+    --expense-foreground: oklch(0.99 0.01 25);
+    --expense-subtle: oklch(0.955 0.025 25);
+    --investment: oklch(0.505 0.108 72);
+    --investment-foreground: oklch(0.99 0.01 75);
+    --investment-subtle: oklch(0.955 0.035 80);
+
+    --chart-1: oklch(0.55 0.13 262);
+    --chart-2: oklch(0.6 0.12 200);
+    --chart-3: oklch(0.62 0.11 75);
+    --chart-4: oklch(0.55 0.14 320);
+    --chart-5: oklch(0.55 0.13 150);
+    --chart-6: oklch(0.6 0.05 258);
   }
 
   .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.985 0 0);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
+    --background: oklch(0.171 0.008 262);
+    --foreground: oklch(0.96 0.004 260);
+    --card: oklch(0.208 0.009 262);
+    --card-foreground: oklch(0.96 0.004 260);
+    --popover: oklch(0.225 0.009 262);
+    --popover-foreground: oklch(0.96 0.004 260);
+    --primary: oklch(0.7 0.12 262);
+    --primary-foreground: oklch(0.17 0.01 262);
+    --secondary: oklch(0.262 0.009 262);
+    --secondary-foreground: oklch(0.95 0.004 260);
+    --muted: oklch(0.245 0.008 262);
+    --muted-foreground: oklch(0.712 0.014 258);
+    --accent: oklch(0.278 0.012 262);
+    --accent-foreground: oklch(0.96 0.004 260);
+    --destructive: oklch(0.68 0.18 23);
+    --destructive-foreground: oklch(0.17 0.01 262);
+    --border: oklch(0.282 0.009 262);
+    --input: oklch(0.31 0.009 262);
+    --ring: oklch(0.7 0.13 262);
+
+    --sidebar: oklch(0.155 0.008 262);
+    --sidebar-foreground: oklch(0.96 0.004 260);
+
+    --income: oklch(0.76 0.15 152);
+    --income-foreground: oklch(0.18 0.03 152);
+    --income-subtle: oklch(0.27 0.045 152);
+    --expense: oklch(0.72 0.16 23);
+    --expense-foreground: oklch(0.18 0.03 25);
+    --expense-subtle: oklch(0.28 0.05 25);
+    --investment: oklch(0.79 0.12 78);
+    --investment-foreground: oklch(0.2 0.03 75);
+    --investment-subtle: oklch(0.29 0.045 78);
+
+    --chart-1: oklch(0.7 0.13 262);
+    --chart-2: oklch(0.72 0.12 200);
+    --chart-3: oklch(0.78 0.12 78);
+    --chart-4: oklch(0.72 0.14 320);
+    --chart-5: oklch(0.76 0.14 152);
+    --chart-6: oklch(0.68 0.04 258);
   }
 }
 
@@ -94,7 +157,33 @@
   * {
     @apply border-border;
   }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Numbers read as instruments: monospace, lining, tabular, aligned. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Respect reduced-motion globally; components add richer alternatives. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

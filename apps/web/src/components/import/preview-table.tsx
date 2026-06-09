@@ -160,8 +160,8 @@ export function PreviewTable({
                     </TableCell>
                     <TableCell
                       className={cn(
-                        'text-right text-sm font-medium whitespace-nowrap',
-                        isIncome ? 'text-emerald-600' : 'text-red-600',
+                        'whitespace-nowrap text-right font-mono text-sm font-medium tabular-nums',
+                        isIncome ? 'text-income' : 'text-expense',
                       )}
                     >
                       {isIncome ? '+' : ''}{formatMoney(row.amount)}

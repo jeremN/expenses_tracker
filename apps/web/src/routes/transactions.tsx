@@ -134,7 +134,7 @@ function TransactionsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{t('transactions.title')}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('transactions.title')}</h1>
           <p className="text-sm text-muted-foreground">
             {t('transactions.subtitle')}
           </p>

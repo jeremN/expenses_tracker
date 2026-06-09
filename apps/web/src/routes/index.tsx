@@ -118,11 +118,13 @@ function DashboardPage() {
   const { t } = useTranslation()
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">{t('dashboard.title')}</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-2xl font-semibold tracking-tight text-balance">
+          {t('dashboard.title')}
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           {t('dashboard.subtitle')}
         </p>
       </div>
@@ -134,9 +136,13 @@ function DashboardPage() {
       />
 
       {/* Chart + Recent Transactions grid */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <MonthlyChart data={data.monthlyData} />
-        <RecentTransactions transactions={data.recentTransactions} />
+      <div className="grid gap-4 lg:grid-cols-5 lg:items-start">
+        <div className="lg:col-span-3">
+          <MonthlyChart data={data.monthlyData} />
+        </div>
+        <div className="lg:col-span-2">
+          <RecentTransactions transactions={data.recentTransactions} />
+        </div>
       </div>
     </div>
   )

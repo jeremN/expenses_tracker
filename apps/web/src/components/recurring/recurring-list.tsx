@@ -2,7 +2,7 @@ import type { RecurringRule, Category } from '@tracker/shared'
 import { Pencil, Trash2, Pause, Play } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Badge } from '~/components/ui/badge'
-import { useFormat } from '~/lib/format'
+import { Amount } from '~/components/ui/amount'
 import { useTranslation } from '~/i18n'
 
 interface RecurringRuleWithCategory {
@@ -19,7 +19,6 @@ interface RecurringListProps {
 
 export function RecurringList({ rules, onEdit, onDelete, onToggle }: RecurringListProps) {
   const { t } = useTranslation()
-  const { formatMoney } = useFormat()
 
   if (rules.length === 0) {
     return (
@@ -43,7 +42,7 @@ export function RecurringList({ rules, onEdit, onDelete, onToggle }: RecurringLi
       {rules.map(({ recurring_rules: rule, categories: category }) => (
         <div
           key={rule.id}
-          className={`flex items-center justify-between rounded-lg border bg-card p-4 shadow-sm ${
+          className={`flex items-center justify-between rounded-lg border bg-card p-4 shadow-soft ${
             !rule.isActive ? 'opacity-60' : ''
           }`}
         >
@@ -77,13 +76,11 @@ export function RecurringList({ rules, onEdit, onDelete, onToggle }: RecurringLi
 
             {/* Amount */}
             <div className="text-right">
-              <p
-                className={`text-lg font-semibold ${
-                  rule.type === 'income' ? 'text-green-600' : 'text-red-600'
-                }`}
-              >
-                {rule.type === 'income' ? '+' : '-'}{formatMoney(rule.amount)}
-              </p>
+              <Amount
+                cents={rule.amount}
+                tone={rule.type === 'income' ? 'income' : 'expense'}
+                className="text-lg font-semibold"
+              />
             </div>
 
             {/* Badges */}

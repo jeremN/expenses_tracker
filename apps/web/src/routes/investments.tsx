@@ -156,7 +156,7 @@ function InvestmentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{t('investments.title')}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('investments.title')}</h1>
           <p className="text-sm text-muted-foreground">
             {t('investments.subtitle')}
           </p>
@@ -177,7 +177,7 @@ function InvestmentsPage() {
             <div className="flex items-baseline gap-6">
               <div>
                 <p className="text-sm text-muted-foreground">{t('investments.summary.currentValue')}</p>
-                <p className="text-3xl font-bold tabular-nums">
+                <p className="font-mono text-3xl font-semibold tabular-nums">
                   {formatMoney(latestSnapshot.totalValue)}
                 </p>
               </div>
@@ -186,13 +186,13 @@ function InvestmentsPage() {
                   <p className="text-sm text-muted-foreground">{t('investments.summary.gainLoss')}</p>
                   <div className="flex items-center gap-1">
                     {gainLossPercent >= 0 ? (
-                      <TrendingUp className="h-4 w-4 text-green-500" />
+                      <TrendingUp className="h-4 w-4 text-income" />
                     ) : (
-                      <TrendingDown className="h-4 w-4 text-red-500" />
+                      <TrendingDown className="h-4 w-4 text-expense" />
                     )}
                     <p
-                      className={`text-xl font-semibold tabular-nums ${
-                        gainLossPercent >= 0 ? 'text-green-500' : 'text-red-500'
+                      className={`font-mono text-xl font-semibold tabular-nums ${
+                        gainLossPercent >= 0 ? 'text-income' : 'text-expense'
                       }`}
                     >
                       {gainLossPercent >= 0 ? '+' : ''}

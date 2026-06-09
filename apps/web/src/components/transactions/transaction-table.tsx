@@ -2,6 +2,7 @@ import type { Transaction } from '@tracker/shared'
 import { Pencil, Trash2, RefreshCw } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Badge } from '~/components/ui/badge'
+import { Amount } from '~/components/ui/amount'
 import {
   Table,
   TableBody,
@@ -21,7 +22,7 @@ interface TransactionTableProps {
 
 export function TransactionTable({ transactions, onEdit, onDelete }: TransactionTableProps) {
   const { t } = useTranslation()
-  const { formatMoney, formatDate } = useFormat()
+  const { formatDate } = useFormat()
 
   if (transactions.length === 0) {
     return (
@@ -75,10 +76,12 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
                   <span className="text-sm text-muted-foreground">-</span>
                 )}
               </TableCell>
-              <TableCell className="text-right font-medium tabular-nums">
-                <span className={tx.type === 'income' ? 'text-green-600' : 'text-red-600'}>
-                  {tx.type === 'income' ? '+' : '-'}{formatMoney(tx.amount)}
-                </span>
+              <TableCell className="text-right">
+                <Amount
+                  cents={tx.amount}
+                  tone={tx.type === 'income' ? 'income' : 'expense'}
+                  className="font-medium"
+                />
               </TableCell>
               <TableCell>
                 <div className="flex items-center justify-end gap-1">
