@@ -6,6 +6,11 @@ import {
   upsertBudget,
   getBudgetOverview,
 } from '@tracker/db'
+// The libsql driver type and the D1 driver type are nominally incompatible due
+// to a private `resultKind` property that TypeScript flags as a mismatch.
+// Using Parameters<fn>[0] ensures we cast to the exact `DB` type the query
+// functions accept, keeping the cast safe and self-documenting.
+type QueryDb = Parameters<typeof getBudgetOverview>[0]
 
 // libsql `.run()` returns `{ rows }` (the app reads `.results` from D1's
 // driver). Either way the SQL semantics are what we assert here.
@@ -16,14 +21,14 @@ type Row = {
   budget: number | null
   spent: number
 }
-async function overview(db: Awaited<ReturnType<typeof makeTestDb>>, month: string) {
+async function overview(db: QueryDb, month: string) {
   const res = (await getBudgetOverview(db, month)) as unknown as { rows: Row[] }
   return res.rows
 }
 
 describe('getBudgetOverview', () => {
   it('returns every category, null budget when unset, spend summed for the month', async () => {
-    const db = await makeTestDb()
+    const db = (await makeTestDb()) as unknown as QueryDb
     const food = await createCategory(db, { name: 'Food' })
     const rent = await createCategory(db, { name: 'Rent' })
 
@@ -50,7 +55,7 @@ describe('getBudgetOverview', () => {
   })
 
   it('returns spent 0 for a category with no transactions in the month', async () => {
-    const db = await makeTestDb()
+    const db = (await makeTestDb()) as unknown as QueryDb
     await createCategory(db, { name: 'Travel' })
     const rows = await overview(db, '2026-06')
     expect(rows).toHaveLength(1)
