@@ -25,6 +25,7 @@ import { Route as ApiInvestmentsRouteImport } from './routes/api/investments'
 import { Route as ApiImportRouteImport } from './routes/api/import'
 import { Route as ApiExportRouteImport } from './routes/api/export'
 import { Route as ApiCategoriesRouteImport } from './routes/api/categories'
+import { Route as ApiBudgetsRouteImport } from './routes/api/budgets'
 import { Route as TransactionsIdEditRouteImport } from './routes/transactions_.$id.edit'
 import { Route as ApiTransactionsIdRouteImport } from './routes/api/transactions.$id'
 import { Route as ApiStatsMonthlySummaryRouteImport } from './routes/api/stats.monthly-summary'
@@ -32,6 +33,7 @@ import { Route as ApiStatsCategoryBreakdownRouteImport } from './routes/api/stat
 import { Route as ApiRecurringIdRouteImport } from './routes/api/recurring.$id'
 import { Route as ApiInvestmentsIdRouteImport } from './routes/api/investments.$id'
 import { Route as ApiCategoriesIdRouteImport } from './routes/api/categories.$id'
+import { Route as ApiBudgetsCategoryIdRouteImport } from './routes/api/budgets.$categoryId'
 
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
@@ -113,6 +115,11 @@ const ApiCategoriesRoute = ApiCategoriesRouteImport.update({
   path: '/api/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBudgetsRoute = ApiBudgetsRouteImport.update({
+  id: '/api/budgets',
+  path: '/api/budgets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TransactionsIdEditRoute = TransactionsIdEditRouteImport.update({
   id: '/transactions_/$id/edit',
   path: '/transactions/$id/edit',
@@ -149,6 +156,11 @@ const ApiCategoriesIdRoute = ApiCategoriesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ApiCategoriesRoute,
 } as any)
+const ApiBudgetsCategoryIdRoute = ApiBudgetsCategoryIdRouteImport.update({
+  id: '/$categoryId',
+  path: '/$categoryId',
+  getParentRoute: () => ApiBudgetsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -160,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/stats': typeof StatsRoute
   '/transactions': typeof TransactionsRoute
+  '/api/budgets': typeof ApiBudgetsRouteWithChildren
   '/api/categories': typeof ApiCategoriesRouteWithChildren
   '/api/export': typeof ApiExportRoute
   '/api/import': typeof ApiImportRoute
@@ -167,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/api/recurring': typeof ApiRecurringRouteWithChildren
   '/api/transactions': typeof ApiTransactionsRouteWithChildren
   '/transactions/new': typeof TransactionsNewRoute
+  '/api/budgets/$categoryId': typeof ApiBudgetsCategoryIdRoute
   '/api/categories/$id': typeof ApiCategoriesIdRoute
   '/api/investments/$id': typeof ApiInvestmentsIdRoute
   '/api/recurring/$id': typeof ApiRecurringIdRoute
@@ -185,6 +199,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/stats': typeof StatsRoute
   '/transactions': typeof TransactionsRoute
+  '/api/budgets': typeof ApiBudgetsRouteWithChildren
   '/api/categories': typeof ApiCategoriesRouteWithChildren
   '/api/export': typeof ApiExportRoute
   '/api/import': typeof ApiImportRoute
@@ -192,6 +207,7 @@ export interface FileRoutesByTo {
   '/api/recurring': typeof ApiRecurringRouteWithChildren
   '/api/transactions': typeof ApiTransactionsRouteWithChildren
   '/transactions/new': typeof TransactionsNewRoute
+  '/api/budgets/$categoryId': typeof ApiBudgetsCategoryIdRoute
   '/api/categories/$id': typeof ApiCategoriesIdRoute
   '/api/investments/$id': typeof ApiInvestmentsIdRoute
   '/api/recurring/$id': typeof ApiRecurringIdRoute
@@ -211,6 +227,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/stats': typeof StatsRoute
   '/transactions': typeof TransactionsRoute
+  '/api/budgets': typeof ApiBudgetsRouteWithChildren
   '/api/categories': typeof ApiCategoriesRouteWithChildren
   '/api/export': typeof ApiExportRoute
   '/api/import': typeof ApiImportRoute
@@ -218,6 +235,7 @@ export interface FileRoutesById {
   '/api/recurring': typeof ApiRecurringRouteWithChildren
   '/api/transactions': typeof ApiTransactionsRouteWithChildren
   '/transactions_/new': typeof TransactionsNewRoute
+  '/api/budgets/$categoryId': typeof ApiBudgetsCategoryIdRoute
   '/api/categories/$id': typeof ApiCategoriesIdRoute
   '/api/investments/$id': typeof ApiInvestmentsIdRoute
   '/api/recurring/$id': typeof ApiRecurringIdRoute
@@ -238,6 +256,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/stats'
     | '/transactions'
+    | '/api/budgets'
     | '/api/categories'
     | '/api/export'
     | '/api/import'
@@ -245,6 +264,7 @@ export interface FileRouteTypes {
     | '/api/recurring'
     | '/api/transactions'
     | '/transactions/new'
+    | '/api/budgets/$categoryId'
     | '/api/categories/$id'
     | '/api/investments/$id'
     | '/api/recurring/$id'
@@ -263,6 +283,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/stats'
     | '/transactions'
+    | '/api/budgets'
     | '/api/categories'
     | '/api/export'
     | '/api/import'
@@ -270,6 +291,7 @@ export interface FileRouteTypes {
     | '/api/recurring'
     | '/api/transactions'
     | '/transactions/new'
+    | '/api/budgets/$categoryId'
     | '/api/categories/$id'
     | '/api/investments/$id'
     | '/api/recurring/$id'
@@ -288,6 +310,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/stats'
     | '/transactions'
+    | '/api/budgets'
     | '/api/categories'
     | '/api/export'
     | '/api/import'
@@ -295,6 +318,7 @@ export interface FileRouteTypes {
     | '/api/recurring'
     | '/api/transactions'
     | '/transactions_/new'
+    | '/api/budgets/$categoryId'
     | '/api/categories/$id'
     | '/api/investments/$id'
     | '/api/recurring/$id'
@@ -314,6 +338,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   StatsRoute: typeof StatsRoute
   TransactionsRoute: typeof TransactionsRoute
+  ApiBudgetsRoute: typeof ApiBudgetsRouteWithChildren
   ApiCategoriesRoute: typeof ApiCategoriesRouteWithChildren
   ApiExportRoute: typeof ApiExportRoute
   ApiImportRoute: typeof ApiImportRoute
@@ -440,6 +465,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/budgets': {
+      id: '/api/budgets'
+      path: '/api/budgets'
+      fullPath: '/api/budgets'
+      preLoaderRoute: typeof ApiBudgetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/transactions_/$id/edit': {
       id: '/transactions_/$id/edit'
       path: '/transactions/$id/edit'
@@ -489,8 +521,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCategoriesIdRouteImport
       parentRoute: typeof ApiCategoriesRoute
     }
+    '/api/budgets/$categoryId': {
+      id: '/api/budgets/$categoryId'
+      path: '/$categoryId'
+      fullPath: '/api/budgets/$categoryId'
+      preLoaderRoute: typeof ApiBudgetsCategoryIdRouteImport
+      parentRoute: typeof ApiBudgetsRoute
+    }
   }
 }
+
+interface ApiBudgetsRouteChildren {
+  ApiBudgetsCategoryIdRoute: typeof ApiBudgetsCategoryIdRoute
+}
+
+const ApiBudgetsRouteChildren: ApiBudgetsRouteChildren = {
+  ApiBudgetsCategoryIdRoute: ApiBudgetsCategoryIdRoute,
+}
+
+const ApiBudgetsRouteWithChildren = ApiBudgetsRoute._addFileChildren(
+  ApiBudgetsRouteChildren,
+)
 
 interface ApiCategoriesRouteChildren {
   ApiCategoriesIdRoute: typeof ApiCategoriesIdRoute
@@ -550,6 +601,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   StatsRoute: StatsRoute,
   TransactionsRoute: TransactionsRoute,
+  ApiBudgetsRoute: ApiBudgetsRouteWithChildren,
   ApiCategoriesRoute: ApiCategoriesRouteWithChildren,
   ApiExportRoute: ApiExportRoute,
   ApiImportRoute: ApiImportRoute,

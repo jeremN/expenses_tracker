@@ -24,6 +24,10 @@ vi.mock('@tracker/db', () => ({
   createTransaction: vi.fn(),
   updateTransaction: vi.fn(),
   deleteTransaction: vi.fn(),
+  // budgets
+  getBudgets: vi.fn(),
+  upsertBudget: vi.fn(),
+  deleteBudget: vi.fn(),
   // others used transitively
   getInvestmentSnapshotById: vi.fn(),
   deleteInvestmentSnapshot: vi.fn(),
@@ -276,5 +280,69 @@ describe('POST /api/import', () => {
     const body = await res.json() as { code: string }
     expect(body.code).toBe('VALIDATION')
     expect(errSpy).not.toHaveBeenCalled()
+  })
+})
+
+// --- /api/budgets ---
+
+describe('POST /api/budgets', () => {
+  it('returns 200 with the upserted row on happy path', async () => {
+    const { upsertBudget } = await import('@tracker/db')
+    vi.mocked(upsertBudget).mockResolvedValue({
+      id: 1, categoryId: 3, amount: 50000, createdAt: 'now', updatedAt: 'now',
+    } as never)
+
+    const handler = await getHandler('./budgets', 'POST')
+    const res = await handler({
+      request: jsonRequest('http://x', 'POST', { categoryId: 3, amount: 50000 }),
+    })
+
+    expect(res.status).toBe(200)
+    const body = await res.json() as { categoryId: number; amount: number }
+    expect(body).toMatchObject({ categoryId: 3, amount: 50000 })
+    expect(errSpy).not.toHaveBeenCalled()
+  })
+
+  it('returns 400 + VALIDATION on bad input (no log)', async () => {
+    const handler = await getHandler('./budgets', 'POST')
+    const res = await handler({
+      request: jsonRequest('http://x', 'POST', { categoryId: 3 /* missing amount */ }),
+    })
+    expect(res.status).toBe(400)
+    const body = await res.json() as { code: string }
+    expect(body.code).toBe('VALIDATION')
+    expect(errSpy).not.toHaveBeenCalled()
+  })
+})
+
+describe('DELETE /api/budgets/$categoryId', () => {
+  it('returns 200 + success on happy path', async () => {
+    const { deleteBudget } = await import('@tracker/db')
+    vi.mocked(deleteBudget).mockResolvedValue({ id: 1, categoryId: 3 } as never)
+
+    const handler = await getHandler('./budgets.$categoryId', 'DELETE')
+    const res = await handler({ request: jsonRequest('http://x', 'DELETE'), params: { categoryId: '3' } })
+    expect(res.status).toBe(200)
+    const body = await res.json() as { success: boolean }
+    expect(body.success).toBe(true)
+  })
+
+  it('returns 404 + NOT_FOUND on stale id (assertFound)', async () => {
+    const { deleteBudget } = await import('@tracker/db')
+    vi.mocked(deleteBudget).mockResolvedValue(undefined as never)
+
+    const handler = await getHandler('./budgets.$categoryId', 'DELETE')
+    const res = await handler({ request: jsonRequest('http://x', 'DELETE'), params: { categoryId: '999' } })
+    expect(res.status).toBe(404)
+    const body = await res.json() as { code: string }
+    expect(body.code).toBe('NOT_FOUND')
+  })
+
+  it('returns 400 + INVALID_ID for non-numeric categoryId', async () => {
+    const handler = await getHandler('./budgets.$categoryId', 'DELETE')
+    const res = await handler({ request: jsonRequest('http://x', 'DELETE'), params: { categoryId: 'abc' } })
+    expect(res.status).toBe(400)
+    const body = await res.json() as { code: string }
+    expect(body.code).toBe('INVALID_ID')
   })
 })
