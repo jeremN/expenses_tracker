@@ -2,12 +2,13 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { Plus, Upload } from 'lucide-react'
 import { getDB } from '~/server/db'
-import { getMonthlySummary, getTransactions, getCategories } from '@tracker/db'
+import { getMonthlySummary, getTransactions, getCategories, getBudgetOverview } from '@tracker/db'
 import { generateMissingTransactions } from '~/server/recurring'
-import type { MonthlySummary, Transaction, Category } from '@tracker/shared'
+import type { MonthlySummary, Transaction, Category, BudgetOverviewItem } from '@tracker/shared'
 import { SummaryCards } from '~/components/dashboard/summary-cards'
 import { MonthlyChart } from '~/components/dashboard/monthly-chart'
 import { RecentTransactions } from '~/components/dashboard/recent-transactions'
+import { BudgetSummary } from '~/components/dashboard/budget-summary'
 import { Card } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
@@ -16,6 +17,14 @@ import { useTranslation } from '~/i18n'
 import { withServerFn } from '~/server/logger'
 
 // --- Server Functions ---
+
+interface OverviewRow {
+  category_id: number
+  category_name: string
+  category_color: string | null
+  budget: number | null
+  spent: number
+}
 
 const getDashboardData = createServerFn({ method: 'GET' }).handler(withServerFn('server-fn:getDashboardData', async () => {
   const db = getDB()
@@ -32,11 +41,24 @@ const getDashboardData = createServerFn({ method: 'GET' }).handler(withServerFn(
   const previousMonth = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`
 
   // Fetch data in parallel
-  const [summaryResult, transactionRows, categories] = await Promise.all([
+  const [summaryResult, transactionRows, categories, budgetOverview] = await Promise.all([
     getMonthlySummary(db, currentYear),
     getTransactions(db),
     getCategories(db),
+    getBudgetOverview(db, currentMonth),
   ])
+
+  const budgetItems: BudgetOverviewItem[] = (
+    (budgetOverview as unknown as { rows?: OverviewRow[]; results?: OverviewRow[] }).results ??
+    (budgetOverview as unknown as { rows?: OverviewRow[] }).rows ??
+    []
+  ).map((r) => ({
+    categoryId: r.category_id,
+    categoryName: r.category_name,
+    categoryColor: r.category_color,
+    budget: r.budget ?? null,
+    spent: Number(r.spent) || 0,
+  }))
 
   // Also fetch previous year's summary if previous month is in a different year
   let prevYearSummary: { results: unknown[] } = { results: [] }
@@ -74,6 +96,7 @@ const getDashboardData = createServerFn({ method: 'GET' }).handler(withServerFn(
     monthlyData: allMonthlyData as MonthlySummary[],
     recentTransactions: transactions.slice(0, 10),
     categories,
+    budgetItems,
   }
 }))
 
@@ -114,6 +137,7 @@ interface DashboardData {
   monthlyData: MonthlySummary[]
   recentTransactions: Transaction[]
   categories: Category[]
+  budgetItems: BudgetOverviewItem[]
 }
 
 function DashboardPage() {
@@ -167,14 +191,19 @@ function DashboardPage() {
         </Card>
       ) : (
         /* Chart + recent transactions, equal-height columns. */
-        <div className="grid items-stretch gap-4 lg:grid-cols-5">
-          <div className="lg:col-span-3">
-            <MonthlyChart data={data.monthlyData} />
+        <>
+          <div className="grid items-stretch gap-4 lg:grid-cols-5">
+            <div className="lg:col-span-3">
+              <MonthlyChart data={data.monthlyData} />
+            </div>
+            <div className="lg:col-span-2">
+              <RecentTransactions transactions={data.recentTransactions} />
+            </div>
           </div>
-          <div className="lg:col-span-2">
-            <RecentTransactions transactions={data.recentTransactions} />
-          </div>
-        </div>
+          {data.budgetItems.some((i) => i.budget != null) && (
+            <BudgetSummary items={data.budgetItems} />
+          )}
+        </>
       )}
     </div>
   )
