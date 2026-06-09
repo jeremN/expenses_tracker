@@ -1,4 +1,4 @@
-import { eq, and, like, desc, sql } from 'drizzle-orm'
+import { eq, and, or, like, desc, sql, count } from 'drizzle-orm'
 import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core'
 import * as schema from './schema'
 
@@ -88,9 +88,18 @@ export function getBudgetOverview(db: DB, month: string) {
 }
 
 // --- Transactions ---
-export function getTransactions(db: DB, filters?: { month?: string; categoryId?: number; type?: string }) {
-  const conditions = []
+type TxFilters = {
+  month?: string
+  categoryId?: number
+  type?: string
+  search?: string
+  limit?: number
+  offset?: number
+}
 
+// Shared WHERE conditions so list and count never drift apart.
+function txConditions(filters?: TxFilters) {
+  const conditions = []
   if (filters?.month) {
     conditions.push(like(schema.transactions.date, `${filters.month}%`))
   }
@@ -100,15 +109,52 @@ export function getTransactions(db: DB, filters?: { month?: string; categoryId?:
   if (filters?.type) {
     conditions.push(eq(schema.transactions.type, filters.type as TxType))
   }
+  if (filters?.search) {
+    const term = `%${filters.search}%`
+    conditions.push(
+      or(
+        like(schema.transactions.description, term),
+        like(schema.categories.name, term),
+      ),
+    )
+  }
+  return conditions
+}
 
-  const query = db.select().from(schema.transactions)
+export function getTransactions(db: DB, filters?: TxFilters) {
+  const conditions = txConditions(filters)
+  let query = db
+    .select()
+    .from(schema.transactions)
     .leftJoin(schema.categories, eq(schema.transactions.categoryId, schema.categories.id))
-    .orderBy(desc(schema.transactions.date))
+    .$dynamic()
 
   if (conditions.length > 0) {
-    return query.where(and(...conditions))
+    query = query.where(and(...conditions))
+  }
+  query = query.orderBy(desc(schema.transactions.date))
+  if (filters?.limit != null) {
+    query = query.limit(filters.limit)
+  }
+  if (filters?.offset != null) {
+    query = query.offset(filters.offset)
   }
   return query
+}
+
+// Total matching rows for pagination. `.get()` returns a plain object on both
+// the D1 and libsql drivers (unlike `.run()`, whose shape diverges).
+export function countTransactions(db: DB, filters?: TxFilters) {
+  const conditions = txConditions(filters)
+  let query = db
+    .select({ value: count() })
+    .from(schema.transactions)
+    .leftJoin(schema.categories, eq(schema.transactions.categoryId, schema.categories.id))
+    .$dynamic()
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions))
+  }
+  return query.get()
 }
 
 export function getTransactionById(db: DB, id: number) {
