@@ -1,4 +1,5 @@
 import type { Category } from '@tracker/shared'
+import { Search } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { useTranslation } from '~/i18n'
@@ -13,6 +14,8 @@ import {
 export type TypeFilter = 'all' | 'income' | 'expense'
 
 interface TransactionFiltersProps {
+  search: string
+  onSearchChange: (search: string) => void
   month: string
   onMonthChange: (month: string) => void
   categoryId: string
@@ -23,6 +26,8 @@ interface TransactionFiltersProps {
 }
 
 export function TransactionFilters({
+  search,
+  onSearchChange,
   month,
   onMonthChange,
   categoryId,
@@ -34,6 +39,22 @@ export function TransactionFilters({
   const { t } = useTranslation()
   return (
     <div className="flex flex-wrap items-center gap-3">
+      {/* Description search */}
+      <div className="relative w-full sm:w-64">
+        <Search
+          aria-hidden
+          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+        />
+        <Input
+          type="search"
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder={t('transactions.searchPlaceholder')}
+          aria-label={t('transactions.searchPlaceholder')}
+          className="pl-9"
+        />
+      </div>
+
       {/* Month picker */}
       <Input
         type="month"

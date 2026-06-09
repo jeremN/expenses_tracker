@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createFileRoute, useRouter, Link } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getDB } from '~/server/db'
@@ -6,7 +6,7 @@ import { getTransactions, getCategories, deleteTransaction } from '@tracker/db'
 import { z } from 'zod'
 import type { Transaction, Category } from '@tracker/shared'
 import { assertFound } from '@tracker/shared'
-import { Plus } from 'lucide-react'
+import { Plus, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import {
   Dialog,
@@ -88,26 +88,47 @@ function TransactionsSkeleton() {
 
 // --- Page Component ---
 
+const PAGE_SIZE = 25
+
 function TransactionsPage() {
   const { t } = useTranslation()
   const { transactions: initialTransactions, categories } =
     Route.useLoaderData() as { transactions: Transaction[]; categories: Category[] }
 
+  const [search, setSearch] = useState('')
   const [month, setMonth] = useState('')
   const [categoryId, setCategoryId] = useState('all')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
+  const [page, setPage] = useState(1)
   const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const router = useRouter()
 
   // Client-side filtering from loaded data
-  const filteredTransactions = initialTransactions.filter((tx) => {
-    if (month && !tx.date.startsWith(month)) return false
-    if (categoryId !== 'all' && tx.categoryId !== Number(categoryId)) return false
-    if (typeFilter !== 'all' && tx.type !== typeFilter) return false
-    return true
-  })
+  const filteredTransactions = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return initialTransactions.filter((tx) => {
+      if (month && !tx.date.startsWith(month)) return false
+      if (categoryId !== 'all' && tx.categoryId !== Number(categoryId)) return false
+      if (typeFilter !== 'all' && tx.type !== typeFilter) return false
+      if (q) {
+        const haystack = `${tx.description ?? ''} ${tx.category?.name ?? ''}`.toLowerCase()
+        if (!haystack.includes(q)) return false
+      }
+      return true
+    })
+  }, [initialTransactions, search, month, categoryId, typeFilter])
+
+  // Reset to the first page whenever the filtered set changes.
+  useEffect(() => {
+    setPage(1)
+  }, [search, month, categoryId, typeFilter])
+
+  const pageCount = Math.max(1, Math.ceil(filteredTransactions.length / PAGE_SIZE))
+  const currentPage = Math.min(page, pageCount)
+  const start = (currentPage - 1) * PAGE_SIZE
+  const pageItems = filteredTransactions.slice(start, start + PAGE_SIZE)
 
   function handleEdit(tx: Transaction) {
     router.navigate({ to: '/transactions/$id/edit', params: { id: String(tx.id) } })
@@ -149,6 +170,8 @@ function TransactionsPage() {
 
       {/* Filters */}
       <TransactionFilters
+        search={search}
+        onSearchChange={setSearch}
         month={month}
         onMonthChange={setMonth}
         categoryId={categoryId}
@@ -160,10 +183,48 @@ function TransactionsPage() {
 
       {/* Transaction Table */}
       <TransactionTable
-        transactions={filteredTransactions}
+        transactions={pageItems}
         onEdit={handleEdit}
         onDelete={setDeleteTarget}
       />
+
+      {/* Pagination */}
+      {filteredTransactions.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
+          <span className="tabular-nums">
+            {t('transactions.pagination.showing', {
+              from: start + 1,
+              to: start + pageItems.length,
+              total: filteredTransactions.length,
+            })}
+          </span>
+          {pageCount > 1 && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                {t('transactions.pagination.previous')}
+              </Button>
+              <span className="tabular-nums">
+                {t('transactions.pagination.page', { page: currentPage, pages: pageCount })}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                disabled={currentPage >= pageCount}
+              >
+                {t('transactions.pagination.next')}
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Delete Confirmation Dialog */}
       <Dialog
