@@ -1,4 +1,6 @@
+import { useRef, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
+import { ChartTooltip } from '~/components/ui/chart-tooltip'
 import { useFormat } from '~/lib/format'
 import { useTranslation } from '~/i18n'
 import type { MonthlySummary } from '@tracker/shared'
@@ -29,6 +31,17 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
   const { formatMoney } = useFormat()
   const months = data.slice(-6)
 
+  const rowRef = useRef<HTMLDivElement>(null)
+  const [hover, setHover] = useState<{ x: number; y: number; label: string } | null>(null)
+
+  function show(e: React.MouseEvent<HTMLDivElement>, label: string) {
+    const row = rowRef.current
+    if (!row) return
+    const rowRect = row.getBoundingClientRect()
+    const r = e.currentTarget.getBoundingClientRect()
+    setHover({ x: r.left - rowRect.left + r.width / 2, y: r.top - rowRect.top, label })
+  }
+
   if (months.length === 0) {
     return (
       <Card>
@@ -54,7 +67,10 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
         </div>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col">
-        <div className="flex min-h-[200px] flex-1 items-end gap-2 border-b border-border sm:gap-4">
+        <div
+          ref={rowRef}
+          className="relative flex min-h-[200px] flex-1 items-end gap-2 border-b border-border sm:gap-4"
+        >
           {months.map((month, i) => {
             const incomeHeight = Math.max((month.income / maxValue) * 100, month.income > 0 ? 1.5 : 0)
             const expenseHeight = Math.max((month.expenses / maxValue) * 100, month.expenses > 0 ? 1.5 : 0)
@@ -65,16 +81,23 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
                 <div
                   className={`w-full max-w-[22px] rounded-t-sm bg-income opacity-90 transition-opacity duration-200 group-hover:opacity-100 ${rise}`}
                   style={{ height: `${incomeHeight}%`, animationDelay: `${i * 70}ms` }}
-                  title={`${t('dashboard.income')}: ${formatMoney(month.income)}`}
+                  onMouseEnter={(e) => show(e, `${t('dashboard.income')}: ${formatMoney(month.income)}`)}
+                  onMouseLeave={() => setHover(null)}
                 />
                 <div
                   className={`w-full max-w-[22px] rounded-t-sm bg-expense opacity-90 transition-opacity duration-200 group-hover:opacity-100 ${rise}`}
                   style={{ height: `${expenseHeight}%`, animationDelay: `${i * 70 + 35}ms` }}
-                  title={`${t('dashboard.expenses')}: ${formatMoney(month.expenses)}`}
+                  onMouseEnter={(e) => show(e, `${t('dashboard.expenses')}: ${formatMoney(month.expenses)}`)}
+                  onMouseLeave={() => setHover(null)}
                 />
               </div>
             )
           })}
+          {hover && (
+            <ChartTooltip visible x={hover.x} y={hover.y}>
+              {hover.label}
+            </ChartTooltip>
+          )}
         </div>
         <div className="mt-2 flex gap-2 sm:gap-4">
           {months.map((month) => (

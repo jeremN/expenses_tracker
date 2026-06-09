@@ -1,3 +1,5 @@
+import { useRef, useState } from 'react'
+import { ChartTooltip } from '~/components/ui/chart-tooltip'
 import { useFormat } from '~/lib/format'
 import { useTranslation } from '~/i18n'
 
@@ -25,25 +27,46 @@ export function CategoryBreakdownChart({ data }: { data: CategoryBreakdownRow[] 
   const grandTotal = data.reduce((sum, row) => sum + row.total, 0)
   const maxTotal = Math.max(...data.map((row) => row.total), 1)
 
+  const barRef = useRef<HTMLDivElement>(null)
+  const [hover, setHover] = useState<{ x: number; y: number; label: string } | null>(null)
+
+  function show(e: React.MouseEvent<HTMLDivElement>, label: string) {
+    const bar = barRef.current
+    if (!bar) return
+    const barRect = bar.getBoundingClientRect()
+    const r = e.currentTarget.getBoundingClientRect()
+    setHover({ x: r.left - barRect.left + r.width / 2, y: r.top - barRect.top, label })
+  }
+
   return (
     <div className="space-y-4">
       {/* Stacked bar overview */}
-      <div className="h-6 w-full rounded-full overflow-hidden flex">
-        {data.map((row) => {
-          const percent = grandTotal > 0 ? (row.total / grandTotal) * 100 : 0
-          return (
-            <div
-              key={row.category_id ?? 'uncategorized'}
-              className="h-full transition-all"
-              style={{
-                width: `${percent}%`,
-                backgroundColor: row.category_color || DEFAULT_COLOR,
-                minWidth: percent > 0 ? '2px' : '0',
-              }}
-              title={`${row.category_name ?? t('stats.uncategorized')}: ${formatMoney(row.total)}`}
-            />
-          )
-        })}
+      <div ref={barRef} className="relative">
+        <div className="h-6 w-full rounded-full overflow-hidden flex">
+          {data.map((row) => {
+            const percent = grandTotal > 0 ? (row.total / grandTotal) * 100 : 0
+            return (
+              <div
+                key={row.category_id ?? 'uncategorized'}
+                className="h-full transition-all"
+                style={{
+                  width: `${percent}%`,
+                  backgroundColor: row.category_color || DEFAULT_COLOR,
+                  minWidth: percent > 0 ? '2px' : '0',
+                }}
+                onMouseEnter={(e) =>
+                  show(e, `${row.category_name ?? t('stats.uncategorized')}: ${formatMoney(row.total)}`)
+                }
+                onMouseLeave={() => setHover(null)}
+              />
+            )
+          })}
+        </div>
+        {hover && (
+          <ChartTooltip visible x={hover.x} y={hover.y}>
+            {hover.label}
+          </ChartTooltip>
+        )}
       </div>
 
       {/* Category rows */}

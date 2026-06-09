@@ -54,7 +54,10 @@ export function MonthlyTrendChart({ data }: { data: MonthlySummaryRow[] }) {
           const net = row.balance
 
           return (
-            <div key={row.month} className="grid grid-cols-[3rem_1fr_6rem] items-center gap-3">
+            <div
+              key={row.month}
+              className="grid grid-cols-[3rem_1fr_6rem] items-center gap-3 transition-colors hover:bg-muted/50 rounded-md -mx-2 px-2 py-0.5"
+            >
               <span className="text-sm font-medium text-muted-foreground">
                 {getMonthLabel(row.month)}
               </span>
