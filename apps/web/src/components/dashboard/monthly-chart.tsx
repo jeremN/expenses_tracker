@@ -55,20 +55,21 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
       </CardHeader>
       <CardContent className="flex-1">
         <div className="flex h-[200px] items-end gap-2 border-b border-border sm:gap-4">
-          {months.map((month) => {
+          {months.map((month, i) => {
             const incomeHeight = Math.max((month.income / maxValue) * 100, month.income > 0 ? 1.5 : 0)
             const expenseHeight = Math.max((month.expenses / maxValue) * 100, month.expenses > 0 ? 1.5 : 0)
+            const rise = 'origin-bottom motion-safe:animate-[bar-rise_500ms_var(--ease-out-expo)_both]'
 
             return (
               <div key={month.month} className="group flex h-full flex-1 items-end justify-center gap-1">
                 <div
-                  className="w-full max-w-[22px] rounded-t-sm bg-income opacity-90 transition-opacity duration-200 group-hover:opacity-100"
-                  style={{ height: `${incomeHeight}%` }}
+                  className={`w-full max-w-[22px] rounded-t-sm bg-income opacity-90 transition-opacity duration-200 group-hover:opacity-100 ${rise}`}
+                  style={{ height: `${incomeHeight}%`, animationDelay: `${i * 70}ms` }}
                   title={`${t('dashboard.income')}: ${formatMoney(month.income)}`}
                 />
                 <div
-                  className="w-full max-w-[22px] rounded-t-sm bg-expense opacity-90 transition-opacity duration-200 group-hover:opacity-100"
-                  style={{ height: `${expenseHeight}%` }}
+                  className={`w-full max-w-[22px] rounded-t-sm bg-expense opacity-90 transition-opacity duration-200 group-hover:opacity-100 ${rise}`}
+                  style={{ height: `${expenseHeight}%`, animationDelay: `${i * 70 + 35}ms` }}
                   title={`${t('dashboard.expenses')}: ${formatMoney(month.expenses)}`}
                 />
               </div>

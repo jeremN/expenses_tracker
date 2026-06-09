@@ -175,6 +175,17 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* Chart bars rise from the baseline. The default (no animation / reduced
+     motion) is the fully grown bar, so the reveal only enhances. */
+  @keyframes bar-rise {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+
   /* Respect reduced-motion globally; components add richer alternatives. */
   @media (prefers-reduced-motion: reduce) {
     *,

@@ -93,7 +93,7 @@ function StatCard({
           <Icon className="h-4 w-4" />
         </span>
       </div>
-      <Amount cents={cents} tone={tone} className="text-3xl font-semibold leading-none" />
+      <Amount cents={cents} tone={tone} animate className="text-3xl font-semibold leading-none" />
       {children}
     </Card>
   )

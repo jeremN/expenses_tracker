@@ -1,5 +1,6 @@
 import { cn } from '~/lib/utils'
 import { useFormat } from '~/lib/format'
+import { useCountUp } from '~/lib/use-count-up'
 
 /**
  * Monetary tone. Income reads positive (green, leading +), expense reads
@@ -19,10 +20,12 @@ interface AmountProps {
   tone?: AmountTone
   /** Show the leading +/− sign. Defaults to true for typed/signed tones. */
   sign?: boolean
+  /** Count up from zero on first mount (reserve for hero figures). */
+  animate?: boolean
   className?: string
 }
 
-export function Amount({ cents, tone = 'neutral', sign, className }: AmountProps) {
+export function Amount({ cents, tone = 'neutral', sign, animate = false, className }: AmountProps) {
   const { formatMoney } = useFormat()
 
   const isIncome = tone === 'income' || (tone === 'signed' && cents >= 0)
@@ -30,6 +33,7 @@ export function Amount({ cents, tone = 'neutral', sign, className }: AmountProps
   const showSign = sign ?? tone !== 'neutral'
 
   const prefix = showSign ? (isIncome ? '+' : isExpense ? MINUS : '') : ''
+  const display = useCountUp(Math.abs(cents), animate)
 
   return (
     <span
@@ -41,7 +45,7 @@ export function Amount({ cents, tone = 'neutral', sign, className }: AmountProps
       )}
     >
       {prefix}
-      {formatMoney(Math.abs(cents))}
+      {formatMoney(display)}
     </span>
   )
 }

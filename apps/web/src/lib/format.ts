@@ -30,11 +30,24 @@ export function formatDate(iso: string, locale: Locale): string {
   return new Intl.DateTimeFormat(TAGS[locale]).format(new Date(y, m - 1, d))
 }
 
+/**
+ * The standalone currency symbol for a locale/currency (e.g. EUR -> "€",
+ * USD -> "$"), extracted from Intl parts so it tracks the currency selector.
+ */
+export function currencySymbol(locale: Locale, currency: Currency): string {
+  const parts = new Intl.NumberFormat(TAGS[locale], {
+    style: 'currency',
+    currency,
+  }).formatToParts(0)
+  return parts.find((p) => p.type === 'currency')?.value ?? currency
+}
+
 /** Hook binding the formatters to the active locale and currency from context. */
 export function useFormat() {
   const { locale, currency } = useLocale()
   return {
     formatMoney: (cents: number) => formatMoney(cents, locale, currency),
     formatDate: (iso: string) => formatDate(iso, locale),
+    currencySymbol: currencySymbol(locale, currency),
   }
 }
