@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useRouter, Link } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getDB } from '~/server/db'
 import { getTransactions, countTransactions, getCategories, deleteTransaction } from '@tracker/db'
@@ -27,7 +27,9 @@ import { withServerFn } from '~/server/logger'
 const PAGE_SIZE = 25
 
 const txSearchSchema = z.object({
-  page: z.coerce.number().int().positive().optional(),
+  // `.catch` so a hand-edited bad value (?page=abc) degrades to the default
+  // instead of throwing the whole route to its errorComponent.
+  page: z.coerce.number().int().positive().optional().catch(undefined),
   q: z.string().optional(),
   month: z.string().optional(),
   category: z.string().optional(),
@@ -41,20 +43,28 @@ const getServerTransactions = createServerFn({ method: 'GET' })
   .inputValidator(txSearchSchema)
   .handler(withServerFn('server-fn:getServerTransactions', async ({ data }) => {
     const db = getDB()
-    const page = data.page ?? 1
     const filters = {
       month: data.month || undefined,
       categoryId: data.category && data.category !== 'all' ? Number(data.category) : undefined,
       type: data.type,
       search: data.q?.trim() || undefined,
     }
-    const [rows, countRow, categories] = await Promise.all([
-      getTransactions(db, { ...filters, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }),
-      countTransactions(db, filters),
+    // Count + categories first so we can clamp the page before fetching it.
+    const [total, categories] = await Promise.all([
+      countTransactions(db, filters).then((r) => r?.value ?? 0),
       getCategories(db),
     ])
+    // Clamp to the available range: a stale URL (e.g. after deleting the last
+    // rows on a page) must not overshoot into an empty offset.
+    const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE))
+    const page = Math.min(Math.max(data.page ?? 1, 1), pageCount)
+    const rows = await getTransactions(db, {
+      ...filters,
+      limit: PAGE_SIZE,
+      offset: (page - 1) * PAGE_SIZE,
+    })
     const transactions = rows.map((row) => ({ ...row.transactions, category: row.categories }))
-    return { transactions, total: countRow?.value ?? 0, page, categories }
+    return { transactions, total, page, categories }
   }))
 
 const deleteServerTransaction = createServerFn({ method: 'POST' })
@@ -105,6 +115,7 @@ function TransactionsPage() {
   }
   const search = Route.useSearch()
   const navigate = useNavigate({ from: Route.fullPath })
+  const router = useRouter()
 
   const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -147,7 +158,8 @@ function TransactionsPage() {
       await deleteServerTransaction({ data: { id: deleteTarget.id } })
       toast.success(t('toast.deleted'))
       setDeleteTarget(null)
-      navigate({ search: (prev) => prev }) // re-run loader
+      // Force the loader to re-run regardless of staleTime config.
+      router.invalidate()
     } catch (error) {
       console.error('Failed to delete transaction:', error)
       toast.error(translateApiError(error, t))
