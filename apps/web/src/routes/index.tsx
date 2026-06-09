@@ -1,5 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
+import { Plus, Upload } from 'lucide-react'
 import { getDB } from '~/server/db'
 import { getMonthlySummary, getTransactions, getCategories } from '@tracker/db'
 import { generateMissingTransactions } from '~/server/recurring'
@@ -7,6 +8,8 @@ import type { MonthlySummary, Transaction, Category } from '@tracker/shared'
 import { SummaryCards } from '~/components/dashboard/summary-cards'
 import { MonthlyChart } from '~/components/dashboard/monthly-chart'
 import { RecentTransactions } from '~/components/dashboard/recent-transactions'
+import { Card } from '~/components/ui/card'
+import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
 import { RouteError } from '~/components/route-error'
 import { useTranslation } from '~/i18n'
@@ -135,15 +138,44 @@ function DashboardPage() {
         previousMonth={data.previousMonth}
       />
 
-      {/* Chart + Recent Transactions grid */}
-      <div className="grid gap-4 lg:grid-cols-5 lg:items-start">
-        <div className="lg:col-span-3">
-          <MonthlyChart data={data.monthlyData} />
+      {data.recentTransactions.length === 0 ? (
+        /* First-run: teach the next action instead of three empty panels. */
+        <Card className="flex flex-col items-center gap-4 px-6 py-12 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-income-subtle text-income">
+            <Plus className="h-6 w-6" />
+          </span>
+          <div className="max-w-md">
+            <h2 className="text-lg font-semibold">{t('dashboard.onboarding.title')}</h2>
+            <p className="mt-1 text-sm text-muted-foreground text-balance">
+              {t('dashboard.onboarding.subtitle')}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <Button asChild>
+              <Link to="/transactions/new">
+                <Plus className="h-4 w-4" />
+                {t('transactions.add')}
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/import">
+                <Upload className="h-4 w-4" />
+                {t('import.title')}
+              </Link>
+            </Button>
+          </div>
+        </Card>
+      ) : (
+        /* Chart + recent transactions, equal-height columns. */
+        <div className="grid items-stretch gap-4 lg:grid-cols-5">
+          <div className="lg:col-span-3">
+            <MonthlyChart data={data.monthlyData} />
+          </div>
+          <div className="lg:col-span-2">
+            <RecentTransactions transactions={data.recentTransactions} />
+          </div>
         </div>
-        <div className="lg:col-span-2">
-          <RecentTransactions transactions={data.recentTransactions} />
-        </div>
-      </div>
+      )}
     </div>
   )
 }

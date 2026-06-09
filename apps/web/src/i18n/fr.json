@@ -40,6 +40,8 @@
   "dashboard.noTransactions": "Aucune transaction pour le moment.",
   "dashboard.untitled": "Sans titre",
   "dashboard.viewAllTransactions": "Voir toutes les transactions",
+  "dashboard.onboarding.title": "Bienvenue, commençons",
+  "dashboard.onboarding.subtitle": "Ajoutez votre première transaction ou importez un relevé bancaire, et votre tableau de bord se remplira.",
   "import.result": "{imported} transactions sur {total} importées depuis {filename}.",
   "settings.title": "Paramètres",
   "settings.subtitle": "Gérez vos données et les préférences de l'application.",

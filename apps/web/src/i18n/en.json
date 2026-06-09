@@ -40,6 +40,8 @@
   "dashboard.noTransactions": "No transactions yet.",
   "dashboard.untitled": "Untitled",
   "dashboard.viewAllTransactions": "View all transactions",
+  "dashboard.onboarding.title": "Welcome, let's get started",
+  "dashboard.onboarding.subtitle": "Add your first transaction or import a bank statement, and your dashboard will fill in.",
   "import.result": "Successfully imported {imported} of {total} transactions from {filename}.",
   "settings.title": "Settings",
   "settings.subtitle": "Manage your data and app preferences.",

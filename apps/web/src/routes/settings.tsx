@@ -37,7 +37,7 @@ function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t('settings.appearance.title')}</CardTitle>
+          <CardTitle className="text-base">{t('settings.appearance.title')}</CardTitle>
           <CardDescription>{t('settings.appearance.description')}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -47,7 +47,7 @@ function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t('settings.language.title')}</CardTitle>
+          <CardTitle className="text-base">{t('settings.language.title')}</CardTitle>
           <CardDescription>{t('settings.language.description')}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -68,7 +68,7 @@ function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t('settings.currency.title')}</CardTitle>
+          <CardTitle className="text-base">{t('settings.currency.title')}</CardTitle>
           <CardDescription>{t('settings.currency.description')}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -92,7 +92,7 @@ function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t('settings.export.title')}</CardTitle>
+          <CardTitle className="text-base">{t('settings.export.title')}</CardTitle>
           <CardDescription>{t('settings.export.description')}</CardDescription>
         </CardHeader>
         <CardContent>
