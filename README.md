@@ -2,7 +2,7 @@
 
 A personal finance app for tracking income, expenses, recurring payments, and investments. Built to run on Cloudflare's free tier.
 
-This is a rewrite of the [v1](expenses-tracker/) (React 16 / Redux / Firebase) using a modern stack.
+This is a rewrite of an earlier version (React 16 / Redux / Firebase) using a modern stack.
 
 ## What it does
 
