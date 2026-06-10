@@ -7,4 +7,4 @@
 # instead of verifying a real Cf-Access-Jwt-Assertion. Leave commented
 # out to require a real Access JWT (use this if you front local dev
 # with a Cloudflare Tunnel).
-CF_ACCESS_DEV_USER_EMAIL="jeremie.nehlil.freelance@proton.me"
+CF_ACCESS_DEV_USER_EMAIL="you@example.com"
