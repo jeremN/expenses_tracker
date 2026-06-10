@@ -139,6 +139,26 @@ describe('requireUser', () => {
     expect(jwtVerifyMock).not.toHaveBeenCalled()
   })
 
+  it('does NOT bypass in a production build (DEV=false) even if the var is set', async () => {
+    // Guards the security property: in prod Vite sets import.meta.env.DEV=false
+    // and the bypass branch is gone. Stub DEV here to assert the real JWT path
+    // is taken even with CF_ACCESS_DEV_USER_EMAIL present.
+    vi.stubEnv('DEV', false)
+    try {
+      mockEnv.values = {
+        CF_ACCESS_TEAM_DOMAIN: TEAM,
+        CF_ACCESS_AUD: AUD,
+        CF_ACCESS_DEV_USER_EMAIL: 'dev@local',
+      }
+      jwtVerifyMock.mockResolvedValue({ payload: { email: 'real@user.com', sub: 's' } })
+      const user = await requireUser(makeRequest({ jwt: 'real-token' }))
+      expect(user.email).toBe('real@user.com') // real JWT path, NOT the bypass
+      expect(jwtVerifyMock).toHaveBeenCalled()
+    } finally {
+      vi.unstubAllEnvs()
+    }
+  })
+
   it('throws AppError(UNAUTHORIZED) when no bypass and no JWT', async () => {
     configuredEnv()
     await expect(requireUser(makeRequest())).rejects.toMatchObject({

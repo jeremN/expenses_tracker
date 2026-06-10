@@ -24,7 +24,10 @@ type AccessEnv = {
    * Dev-only escape hatch. When set (typically in `.dev.vars`), the auth
    * check is replaced with a fake user with this email. Never set this in
    * production — the committed wrangler.jsonc has no such var, so prod
-   * deploys cannot be tricked into bypassing auth.
+   * deploys cannot be tricked into bypassing auth. Additionally, the bypass
+   * is build-gated: `import.meta.env.DEV` is statically replaced with
+   * `false` by Vite in production builds, so the branch is dead-code-
+   * eliminated and this var has no effect even if somehow present.
    */
   CF_ACCESS_DEV_USER_EMAIL?: string
 }
@@ -105,12 +108,17 @@ function extractCookie(header: string | null, name: string): string | null {
  * returns null and this throws — there is no silent bypass.
  */
 export async function requireUser(request: Request): Promise<AccessUser> {
-  const { CF_ACCESS_DEV_USER_EMAIL } = readEnv()
-  if (CF_ACCESS_DEV_USER_EMAIL) {
-    return {
-      email: CF_ACCESS_DEV_USER_EMAIL,
-      sub: `dev:${CF_ACCESS_DEV_USER_EMAIL}`,
-      raw: { email: CF_ACCESS_DEV_USER_EMAIL, sub: `dev:${CF_ACCESS_DEV_USER_EMAIL}` },
+  // Dev-only escape hatch. `import.meta.env.DEV` is statically `false` in
+  // production builds, so Vite eliminates this entire block — including the
+  // env read — and the bypass cannot exist in the prod binary.
+  if (import.meta.env.DEV) {
+    const { CF_ACCESS_DEV_USER_EMAIL } = readEnv()
+    if (CF_ACCESS_DEV_USER_EMAIL) {
+      return {
+        email: CF_ACCESS_DEV_USER_EMAIL,
+        sub: `dev:${CF_ACCESS_DEV_USER_EMAIL}`,
+        raw: { email: CF_ACCESS_DEV_USER_EMAIL, sub: `dev:${CF_ACCESS_DEV_USER_EMAIL}` },
+      }
     }
   }
   const user = await verifyAccessJwt(request)
