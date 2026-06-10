@@ -108,15 +108,17 @@ function extractCookie(header: string | null, name: string): string | null {
  * returns null and this throws — there is no silent bypass.
  */
 export async function requireUser(request: Request): Promise<AccessUser> {
-  const { CF_ACCESS_DEV_USER_EMAIL } = readEnv()
-  // Dev-only: Vite replaces `import.meta.env.DEV` with `false` in production
-  // builds, so this branch is dead-code-eliminated and the bypass can never
-  // activate in prod even if the var is somehow present.
-  if (import.meta.env.DEV && CF_ACCESS_DEV_USER_EMAIL) {
-    return {
-      email: CF_ACCESS_DEV_USER_EMAIL,
-      sub: `dev:${CF_ACCESS_DEV_USER_EMAIL}`,
-      raw: { email: CF_ACCESS_DEV_USER_EMAIL, sub: `dev:${CF_ACCESS_DEV_USER_EMAIL}` },
+  // Dev-only escape hatch. `import.meta.env.DEV` is statically `false` in
+  // production builds, so Vite eliminates this entire block — including the
+  // env read — and the bypass cannot exist in the prod binary.
+  if (import.meta.env.DEV) {
+    const { CF_ACCESS_DEV_USER_EMAIL } = readEnv()
+    if (CF_ACCESS_DEV_USER_EMAIL) {
+      return {
+        email: CF_ACCESS_DEV_USER_EMAIL,
+        sub: `dev:${CF_ACCESS_DEV_USER_EMAIL}`,
+        raw: { email: CF_ACCESS_DEV_USER_EMAIL, sub: `dev:${CF_ACCESS_DEV_USER_EMAIL}` },
+      }
     }
   }
   const user = await verifyAccessJwt(request)
