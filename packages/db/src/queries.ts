@@ -271,6 +271,9 @@ export function getBankImports(db: DB) {
 
 // --- Stats ---
 export function getMonthlySummary(db: DB, year: string) {
+  // Reconciliation entries are balance corrections, not real cash flow, so they
+  // are excluded from income/expense/balance. NOT EXISTS is null-safe — rows
+  // with a NULL category_id (uncategorized) are kept. See RECONCILIATION_CATEGORY.
   return db.run(sql`
     SELECT
       substr(date, 1, 7) as month,
@@ -279,6 +282,10 @@ export function getMonthlySummary(db: DB, year: string) {
       SUM(CASE WHEN type = 'income' THEN amount ELSE -amount END) as balance
     FROM transactions
     WHERE date LIKE ${year + '%'}
+      AND NOT EXISTS (
+        SELECT 1 FROM categories rc
+        WHERE rc.id = transactions.category_id AND rc.name = ${RECONCILIATION_CATEGORY}
+      )
     GROUP BY substr(date, 1, 7)
     ORDER BY month
   `)
@@ -294,6 +301,10 @@ export function getCategoryBreakdown(db: DB, month: string) {
     FROM transactions t
     LEFT JOIN categories c ON t.category_id = c.id
     WHERE t.date LIKE ${month + '%'} AND t.type = 'expense'
+      AND NOT EXISTS (
+        SELECT 1 FROM categories rc
+        WHERE rc.id = t.category_id AND rc.name = ${RECONCILIATION_CATEGORY}
+      )
     GROUP BY c.id
     ORDER BY total DESC
   `)
