@@ -31,4 +31,15 @@ describe('ValuationHistory', () => {
     render(<ValuationHistory valuations={[val('2026-07-01', 900), val('2026-06-01', 1000)]} />)
     expect(screen.getByText('−$1.00')).toBeInTheDocument() // U+2212
   })
+
+  it('renders the balance chart when there are at least two valuations', () => {
+    render(<ValuationHistory valuations={[val('2026-07-01', 900), val('2026-06-01', 1000)]} />)
+    expect(screen.getByTestId('valuation-chart')).toBeInTheDocument()
+  })
+
+  it('omits the chart (list only) with a single valuation', () => {
+    render(<ValuationHistory valuations={[val('2026-07-01', 900)]} />)
+    expect(screen.queryByTestId('valuation-chart')).toBeNull()
+    expect(screen.getByText('$9.00')).toBeInTheDocument()
+  })
 })
