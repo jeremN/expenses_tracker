@@ -504,6 +504,13 @@ export function deleteNetWorthSnapshot(db: DB, id: number) {
 // unique in `categories`, so we get-or-create it once and reuse it.
 export const RECONCILIATION_CATEGORY = 'Reconciliation'
 
+// Reconciling one of these types treats a balance discrepancy as real cash flow
+// (unrecorded income/spending) and books a balancing transaction. Every other
+// type is a revaluation (investments, property, vehicles) or a liability, where
+// a value change is NOT cash flow — those reconcile silently (value only). Only
+// asset-cash types are included so `delta > 0 → income` always holds.
+export const CASH_FLOW_ACCOUNT_TYPES = new Set<AccountType>(['cash', 'checking', 'savings'])
+
 async function getOrCreateReconciliationCategoryId(db: DB): Promise<number> {
   const existing = await db.select().from(schema.categories)
     .where(eq(schema.categories.name, RECONCILIATION_CATEGORY)).get()
@@ -520,11 +527,12 @@ async function getOrCreateReconciliationCategoryId(db: DB): Promise<number> {
 }
 
 /**
- * Set an account's observed balance on a date. Per the chosen policy, the
- * discrepancy (observed − previous) is booked as a cash-flow transaction
- * (income if up, expense if down) in the reserved Reconciliation category, so
- * it's visible in cash-flow yet excludable. Also records an account_valuations
- * row (upserted per day) and snaps current_value to the observed value.
+ * Set an account's observed balance on a date. For CASH_FLOW_ACCOUNT_TYPES only,
+ * the discrepancy (observed − previous) is booked as a balancing transaction
+ * (income if up, expense if down) in the reserved Reconciliation category. For
+ * every other type (investments/property/liabilities) a value change is a
+ * revaluation, not cash flow, so no transaction is written. Either way it records
+ * an account_valuations row (upserted per day) and snaps current_value.
  * Returns undefined if the account doesn't exist (so the route can 404).
  */
 export async function reconcileAccount(db: DB, accountId: number, data: {
@@ -537,7 +545,7 @@ export async function reconcileAccount(db: DB, accountId: number, data: {
   const delta = data.value - account.currentValue
 
   let transaction = null
-  if (delta !== 0) {
+  if (delta !== 0 && CASH_FLOW_ACCOUNT_TYPES.has(account.type)) {
     const categoryId = await getOrCreateReconciliationCategoryId(db)
     transaction = await db.insert(schema.transactions).values({
       type: delta > 0 ? 'income' : 'expense',

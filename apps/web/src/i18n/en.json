@@ -296,6 +296,7 @@
   "accounts.reconcile.title": "Reconcile balance",
   "accounts.reconcile.subtitle": "Enter the real current balance of \"{name}\". The difference is booked to the Reconciliation category.",
   "accounts.reconcile.hint": "The gap between this and the tracked value is recorded as income or expense so your cash flow stays honest.",
+  "accounts.reconcile.hintNoCashFlow": "This account's value is updated on its own — a revaluation like this isn't cash flow, so no income or expense entry is created.",
   "accounts.reconcile.confirm": "Reconcile",
   "accounts.kind.asset": "Asset",
   "accounts.kind.liability": "Liability",

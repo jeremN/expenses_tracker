@@ -15,6 +15,7 @@ import {
   deleteHolding,
   createTransfer,
   deleteTransfer,
+  CASH_FLOW_ACCOUNT_TYPES,
 } from '@tracker/db'
 import {
   createAccountSchema,
@@ -414,7 +415,11 @@ function AccountsPage() {
               value={reconcileValue}
               onChange={(e) => setReconcileValue(e.target.value)}
             />
-            <p className="text-xs text-muted-foreground">{t('accounts.reconcile.hint')}</p>
+            <p className="text-xs text-muted-foreground">
+              {reconcileTarget && CASH_FLOW_ACCOUNT_TYPES.has(reconcileTarget.type)
+                ? t('accounts.reconcile.hint')
+                : t('accounts.reconcile.hintNoCashFlow')}
+            </p>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => { setReconcileTarget(null); setReconcileValue('') }} disabled={isSubmitting}>
                 {t('common.cancel')}
