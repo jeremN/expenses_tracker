@@ -14,6 +14,7 @@ import type {
   updateHoldingSchema,
   createNetWorthSnapshotSchema,
   reconcileAccountSchema,
+  createTransferSchema,
 } from './validators'
 
 export type CreateTransaction = z.infer<typeof createTransactionSchema>
@@ -30,6 +31,7 @@ export type CreateHolding = z.infer<typeof createHoldingSchema>
 export type UpdateHolding = z.infer<typeof updateHoldingSchema>
 export type CreateNetWorthSnapshot = z.infer<typeof createNetWorthSnapshotSchema>
 export type ReconcileAccount = z.infer<typeof reconcileAccountSchema>
+export type CreateTransfer = z.infer<typeof createTransferSchema>
 
 export type TransactionType = 'income' | 'expense'
 export type Frequency = 'weekly' | 'monthly' | 'yearly'
@@ -161,4 +163,14 @@ export interface NetWorthSnapshot {
 export interface NetWorthSummary extends NetWorthTotals {
   netWorth: number
   accounts: Account[]
+}
+
+export interface AssetTransfer {
+  id: number
+  date: string
+  fromAccountId: number | null
+  toAccountId: number | null
+  amount: number
+  note: string | null
+  createdAt: string
 }

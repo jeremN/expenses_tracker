@@ -332,5 +332,22 @@
   "accounts.holdings.marketValue": "Valeur",
   "accounts.holdings.delete": "Supprimer la position",
   "error.form.nameRequired": "Le nom est requis",
-  "error.form.marketValueRequired": "La valeur est requise"
+  "error.form.marketValueRequired": "La valeur est requise",
+  "error.form.amountRequired": "Le montant est requis",
+  "error.form.transferNoLegs": "Choisissez au moins un compte",
+  "error.form.transferSameAccount": "Les comptes source et destination doivent être différents",
+  "transfers.title": "Virements",
+  "transfers.record": "Virement",
+  "transfers.recorded": "Virement enregistré",
+  "transfers.delete": "Supprimer le virement",
+  "transfers.external": "Externe",
+  "transfers.from": "Depuis",
+  "transfers.to": "Vers",
+  "transfers.amount": "Montant",
+  "transfers.date": "Date",
+  "transfers.note": "Note (optionnel)",
+  "transfers.notePlaceholder": "ex. Épargne mensuelle",
+  "transfers.hint": "Déplacer de l'argent entre vos comptes ne change pas votre patrimoine. Utilisez « Externe » d'un côté pour de l'argent qui entre ou sort de vos comptes suivis.",
+  "transfers.new.title": "Enregistrer un virement",
+  "transfers.new.subtitle": "Déplacez de la valeur entre deux comptes, ou depuis/vers un compte externe."
 }

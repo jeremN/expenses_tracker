@@ -352,11 +352,15 @@ export function updateAccount(db: DB, id: number, data: Partial<{
 
 export async function deleteAccount(db: DB, id: number) {
   // No DB-level cascade (FKs are ON DELETE no action) — remove children in the
-  // query layer, exactly like deleteCategory. NOTE: when asset_transfers get a
-  // write path, their from/to legs referencing this account must also be
-  // reconciled here (null the leg or delete the transfer).
+  // query layer, exactly like deleteCategory. Transfer rows are kept as history
+  // but the leg pointing at this account is nulled (it becomes an external leg),
+  // dropping the dangling reference without rewriting the other account.
   await db.delete(schema.holdings).where(eq(schema.holdings.accountId, id))
   await db.delete(schema.accountValuations).where(eq(schema.accountValuations.accountId, id))
+  await db.update(schema.assetTransfers).set({ fromAccountId: null })
+    .where(eq(schema.assetTransfers.fromAccountId, id))
+  await db.update(schema.assetTransfers).set({ toAccountId: null })
+    .where(eq(schema.assetTransfers.toAccountId, id))
   return db.delete(schema.accounts)
     .where(eq(schema.accounts.id, id))
     .returning()
@@ -547,4 +551,101 @@ export async function reconcileAccount(db: DB, accountId: number, data: {
     .returning().get()
 
   return { account: updated, valuation, transaction }
+}
+
+// --- Asset transfers ---
+// A transfer moves `amount` (cents, positive) between accounts, applying a
+// kind-signed delta to each present leg's current_value:
+//   from → asset −amount / liability +amount
+//   to   → asset +amount / liability −amount
+// With both legs present the change nets to zero (composition, not total). A
+// one-legged transfer (external in/out) intentionally moves net worth. Only
+// MANUAL-valued accounts may participate — a tracked account's value is derived
+// from holdings and would be overwritten by recalcAccountValue, so it's rejected.
+
+type AccountRow = typeof schema.accounts.$inferSelect
+type AssetTransferRow = typeof schema.assetTransfers.$inferSelect
+
+export type CreateTransferResult =
+  | { ok: true; transfer: AssetTransferRow; from?: AccountRow; to?: AccountRow }
+  | { ok: false; reason: 'no_legs' | 'not_found' | 'tracked_leg'; accountId?: number }
+
+/** Signed delta applied to a leg's current_value. Positive = value grows. */
+function transferLegDelta(kind: AccountKind, leg: 'from' | 'to', amount: number): number {
+  const dir = leg === 'from' ? -1 : 1 // asset frame: source removes, destination adds
+  return kind === 'asset' ? dir * amount : -dir * amount
+}
+
+export async function createTransfer(db: DB, data: {
+  amount: number; date: string; fromAccountId?: number | null; toAccountId?: number | null; note?: string;
+}): Promise<CreateTransferResult> {
+  const fromId = data.fromAccountId ?? null
+  const toId = data.toAccountId ?? null
+  if (fromId == null && toId == null) return { ok: false, reason: 'no_legs' }
+
+  const legs: Array<{ id: number; leg: 'from' | 'to' }> = []
+  if (fromId != null) legs.push({ id: fromId, leg: 'from' })
+  if (toId != null) legs.push({ id: toId, leg: 'to' })
+
+  // Validate BEFORE writing anything, so a bad leg leaves no partial state.
+  const loaded: Partial<Record<'from' | 'to', AccountRow>> = {}
+  for (const { id, leg } of legs) {
+    const acc = await db.select().from(schema.accounts).where(eq(schema.accounts.id, id)).get()
+    if (!acc) return { ok: false, reason: 'not_found', accountId: id }
+    if (acc.valuation !== 'manual') return { ok: false, reason: 'tracked_leg', accountId: id }
+    loaded[leg] = acc
+  }
+
+  const transfer = await db.insert(schema.assetTransfers).values({
+    date: data.date, amount: data.amount, note: data.note,
+    fromAccountId: fromId, toAccountId: toId,
+  }).returning().get()
+
+  const applied: { from?: AccountRow; to?: AccountRow } = {}
+  for (const { id, leg } of legs) {
+    const acc = loaded[leg]!
+    const delta = transferLegDelta(acc.kind, leg, data.amount)
+    applied[leg] = await db.update(schema.accounts)
+      .set({ currentValue: acc.currentValue + delta, updatedAt: sql`(current_timestamp)` })
+      .where(eq(schema.accounts.id, id))
+      .returning().get()
+  }
+
+  return { ok: true, transfer, from: applied.from, to: applied.to }
+}
+
+export function getTransfers(db: DB, limit?: number) {
+  const query = db.select().from(schema.assetTransfers)
+    .orderBy(desc(schema.assetTransfers.date), desc(schema.assetTransfers.id))
+  return limit ? query.limit(limit) : query
+}
+
+/**
+ * Delete a transfer and REVERSE its effect on each leg that still points to an
+ * existing manual account (a leg may have been nulled by deleteAccount, or the
+ * account since converted to tracked — skip those). Returns undefined for a
+ * missing transfer so the route can 404.
+ */
+export async function deleteTransfer(db: DB, id: number): Promise<AssetTransferRow | undefined> {
+  const transfer = await db.select().from(schema.assetTransfers)
+    .where(eq(schema.assetTransfers.id, id)).get()
+  if (!transfer) return undefined
+
+  const legs: Array<{ id: number | null; leg: 'from' | 'to' }> = [
+    { id: transfer.fromAccountId, leg: 'from' },
+    { id: transfer.toAccountId, leg: 'to' },
+  ]
+  for (const { id: accId, leg } of legs) {
+    if (accId == null) continue
+    const acc = await db.select().from(schema.accounts).where(eq(schema.accounts.id, accId)).get()
+    if (!acc || acc.valuation !== 'manual') continue
+    const delta = transferLegDelta(acc.kind, leg, transfer.amount)
+    await db.update(schema.accounts)
+      .set({ currentValue: acc.currentValue - delta, updatedAt: sql`(current_timestamp)` })
+      .where(eq(schema.accounts.id, accId)).run()
+  }
+
+  return db.delete(schema.assetTransfers)
+    .where(eq(schema.assetTransfers.id, id))
+    .returning().get()
 }

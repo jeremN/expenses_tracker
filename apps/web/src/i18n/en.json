@@ -332,5 +332,22 @@
   "accounts.holdings.marketValue": "Value",
   "accounts.holdings.delete": "Delete holding",
   "error.form.nameRequired": "Name is required",
-  "error.form.marketValueRequired": "Value is required"
+  "error.form.marketValueRequired": "Value is required",
+  "error.form.amountRequired": "Amount is required",
+  "error.form.transferNoLegs": "Pick at least one account",
+  "error.form.transferSameAccount": "From and to must be different accounts",
+  "transfers.title": "Transfers",
+  "transfers.record": "Transfer",
+  "transfers.recorded": "Transfer recorded",
+  "transfers.delete": "Delete transfer",
+  "transfers.external": "External",
+  "transfers.from": "From",
+  "transfers.to": "To",
+  "transfers.amount": "Amount",
+  "transfers.date": "Date",
+  "transfers.note": "Note (optional)",
+  "transfers.notePlaceholder": "e.g. Monthly savings",
+  "transfers.hint": "Moving money between your accounts leaves net worth unchanged. Use \"External\" on one side for money entering or leaving your tracked accounts.",
+  "transfers.new.title": "Record a transfer",
+  "transfers.new.subtitle": "Move value between two accounts, or to/from an external account."
 }
