@@ -3,7 +3,7 @@ import {
   LayoutDashboard,
   ArrowLeftRight,
   Target,
-  RefreshCw,
+  Wallet,
   BarChart3,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
@@ -13,7 +13,7 @@ const mobileNavItems = [
   { to: '/' as const, labelKey: 'nav.dashboard', icon: LayoutDashboard },
   { to: '/transactions' as const, labelKey: 'nav.transactions', icon: ArrowLeftRight },
   { to: '/budgets' as const, labelKey: 'nav.budgets', icon: Target },
-  { to: '/recurring' as const, labelKey: 'nav.recurring', icon: RefreshCw },
+  { to: '/net-worth' as const, labelKey: 'nav.netWorth', icon: Wallet },
   { to: '/stats' as const, labelKey: 'nav.stats', icon: BarChart3 },
 ]
 

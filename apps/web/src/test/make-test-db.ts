@@ -10,6 +10,11 @@ import {
   investmentSnapshots,
   budgets,
   bankImports,
+  accounts,
+  holdings,
+  netWorthSnapshots,
+  accountValuations,
+  assetTransfers,
 } from '@tracker/db'
 
 const schema = {
@@ -19,6 +24,11 @@ const schema = {
   investmentSnapshots,
   budgets,
   bankImports,
+  accounts,
+  holdings,
+  netWorthSnapshots,
+  accountValuations,
+  assetTransfers,
 }
 
 // packages/db/drizzle relative to this file (apps/web/src/test/).
