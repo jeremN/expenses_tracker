@@ -47,6 +47,10 @@ vi.mock('@tracker/db', () => ({
   deleteNetWorthSnapshot: vi.fn(),
   // reconciliation
   reconcileAccount: vi.fn(),
+  // asset transfers
+  getTransfers: vi.fn(),
+  createTransfer: vi.fn(),
+  deleteTransfer: vi.fn(),
   // others used transitively
   getInvestmentSnapshotById: vi.fn(),
   deleteInvestmentSnapshot: vi.fn(),
@@ -757,5 +761,104 @@ describe('POST /api/accounts/$id/reconcile', () => {
     expect(res.status).toBe(400)
     const body = await res.json() as { code: string }
     expect(body.code).toBe('INVALID_ID')
+  })
+})
+
+// --- /api/transfers ---
+
+describe('POST /api/transfers', () => {
+  it('returns 201 with the created transfer and defaults the date', async () => {
+    const { createTransfer } = await import('@tracker/db')
+    vi.mocked(createTransfer).mockResolvedValue({
+      ok: true,
+      transfer: { id: 7, date: '2026-07-07', fromAccountId: 1, toAccountId: 2, amount: 5000, note: null, createdAt: 'now' },
+    } as never)
+
+    const handler = await getHandler('./transfers', 'POST')
+    const res = await handler({ request: jsonRequest('http://x', 'POST', { fromAccountId: 1, toAccountId: 2, amount: 5000 }) })
+
+    expect(res.status).toBe(201)
+    const body = await res.json() as { id: number }
+    expect(body.id).toBe(7)
+    expect(vi.mocked(createTransfer)).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ fromAccountId: 1, toAccountId: 2, amount: 5000, date: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/) }),
+    )
+    expect(errSpy).not.toHaveBeenCalled()
+  })
+
+  it('returns 404 + NOT_FOUND when a leg account is missing', async () => {
+    const { createTransfer } = await import('@tracker/db')
+    vi.mocked(createTransfer).mockResolvedValue({ ok: false, reason: 'not_found', accountId: 9999 } as never)
+
+    const handler = await getHandler('./transfers', 'POST')
+    const res = await handler({ request: jsonRequest('http://x', 'POST', { fromAccountId: 1, toAccountId: 9999, amount: 5000 }) })
+
+    expect(res.status).toBe(404)
+    expect((await res.json() as { code: string }).code).toBe('NOT_FOUND')
+  })
+
+  it('returns 400 + VALIDATION when a leg is a tracked account', async () => {
+    const { createTransfer } = await import('@tracker/db')
+    vi.mocked(createTransfer).mockResolvedValue({ ok: false, reason: 'tracked_leg', accountId: 2 } as never)
+
+    const handler = await getHandler('./transfers', 'POST')
+    const res = await handler({ request: jsonRequest('http://x', 'POST', { fromAccountId: 1, toAccountId: 2, amount: 5000 }) })
+
+    expect(res.status).toBe(400)
+    expect((await res.json() as { code: string }).code).toBe('VALIDATION')
+  })
+
+  it('returns 400 + VALIDATION when no legs are supplied (schema refine)', async () => {
+    const handler = await getHandler('./transfers', 'POST')
+    const res = await handler({ request: jsonRequest('http://x', 'POST', { amount: 5000 }) })
+
+    expect(res.status).toBe(400)
+    expect((await res.json() as { code: string }).code).toBe('VALIDATION')
+  })
+})
+
+describe('GET /api/transfers', () => {
+  it('passes a numeric limit through to getTransfers', async () => {
+    const { getTransfers } = await import('@tracker/db')
+    vi.mocked(getTransfers).mockResolvedValue([] as never)
+
+    const handler = await getHandler('./transfers', 'GET')
+    const res = await handler({ request: jsonRequest('http://x/api/transfers?limit=5', 'GET') })
+
+    expect(res.status).toBe(200)
+    expect(vi.mocked(getTransfers)).toHaveBeenCalledWith(expect.anything(), 5)
+  })
+
+  it('returns 400 + BAD_QUERY for a non-positive limit', async () => {
+    const handler = await getHandler('./transfers', 'GET')
+    const res = await handler({ request: jsonRequest('http://x/api/transfers?limit=0', 'GET') })
+
+    expect(res.status).toBe(400)
+    expect((await res.json() as { code: string }).code).toBe('BAD_QUERY')
+  })
+})
+
+describe('DELETE /api/transfers/$id', () => {
+  it('returns 200 on success', async () => {
+    const { deleteTransfer } = await import('@tracker/db')
+    vi.mocked(deleteTransfer).mockResolvedValue({ id: 7 } as never)
+
+    const handler = await getHandler('./transfers.$id', 'DELETE')
+    const res = await handler({ params: { id: '7' } })
+
+    expect(res.status).toBe(200)
+    expect(errSpy).not.toHaveBeenCalled()
+  })
+
+  it('returns 404 + NOT_FOUND when the transfer is missing (assertFound)', async () => {
+    const { deleteTransfer } = await import('@tracker/db')
+    vi.mocked(deleteTransfer).mockResolvedValue(undefined as never)
+
+    const handler = await getHandler('./transfers.$id', 'DELETE')
+    const res = await handler({ params: { id: '999' } })
+
+    expect(res.status).toBe(404)
+    expect((await res.json() as { code: string }).code).toBe('NOT_FOUND')
   })
 })

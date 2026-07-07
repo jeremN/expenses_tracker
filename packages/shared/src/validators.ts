@@ -90,6 +90,24 @@ export const reconcileAccountSchema = z.object({
   note: z.string().optional(),
 })
 
+// A transfer moves value between accounts. Each leg is optional (one may be
+// external), but at least one is required and the two must differ.
+export const createTransferSchema = z.object({
+  amount: z.number().int().positive(), // cents moved, positive
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  fromAccountId: z.number().int().positive().nullable().optional(),
+  toAccountId: z.number().int().positive().nullable().optional(),
+  note: z.string().max(200).optional(),
+})
+  .refine((d) => d.fromAccountId != null || d.toAccountId != null, {
+    message: 'A transfer needs at least one account',
+    path: ['fromAccountId'],
+  })
+  .refine((d) => !(d.fromAccountId != null && d.fromAccountId === d.toAccountId), {
+    message: 'From and to must be different accounts',
+    path: ['toAccountId'],
+  })
+
 export const monthQuerySchema = z.object({
   month: z.string().regex(/^\d{4}-\d{2}$/).optional(),
 })

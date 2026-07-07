@@ -6,22 +6,28 @@ import { getDB } from '~/server/db'
 import {
   getAccounts,
   getHoldings,
+  getTransfers,
   createAccount,
   updateAccount,
   deleteAccount,
   reconcileAccount,
   createHolding,
   deleteHolding,
+  createTransfer,
+  deleteTransfer,
 } from '@tracker/db'
 import {
   createAccountSchema,
   updateAccountSchema,
   createHoldingSchema,
   reconcileAccountSchema,
+  createTransferSchema,
   assertFound,
+  AppError,
 } from '@tracker/shared'
-import type { Account, Holding, CreateAccount, CreateHolding } from '@tracker/shared'
-import { Plus, Pencil, Trash2, Scale } from 'lucide-react'
+import type { Account, Holding, AssetTransfer, CreateAccount, CreateHolding, CreateTransfer } from '@tracker/shared'
+import { Plus, Pencil, Trash2, Scale, ArrowLeftRight, ArrowRight } from 'lucide-react'
+import { TransferForm } from '~/components/accounts/transfer-form'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Card } from '~/components/ui/card'
@@ -55,7 +61,8 @@ const getServerAccounts = createServerFn({ method: 'GET' }).handler(
     const lists = await Promise.all(tracked.map((a) => getHoldings(db, a.id)))
     const holdings: Record<number, Holding[]> = {}
     tracked.forEach((a, i) => { holdings[a.id] = lists[i] })
-    return { accounts, holdings }
+    const transfers = await getTransfers(db, 25)
+    return { accounts, holdings, transfers }
   }),
 )
 
@@ -95,6 +102,31 @@ const createServerHolding = createServerFn({ method: 'POST' })
     return createHolding(getDB(), data)
   }))
 
+const createServerTransfer = createServerFn({ method: 'POST' })
+  .inputValidator(createTransferSchema)
+  .handler(withServerFn('server-fn:createServerTransfer', async ({ data }) => {
+    const result = await createTransfer(getDB(), {
+      amount: data.amount,
+      date: data.date ?? new Date().toISOString().slice(0, 10),
+      fromAccountId: data.fromAccountId,
+      toAccountId: data.toAccountId,
+      note: data.note,
+    })
+    if (!result.ok) {
+      if (result.reason === 'not_found') throw new AppError('NOT_FOUND', 'Account not found')
+      if (result.reason === 'tracked_leg') throw new AppError('VALIDATION', 'Transfers are only allowed on manually-valued accounts')
+      throw new AppError('VALIDATION', 'A transfer needs at least one account')
+    }
+    return result.transfer
+  }))
+
+const deleteServerTransfer = createServerFn({ method: 'POST' })
+  .inputValidator(z.object({ id: z.number() }))
+  .handler(withServerFn('server-fn:deleteServerTransfer', async ({ data }) => {
+    assertFound(await deleteTransfer(getDB(), data.id), 'Transfer not found')
+    return { success: true }
+  }))
+
 const deleteServerHolding = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerHolding', async ({ data }) => {
@@ -114,6 +146,7 @@ export const Route = createFileRoute('/accounts')({
 interface AccountsData {
   accounts: Account[]
   holdings: Record<number, Holding[]>
+  transfers: AssetTransfer[]
 }
 
 function AccountsSkeleton() {
@@ -140,7 +173,13 @@ function AccountsPage() {
   const [deleteTarget, setDeleteTarget] = useState<Account | null>(null)
   const [reconcileTarget, setReconcileTarget] = useState<Account | null>(null)
   const [reconcileValue, setReconcileValue] = useState('')
+  const [transferOpen, setTransferOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const accountName = (id: number | null) => {
+    if (id == null) return t('transfers.external')
+    return data.accounts.find((a) => a.id === id)?.name ?? t('transfers.external')
+  }
 
   async function run(fn: () => Promise<unknown>, successKey: string, onDone?: () => void) {
     setIsSubmitting(true)
@@ -187,6 +226,12 @@ function AccountsPage() {
   function handleDeleteHolding(id: number) {
     run(() => deleteServerHolding({ data: { id } }), 'toast.deleted')
   }
+  function handleCreateTransfer(values: CreateTransfer) {
+    run(() => createServerTransfer({ data: values }), 'transfers.recorded', () => setTransferOpen(false))
+  }
+  function handleDeleteTransfer(id: number) {
+    run(() => deleteServerTransfer({ data: { id } }), 'toast.deleted')
+  }
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -195,10 +240,16 @@ function AccountsPage() {
           <h1 className="text-2xl font-semibold tracking-tight">{t('accounts.title')}</h1>
           <p className="text-sm text-muted-foreground">{t('accounts.subtitle')}</p>
         </div>
-        <Button onClick={() => setFormOpen(true)}>
-          <Plus className="h-4 w-4" />
-          {t('accounts.add')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setTransferOpen(true)}>
+            <ArrowLeftRight className="h-4 w-4" />
+            {t('transfers.record')}
+          </Button>
+          <Button onClick={() => setFormOpen(true)}>
+            <Plus className="h-4 w-4" />
+            {t('accounts.add')}
+          </Button>
+        </div>
       </div>
 
       {data.accounts.length === 0 ? (
@@ -282,6 +333,48 @@ function AccountsPage() {
           ))}
         </ul>
       )}
+
+      {data.transfers.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="text-sm font-semibold text-muted-foreground">{t('transfers.title')}</h2>
+          <Card className="divide-y divide-border">
+            {data.transfers.map((tr) => (
+              <div key={tr.id} className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm">
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="truncate">{accountName(tr.fromAccountId)}</span>
+                  <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                  <span className="truncate">{accountName(tr.toAccountId)}</span>
+                  {tr.note && <span className="truncate text-muted-foreground">· {tr.note}</span>}
+                </div>
+                <div className="flex shrink-0 items-center gap-3">
+                  <span className="text-xs text-muted-foreground">{tr.date}</span>
+                  <span className="font-medium tabular-nums">{formatMoney(tr.amount)}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteTransfer(tr.id)}
+                    disabled={isSubmitting}
+                    aria-label={t('transfers.delete')}
+                    className="text-muted-foreground transition-colors hover:text-expense"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </Card>
+        </section>
+      )}
+
+      {/* Transfer dialog */}
+      <Dialog open={transferOpen} onOpenChange={(open) => { if (!open) setTransferOpen(false) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('transfers.new.title')}</DialogTitle>
+            <DialogDescription>{t('transfers.new.subtitle')}</DialogDescription>
+          </DialogHeader>
+          <TransferForm accounts={data.accounts} onSubmit={handleCreateTransfer} isSubmitting={isSubmitting} />
+        </DialogContent>
+      </Dialog>
 
       {/* Create dialog */}
       <Dialog open={formOpen} onOpenChange={(open) => { if (!open) setFormOpen(false) }}>

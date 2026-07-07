@@ -21,6 +21,7 @@ import { Route as BudgetsRouteImport } from './routes/budgets'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TransactionsNewRouteImport } from './routes/transactions_.new'
+import { Route as ApiTransfersRouteImport } from './routes/api/transfers'
 import { Route as ApiTransactionsRouteImport } from './routes/api/transactions'
 import { Route as ApiRecurringRouteImport } from './routes/api/recurring'
 import { Route as ApiNetWorthRouteImport } from './routes/api/net-worth'
@@ -32,6 +33,7 @@ import { Route as ApiCategoriesRouteImport } from './routes/api/categories'
 import { Route as ApiBudgetsRouteImport } from './routes/api/budgets'
 import { Route as ApiAccountsRouteImport } from './routes/api/accounts'
 import { Route as TransactionsIdEditRouteImport } from './routes/transactions_.$id.edit'
+import { Route as ApiTransfersIdRouteImport } from './routes/api/transfers.$id'
 import { Route as ApiTransactionsIdRouteImport } from './routes/api/transactions.$id'
 import { Route as ApiStatsMonthlySummaryRouteImport } from './routes/api/stats.monthly-summary'
 import { Route as ApiStatsCategoryBreakdownRouteImport } from './routes/api/stats.category-breakdown'
@@ -105,6 +107,11 @@ const TransactionsNewRoute = TransactionsNewRouteImport.update({
   path: '/transactions/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTransfersRoute = ApiTransfersRouteImport.update({
+  id: '/api/transfers',
+  path: '/api/transfers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiTransactionsRoute = ApiTransactionsRouteImport.update({
   id: '/api/transactions',
   path: '/api/transactions',
@@ -159,6 +166,11 @@ const TransactionsIdEditRoute = TransactionsIdEditRouteImport.update({
   id: '/transactions_/$id/edit',
   path: '/transactions/$id/edit',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTransfersIdRoute = ApiTransfersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiTransfersRoute,
 } as any)
 const ApiTransactionsIdRoute = ApiTransactionsIdRouteImport.update({
   id: '/$id',
@@ -244,6 +256,7 @@ export interface FileRoutesByFullPath {
   '/api/net-worth': typeof ApiNetWorthRouteWithChildren
   '/api/recurring': typeof ApiRecurringRouteWithChildren
   '/api/transactions': typeof ApiTransactionsRouteWithChildren
+  '/api/transfers': typeof ApiTransfersRouteWithChildren
   '/transactions/new': typeof TransactionsNewRoute
   '/api/accounts/$id': typeof ApiAccountsIdRouteWithChildren
   '/api/budgets/$categoryId': typeof ApiBudgetsCategoryIdRoute
@@ -255,6 +268,7 @@ export interface FileRoutesByFullPath {
   '/api/stats/category-breakdown': typeof ApiStatsCategoryBreakdownRoute
   '/api/stats/monthly-summary': typeof ApiStatsMonthlySummaryRoute
   '/api/transactions/$id': typeof ApiTransactionsIdRoute
+  '/api/transfers/$id': typeof ApiTransfersIdRoute
   '/transactions/$id/edit': typeof TransactionsIdEditRoute
   '/api/accounts/$id/reconcile': typeof ApiAccountsIdReconcileRoute
   '/api/net-worth/snapshots/$id': typeof ApiNetWorthSnapshotsIdRoute
@@ -281,6 +295,7 @@ export interface FileRoutesByTo {
   '/api/net-worth': typeof ApiNetWorthRouteWithChildren
   '/api/recurring': typeof ApiRecurringRouteWithChildren
   '/api/transactions': typeof ApiTransactionsRouteWithChildren
+  '/api/transfers': typeof ApiTransfersRouteWithChildren
   '/transactions/new': typeof TransactionsNewRoute
   '/api/accounts/$id': typeof ApiAccountsIdRouteWithChildren
   '/api/budgets/$categoryId': typeof ApiBudgetsCategoryIdRoute
@@ -292,6 +307,7 @@ export interface FileRoutesByTo {
   '/api/stats/category-breakdown': typeof ApiStatsCategoryBreakdownRoute
   '/api/stats/monthly-summary': typeof ApiStatsMonthlySummaryRoute
   '/api/transactions/$id': typeof ApiTransactionsIdRoute
+  '/api/transfers/$id': typeof ApiTransfersIdRoute
   '/transactions/$id/edit': typeof TransactionsIdEditRoute
   '/api/accounts/$id/reconcile': typeof ApiAccountsIdReconcileRoute
   '/api/net-worth/snapshots/$id': typeof ApiNetWorthSnapshotsIdRoute
@@ -319,6 +335,7 @@ export interface FileRoutesById {
   '/api/net-worth': typeof ApiNetWorthRouteWithChildren
   '/api/recurring': typeof ApiRecurringRouteWithChildren
   '/api/transactions': typeof ApiTransactionsRouteWithChildren
+  '/api/transfers': typeof ApiTransfersRouteWithChildren
   '/transactions_/new': typeof TransactionsNewRoute
   '/api/accounts/$id': typeof ApiAccountsIdRouteWithChildren
   '/api/budgets/$categoryId': typeof ApiBudgetsCategoryIdRoute
@@ -330,6 +347,7 @@ export interface FileRoutesById {
   '/api/stats/category-breakdown': typeof ApiStatsCategoryBreakdownRoute
   '/api/stats/monthly-summary': typeof ApiStatsMonthlySummaryRoute
   '/api/transactions/$id': typeof ApiTransactionsIdRoute
+  '/api/transfers/$id': typeof ApiTransfersIdRoute
   '/transactions_/$id/edit': typeof TransactionsIdEditRoute
   '/api/accounts/$id/reconcile': typeof ApiAccountsIdReconcileRoute
   '/api/net-worth/snapshots/$id': typeof ApiNetWorthSnapshotsIdRoute
@@ -358,6 +376,7 @@ export interface FileRouteTypes {
     | '/api/net-worth'
     | '/api/recurring'
     | '/api/transactions'
+    | '/api/transfers'
     | '/transactions/new'
     | '/api/accounts/$id'
     | '/api/budgets/$categoryId'
@@ -369,6 +388,7 @@ export interface FileRouteTypes {
     | '/api/stats/category-breakdown'
     | '/api/stats/monthly-summary'
     | '/api/transactions/$id'
+    | '/api/transfers/$id'
     | '/transactions/$id/edit'
     | '/api/accounts/$id/reconcile'
     | '/api/net-worth/snapshots/$id'
@@ -395,6 +415,7 @@ export interface FileRouteTypes {
     | '/api/net-worth'
     | '/api/recurring'
     | '/api/transactions'
+    | '/api/transfers'
     | '/transactions/new'
     | '/api/accounts/$id'
     | '/api/budgets/$categoryId'
@@ -406,6 +427,7 @@ export interface FileRouteTypes {
     | '/api/stats/category-breakdown'
     | '/api/stats/monthly-summary'
     | '/api/transactions/$id'
+    | '/api/transfers/$id'
     | '/transactions/$id/edit'
     | '/api/accounts/$id/reconcile'
     | '/api/net-worth/snapshots/$id'
@@ -432,6 +454,7 @@ export interface FileRouteTypes {
     | '/api/net-worth'
     | '/api/recurring'
     | '/api/transactions'
+    | '/api/transfers'
     | '/transactions_/new'
     | '/api/accounts/$id'
     | '/api/budgets/$categoryId'
@@ -443,6 +466,7 @@ export interface FileRouteTypes {
     | '/api/stats/category-breakdown'
     | '/api/stats/monthly-summary'
     | '/api/transactions/$id'
+    | '/api/transfers/$id'
     | '/transactions_/$id/edit'
     | '/api/accounts/$id/reconcile'
     | '/api/net-worth/snapshots/$id'
@@ -470,6 +494,7 @@ export interface RootRouteChildren {
   ApiNetWorthRoute: typeof ApiNetWorthRouteWithChildren
   ApiRecurringRoute: typeof ApiRecurringRouteWithChildren
   ApiTransactionsRoute: typeof ApiTransactionsRouteWithChildren
+  ApiTransfersRoute: typeof ApiTransfersRouteWithChildren
   TransactionsNewRoute: typeof TransactionsNewRoute
   ApiStatsCategoryBreakdownRoute: typeof ApiStatsCategoryBreakdownRoute
   ApiStatsMonthlySummaryRoute: typeof ApiStatsMonthlySummaryRoute
@@ -562,6 +587,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TransactionsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/transfers': {
+      id: '/api/transfers'
+      path: '/api/transfers'
+      fullPath: '/api/transfers'
+      preLoaderRoute: typeof ApiTransfersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/transactions': {
       id: '/api/transactions'
       path: '/api/transactions'
@@ -638,6 +670,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/transactions/$id/edit'
       preLoaderRoute: typeof TransactionsIdEditRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/transfers/$id': {
+      id: '/api/transfers/$id'
+      path: '/$id'
+      fullPath: '/api/transfers/$id'
+      preLoaderRoute: typeof ApiTransfersIdRouteImport
+      parentRoute: typeof ApiTransfersRoute
     }
     '/api/transactions/$id': {
       id: '/api/transactions/$id'
@@ -845,6 +884,18 @@ const ApiTransactionsRouteWithChildren = ApiTransactionsRoute._addFileChildren(
   ApiTransactionsRouteChildren,
 )
 
+interface ApiTransfersRouteChildren {
+  ApiTransfersIdRoute: typeof ApiTransfersIdRoute
+}
+
+const ApiTransfersRouteChildren: ApiTransfersRouteChildren = {
+  ApiTransfersIdRoute: ApiTransfersIdRoute,
+}
+
+const ApiTransfersRouteWithChildren = ApiTransfersRoute._addFileChildren(
+  ApiTransfersRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountsRoute: AccountsRoute,
@@ -867,6 +918,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiNetWorthRoute: ApiNetWorthRouteWithChildren,
   ApiRecurringRoute: ApiRecurringRouteWithChildren,
   ApiTransactionsRoute: ApiTransactionsRouteWithChildren,
+  ApiTransfersRoute: ApiTransfersRouteWithChildren,
   TransactionsNewRoute: TransactionsNewRoute,
   ApiStatsCategoryBreakdownRoute: ApiStatsCategoryBreakdownRoute,
   ApiStatsMonthlySummaryRoute: ApiStatsMonthlySummaryRoute,
