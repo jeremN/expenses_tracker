@@ -8,6 +8,12 @@ import type {
   updateRecurringRuleSchema,
   createInvestmentSnapshotSchema,
   upsertBudgetSchema,
+  createAccountSchema,
+  updateAccountSchema,
+  createHoldingSchema,
+  updateHoldingSchema,
+  createNetWorthSnapshotSchema,
+  reconcileAccountSchema,
 } from './validators'
 
 export type CreateTransaction = z.infer<typeof createTransactionSchema>
@@ -18,6 +24,12 @@ export type CreateRecurringRule = z.infer<typeof createRecurringRuleSchema>
 export type UpdateRecurringRule = z.infer<typeof updateRecurringRuleSchema>
 export type CreateInvestmentSnapshot = z.infer<typeof createInvestmentSnapshotSchema>
 export type UpsertBudget = z.infer<typeof upsertBudgetSchema>
+export type CreateAccount = z.infer<typeof createAccountSchema>
+export type UpdateAccount = z.infer<typeof updateAccountSchema>
+export type CreateHolding = z.infer<typeof createHoldingSchema>
+export type UpdateHolding = z.infer<typeof updateHoldingSchema>
+export type CreateNetWorthSnapshot = z.infer<typeof createNetWorthSnapshotSchema>
+export type ReconcileAccount = z.infer<typeof reconcileAccountSchema>
 
 export type TransactionType = 'income' | 'expense'
 export type Frequency = 'weekly' | 'monthly' | 'yearly'
@@ -96,4 +108,57 @@ export interface BudgetOverviewItem {
   categoryColor: string | null
   budget: number | null
   spent: number
+}
+
+export type AccountKind = 'asset' | 'liability'
+export type AccountType =
+  | 'cash' | 'checking' | 'savings' | 'brokerage' | 'retirement'
+  | 'real_estate' | 'crypto' | 'vehicle' | 'loan' | 'credit_card' | 'other'
+export type AccountValuation = 'manual' | 'tracked'
+
+export interface Account {
+  id: number
+  name: string
+  kind: AccountKind
+  type: AccountType
+  valuation: AccountValuation
+  currentValue: number
+  institution: string | null
+  color: string | null
+  icon: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface NetWorthTotals {
+  totalAssets: number
+  totalLiabilities: number
+}
+
+export interface Holding {
+  id: number
+  accountId: number
+  symbol: string | null
+  name: string
+  quantity: number | null
+  costBasis: number | null
+  marketValue: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface NetWorthSnapshot {
+  id: number
+  date: string
+  totalAssets: number
+  totalLiabilities: number
+  netWorth: number
+  note: string | null
+  createdAt: string
+}
+
+export interface NetWorthSummary extends NetWorthTotals {
+  netWorth: number
+  accounts: Account[]
 }

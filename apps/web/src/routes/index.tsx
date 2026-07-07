@@ -2,13 +2,15 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { Plus, Upload } from 'lucide-react'
 import { getDB } from '~/server/db'
-import { getMonthlySummary, getTransactions, getCategories, getBudgetOverview } from '@tracker/db'
+import { getMonthlySummary, getTransactions, getCategories, getBudgetOverview, getNetWorthTotals, getAccounts, getNetWorthSnapshots } from '@tracker/db'
 import { generateMissingTransactions } from '~/server/recurring'
 import type { MonthlySummary, Transaction, Category, BudgetOverviewItem } from '@tracker/shared'
 import { SummaryCards } from '~/components/dashboard/summary-cards'
 import { MonthlyChart } from '~/components/dashboard/monthly-chart'
 import { RecentTransactions } from '~/components/dashboard/recent-transactions'
 import { BudgetSummary } from '~/components/dashboard/budget-summary'
+import { NetWorthSummary } from '~/components/dashboard/net-worth-summary'
+import { latestNetWorthDelta } from '~/lib/net-worth.helpers'
 import { Card } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
@@ -41,11 +43,14 @@ const getDashboardData = createServerFn({ method: 'GET' }).handler(withServerFn(
   const previousMonth = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`
 
   // Fetch data in parallel
-  const [summaryResult, transactionRows, categories, budgetOverview] = await Promise.all([
+  const [summaryResult, transactionRows, categories, budgetOverview, nwTotals, accounts, nwSnapshots] = await Promise.all([
     getMonthlySummary(db, currentYear),
     getTransactions(db),
     getCategories(db),
     getBudgetOverview(db, currentMonth),
+    getNetWorthTotals(db),
+    getAccounts(db),
+    getNetWorthSnapshots(db),
   ])
 
   const budgetItems: BudgetOverviewItem[] = (
@@ -97,6 +102,13 @@ const getDashboardData = createServerFn({ method: 'GET' }).handler(withServerFn(
     recentTransactions: transactions.slice(0, 10),
     categories,
     budgetItems,
+    netWorth: {
+      has: accounts.some((a) => a.isActive),
+      netWorth: nwTotals.totalAssets - nwTotals.totalLiabilities,
+      totalAssets: nwTotals.totalAssets,
+      totalLiabilities: nwTotals.totalLiabilities,
+      delta: latestNetWorthDelta(nwSnapshots),
+    },
   }
 }))
 
@@ -138,6 +150,13 @@ interface DashboardData {
   recentTransactions: Transaction[]
   categories: Category[]
   budgetItems: BudgetOverviewItem[]
+  netWorth: {
+    has: boolean
+    netWorth: number
+    totalAssets: number
+    totalLiabilities: number
+    delta: number | null
+  }
 }
 
 function DashboardPage() {
@@ -161,6 +180,15 @@ function DashboardPage() {
         currentMonth={data.currentMonth}
         previousMonth={data.previousMonth}
       />
+
+      {data.netWorth.has && (
+        <NetWorthSummary
+          netWorth={data.netWorth.netWorth}
+          totalAssets={data.netWorth.totalAssets}
+          totalLiabilities={data.netWorth.totalLiabilities}
+          delta={data.netWorth.delta}
+        />
+      )}
 
       {data.recentTransactions.length === 0 ? (
         /* First-run: teach the next action instead of three empty panels. */

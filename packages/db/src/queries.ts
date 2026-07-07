@@ -317,3 +317,234 @@ export function getLastGeneratedTransaction(db: DB, recurringId: number) {
     .limit(1)
     .get()
 }
+
+// --- Accounts / Net worth ---
+type AccountKind = 'asset' | 'liability'
+type AccountType =
+  | 'cash' | 'checking' | 'savings' | 'brokerage' | 'retirement'
+  | 'real_estate' | 'crypto' | 'vehicle' | 'loan' | 'credit_card' | 'other'
+type Valuation = 'manual' | 'tracked'
+
+export function getAccounts(db: DB) {
+  return db.select().from(schema.accounts).orderBy(schema.accounts.name)
+}
+
+export function getAccountById(db: DB, id: number) {
+  return db.select().from(schema.accounts).where(eq(schema.accounts.id, id)).get()
+}
+
+export function createAccount(db: DB, data: {
+  name: string; kind: AccountKind; type: AccountType; currentValue: number;
+  valuation?: Valuation; institution?: string; color?: string; icon?: string; isActive?: boolean;
+}) {
+  return db.insert(schema.accounts).values(data).returning().get()
+}
+
+export function updateAccount(db: DB, id: number, data: Partial<{
+  name: string; kind: AccountKind; type: AccountType; valuation: Valuation;
+  currentValue: number; institution: string; color: string; icon: string; isActive: boolean;
+}>) {
+  return db.update(schema.accounts)
+    .set({ ...data, updatedAt: sql`(current_timestamp)` })
+    .where(eq(schema.accounts.id, id))
+    .returning().get()
+}
+
+export async function deleteAccount(db: DB, id: number) {
+  // No DB-level cascade (FKs are ON DELETE no action) — remove children in the
+  // query layer, exactly like deleteCategory. NOTE: when asset_transfers get a
+  // write path, their from/to legs referencing this account must also be
+  // reconciled here (null the leg or delete the transfer).
+  await db.delete(schema.holdings).where(eq(schema.holdings.accountId, id))
+  await db.delete(schema.accountValuations).where(eq(schema.accountValuations.accountId, id))
+  return db.delete(schema.accounts)
+    .where(eq(schema.accounts.id, id))
+    .returning()
+    .get()
+}
+
+/**
+ * Current net worth split into asset and liability totals, summed from ACTIVE
+ * accounts only (retired accounts stay in history but drop out of "now").
+ * Values are positive magnitudes; the caller computes netWorth = assets −
+ * liabilities (which may be negative). `.get()` over an aggregate always yields
+ * one COALESCE'd row, so the totals are guaranteed numbers.
+ */
+export async function getNetWorthTotals(db: DB) {
+  const row = await db.select({
+    totalAssets: sql<number>`COALESCE(SUM(CASE WHEN ${schema.accounts.kind} = 'asset' THEN ${schema.accounts.currentValue} ELSE 0 END), 0)`,
+    totalLiabilities: sql<number>`COALESCE(SUM(CASE WHEN ${schema.accounts.kind} = 'liability' THEN ${schema.accounts.currentValue} ELSE 0 END), 0)`,
+  })
+    .from(schema.accounts)
+    .where(eq(schema.accounts.isActive, true))
+    .get()
+  return { totalAssets: row?.totalAssets ?? 0, totalLiabilities: row?.totalLiabilities ?? 0 }
+}
+
+// --- Holdings (positions inside a `tracked` account) ---
+export function getHoldings(db: DB, accountId: number) {
+  return db.select().from(schema.holdings)
+    .where(eq(schema.holdings.accountId, accountId))
+    .orderBy(schema.holdings.name)
+}
+
+export function getHoldingById(db: DB, id: number) {
+  return db.select().from(schema.holdings).where(eq(schema.holdings.id, id)).get()
+}
+
+/**
+ * Recompute a `tracked` account's cached current_value from SUM(holdings).
+ * No-op for `manual` accounts — their current_value is the user's typed figure
+ * and must never be clobbered by a stray holding. Called after every holding
+ * mutation (the single seam that keeps the cache honest, cf. getBudgetOverview
+ * pre-aggregation).
+ */
+export async function recalcAccountValue(db: DB, accountId: number) {
+  const account = await db.select().from(schema.accounts)
+    .where(eq(schema.accounts.id, accountId)).get()
+  if (!account || account.valuation !== 'tracked') return account
+  const row = await db.select({
+    total: sql<number>`COALESCE(SUM(${schema.holdings.marketValue}), 0)`,
+  }).from(schema.holdings).where(eq(schema.holdings.accountId, accountId)).get()
+  return db.update(schema.accounts)
+    .set({ currentValue: row?.total ?? 0, updatedAt: sql`(current_timestamp)` })
+    .where(eq(schema.accounts.id, accountId))
+    .returning().get()
+}
+
+export async function createHolding(db: DB, data: {
+  accountId: number; name: string; symbol?: string;
+  quantity?: number; costBasis?: number; marketValue: number;
+}) {
+  const holding = await db.insert(schema.holdings).values(data).returning().get()
+  await recalcAccountValue(db, data.accountId)
+  return holding
+}
+
+export async function updateHolding(db: DB, id: number, data: Partial<{
+  name: string; symbol: string; quantity: number; costBasis: number; marketValue: number;
+}>) {
+  const holding = await db.update(schema.holdings)
+    .set({ ...data, updatedAt: sql`(current_timestamp)` })
+    .where(eq(schema.holdings.id, id))
+    .returning().get()
+  if (holding) await recalcAccountValue(db, holding.accountId)
+  return holding
+}
+
+export async function deleteHolding(db: DB, id: number) {
+  const holding = await db.delete(schema.holdings)
+    .where(eq(schema.holdings.id, id))
+    .returning().get()
+  if (holding) await recalcAccountValue(db, holding.accountId)
+  return holding
+}
+
+// --- Net-worth snapshots ---
+export function upsertNetWorthSnapshot(db: DB, data: {
+  date: string; totalAssets: number; totalLiabilities: number; netWorth: number; note?: string;
+}) {
+  return db.insert(schema.netWorthSnapshots)
+    .values(data)
+    .onConflictDoUpdate({
+      target: schema.netWorthSnapshots.date,
+      set: {
+        totalAssets: data.totalAssets,
+        totalLiabilities: data.totalLiabilities,
+        netWorth: data.netWorth,
+        note: data.note,
+      },
+    })
+    .returning()
+    .get()
+}
+
+export function getNetWorthSnapshots(db: DB, range?: { from?: string; to?: string }) {
+  // from/to are YYYY-MM; widen to the month edges (cf. getInvestmentSnapshots).
+  const conditions = []
+  if (range?.from) {
+    conditions.push(sql`${schema.netWorthSnapshots.date} >= ${range.from + '-01'}`)
+  }
+  if (range?.to) {
+    conditions.push(sql`${schema.netWorthSnapshots.date} <= ${range.to + '-31'}`)
+  }
+  const query = db.select().from(schema.netWorthSnapshots)
+    .orderBy(desc(schema.netWorthSnapshots.date))
+  if (conditions.length > 0) {
+    return query.where(and(...conditions))
+  }
+  return query
+}
+
+export function deleteNetWorthSnapshot(db: DB, id: number) {
+  return db.delete(schema.netWorthSnapshots)
+    .where(eq(schema.netWorthSnapshots.id, id))
+    .returning()
+    .get()
+}
+
+// --- Reconciliation ---
+// Reconcile entries land in this reserved category so charts/savings-rate can
+// exclude them (the balance-correction-vs-return distinction). The name is
+// unique in `categories`, so we get-or-create it once and reuse it.
+export const RECONCILIATION_CATEGORY = 'Reconciliation'
+
+async function getOrCreateReconciliationCategoryId(db: DB): Promise<number> {
+  const existing = await db.select().from(schema.categories)
+    .where(eq(schema.categories.name, RECONCILIATION_CATEGORY)).get()
+  if (existing) return existing.id
+  // onConflictDoNothing guards the rare concurrent-create race; re-select if we lost it.
+  const created = await db.insert(schema.categories)
+    .values({ name: RECONCILIATION_CATEGORY })
+    .onConflictDoNothing()
+    .returning().get()
+  if (created) return created.id
+  const now = await db.select().from(schema.categories)
+    .where(eq(schema.categories.name, RECONCILIATION_CATEGORY)).get()
+  return now!.id
+}
+
+/**
+ * Set an account's observed balance on a date. Per the chosen policy, the
+ * discrepancy (observed − previous) is booked as a cash-flow transaction
+ * (income if up, expense if down) in the reserved Reconciliation category, so
+ * it's visible in cash-flow yet excludable. Also records an account_valuations
+ * row (upserted per day) and snaps current_value to the observed value.
+ * Returns undefined if the account doesn't exist (so the route can 404).
+ */
+export async function reconcileAccount(db: DB, accountId: number, data: {
+  value: number; date: string; note?: string;
+}) {
+  const account = await db.select().from(schema.accounts)
+    .where(eq(schema.accounts.id, accountId)).get()
+  if (!account) return undefined
+
+  const delta = data.value - account.currentValue
+
+  let transaction = null
+  if (delta !== 0) {
+    const categoryId = await getOrCreateReconciliationCategoryId(db)
+    transaction = await db.insert(schema.transactions).values({
+      type: delta > 0 ? 'income' : 'expense',
+      amount: Math.abs(delta),
+      description: data.note ?? `Reconciliation: ${account.name}`,
+      date: data.date,
+      categoryId,
+    }).returning().get()
+  }
+
+  const valuation = await db.insert(schema.accountValuations)
+    .values({ accountId, date: data.date, value: data.value })
+    .onConflictDoUpdate({
+      target: [schema.accountValuations.accountId, schema.accountValuations.date],
+      set: { value: data.value },
+    })
+    .returning().get()
+
+  const updated = await db.update(schema.accounts)
+    .set({ currentValue: data.value, updatedAt: sql`(current_timestamp)` })
+    .where(eq(schema.accounts.id, accountId))
+    .returning().get()
+
+  return { account: updated, valuation, transaction }
+}
