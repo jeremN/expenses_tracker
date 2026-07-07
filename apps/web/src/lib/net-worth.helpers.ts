@@ -1,4 +1,4 @@
-import type { Account, NetWorthSnapshot } from '@tracker/shared'
+import type { Account, NetWorthSnapshot, AccountValuationEntry } from '@tracker/shared'
 
 export interface AccountGroups {
   assets: Account[]
@@ -23,4 +23,20 @@ export function groupAccountsByKind(accounts: Account[]): AccountGroups {
 export function latestNetWorthDelta(snapshots: NetWorthSnapshot[]): number | null {
   if (snapshots.length < 2) return null
   return snapshots[0].netWorth - snapshots[1].netWorth
+}
+
+export interface ValuationWithChange extends AccountValuationEntry {
+  change: number | null
+}
+
+/**
+ * Annotate each valuation with its change from the chronologically previous
+ * (older) one. Rows arrive newest-first, so row i is compared to row i+1; the
+ * oldest row has no predecessor and gets null.
+ */
+export function withValuationDeltas(valuations: AccountValuationEntry[]): ValuationWithChange[] {
+  return valuations.map((v, i) => ({
+    ...v,
+    change: i < valuations.length - 1 ? v.value - valuations[i + 1].value : null,
+  }))
 }

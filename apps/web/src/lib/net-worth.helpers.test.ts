@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { groupAccountsByKind, latestNetWorthDelta } from './net-worth.helpers'
-import type { Account, NetWorthSnapshot } from '@tracker/shared'
+import { groupAccountsByKind, latestNetWorthDelta, withValuationDeltas } from './net-worth.helpers'
+import type { Account, NetWorthSnapshot, AccountValuationEntry } from '@tracker/shared'
 
 const account = (over: Partial<Account>): Account => ({
   id: 1, name: 'A', kind: 'asset', type: 'cash', valuation: 'manual',
@@ -45,5 +45,34 @@ describe('latestNetWorthDelta', () => {
   it('returns null with fewer than two snapshots', () => {
     expect(latestNetWorthDelta([snap('2026-07-01', 1)])).toBeNull()
     expect(latestNetWorthDelta([])).toBeNull()
+  })
+})
+
+describe('withValuationDeltas', () => {
+  const val = (date: string, value: number): AccountValuationEntry => ({
+    id: date.length, accountId: 1, date, value, createdAt: 'now',
+  })
+
+  it('annotates each row with its change from the chronologically previous (older) one', () => {
+    // newest-first, as the query returns them
+    const rows = withValuationDeltas([
+      val('2026-07-01', 31000000),
+      val('2026-06-01', 30800000),
+      val('2026-05-01', 30500000),
+    ])
+    expect(rows.map((r) => r.change)).toEqual([200000, 300000, null])
+  })
+
+  it('reports negative changes when the value fell', () => {
+    const rows = withValuationDeltas([val('2026-07-01', 900), val('2026-06-01', 1000)])
+    expect(rows[0].change).toBe(-100)
+  })
+
+  it('gives the only row a null change', () => {
+    expect(withValuationDeltas([val('2026-07-01', 500)])[0].change).toBeNull()
+  })
+
+  it('returns an empty array unchanged', () => {
+    expect(withValuationDeltas([])).toEqual([])
   })
 })
