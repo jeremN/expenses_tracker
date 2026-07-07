@@ -157,13 +157,24 @@ describe('reconcileAccount books credit-card discrepancies with a liability-awar
     expect(result?.transaction?.categoryId).toBe(cat!.id)
   })
 
-  it('does NOT book a transaction for other liabilities (e.g. a loan) — scoped to credit cards', async () => {
+  it('reconciling a loan (or any non-card liability) is SILENT: value + valuation update, but NO cash-flow entry', async () => {
     const db = await makeTestDb()
+    // Deliberate: a loan paydown is a transfer of cash (your cash drops, the debt
+    // drops — net-worth-neutral), not income. Booking it would double-count the
+    // money as arriving, so loans reconcile silently. This locks that decision:
+    // if someone later adds 'loan' to CASH_FLOW_ACCOUNT_TYPES, this test fails.
     const loan = await createAccount(db, { name: 'Car loan', kind: 'liability', type: 'loan', currentValue: 1000000 })
+
     const result = await reconcileAccount(db, loan.id, { value: 900000, date: '2026-07-07' })
+
+    // No cash-flow entry — and the reserved Reconciliation category is never even created.
     expect(result?.transaction).toBeNull()
     expect(await db.select().from(transactions)).toHaveLength(0)
-    // value still snapped
+    expect(await reconciliationCategory(db)).toBeFalsy()
+    // ...but it IS a revaluation: the value snaps and a valuation row is recorded.
     expect((await getAccountById(db, loan.id))?.currentValue).toBe(900000)
+    const vals = await db.select().from(accountValuations).where(eq(accountValuations.accountId, loan.id))
+    expect(vals).toHaveLength(1)
+    expect(vals[0].value).toBe(900000)
   })
 })
