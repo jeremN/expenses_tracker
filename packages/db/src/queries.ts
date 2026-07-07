@@ -506,10 +506,12 @@ export const RECONCILIATION_CATEGORY = 'Reconciliation'
 
 // Reconciling one of these types treats a balance discrepancy as real cash flow
 // (unrecorded income/spending) and books a balancing transaction. Every other
-// type is a revaluation (investments, property, vehicles) or a liability, where
-// a value change is NOT cash flow — those reconcile silently (value only). Only
-// asset-cash types are included so `delta > 0 → income` always holds.
-export const CASH_FLOW_ACCOUNT_TYPES = new Set<AccountType>(['cash', 'checking', 'savings'])
+// type is a revaluation (investments, property, vehicles) or a non-spending
+// liability (loans), where a value change is NOT cash flow — those reconcile
+// silently (value only). Credit cards are included because a balance change IS
+// spending/paydown; the sign is derived per-kind in reconcileAccount (a liability
+// owing MORE is an expense, the inverse of an asset gaining value).
+export const CASH_FLOW_ACCOUNT_TYPES = new Set<AccountType>(['cash', 'checking', 'savings', 'credit_card'])
 
 async function getOrCreateReconciliationCategoryId(db: DB): Promise<number> {
   const existing = await db.select().from(schema.categories)
@@ -528,9 +530,10 @@ async function getOrCreateReconciliationCategoryId(db: DB): Promise<number> {
 
 /**
  * Set an account's observed balance on a date. For CASH_FLOW_ACCOUNT_TYPES only,
- * the discrepancy (observed − previous) is booked as a balancing transaction
- * (income if up, expense if down) in the reserved Reconciliation category. For
- * every other type (investments/property/liabilities) a value change is a
+ * the discrepancy (observed − previous) is booked as a balancing transaction in
+ * the reserved Reconciliation category, signed per account kind (an asset gaining
+ * value is income; a credit card owing more is an expense). For every other type
+ * (investments/property, and non-card liabilities like loans) a value change is a
  * revaluation, not cash flow, so no transaction is written. Either way it records
  * an account_valuations row (upserted per day) and snaps current_value.
  * Returns undefined if the account doesn't exist (so the route can 404).
@@ -546,9 +549,12 @@ export async function reconcileAccount(db: DB, accountId: number, data: {
 
   let transaction = null
   if (delta !== 0 && CASH_FLOW_ACCOUNT_TYPES.has(account.type)) {
+    // Asset frame: more value = income. Liability frame is inverted: owing MORE
+    // (delta > 0) is spending (expense), owing LESS is a paydown booked as income.
+    const gainIsIncome = account.kind === 'asset' ? delta > 0 : delta < 0
     const categoryId = await getOrCreateReconciliationCategoryId(db)
     transaction = await db.insert(schema.transactions).values({
-      type: delta > 0 ? 'income' : 'expense',
+      type: gainIsIncome ? 'income' : 'expense',
       amount: Math.abs(delta),
       description: data.note ?? `Reconciliation: ${account.name}`,
       date: data.date,

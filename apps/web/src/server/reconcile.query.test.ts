@@ -124,3 +124,46 @@ describe('reconcileAccount scopes the cash-flow entry to cash-type accounts', ()
     expect(r2?.transaction).toMatchObject({ type: 'expense', amount: 2000 })
   })
 })
+
+describe('reconcileAccount books credit-card discrepancies with a liability-aware sign', () => {
+  async function card(db: Awaited<ReturnType<typeof makeTestDb>>, owed: number) {
+    return createAccount(db, { name: 'Visa', kind: 'liability', type: 'credit_card', currentValue: owed })
+  }
+
+  it('owing MORE (balance up) books an EXPENSE for the delta — you spent on the card', async () => {
+    const db = await makeTestDb()
+    const visa = await card(db, 20000) // owe 200.00
+
+    const result = await reconcileAccount(db, visa.id, { value: 35000, date: '2026-07-07' }) // owe 350.00
+
+    expect(result?.transaction).toMatchObject({ type: 'expense', amount: 15000 })
+    expect((await getAccountById(db, visa.id))?.currentValue).toBe(35000)
+  })
+
+  it('owing LESS (balance down) books an INCOME for the delta — the inverse of a cash account', async () => {
+    const db = await makeTestDb()
+    const visa = await card(db, 35000) // owe 350.00
+
+    const result = await reconcileAccount(db, visa.id, { value: 10000, date: '2026-07-07' }) // owe 100.00
+
+    expect(result?.transaction).toMatchObject({ type: 'income', amount: 25000 })
+  })
+
+  it('routes the card entry to the reserved Reconciliation category (excluded from stats)', async () => {
+    const db = await makeTestDb()
+    const visa = await card(db, 20000)
+    const result = await reconcileAccount(db, visa.id, { value: 25000, date: '2026-07-07' })
+    const cat = await reconciliationCategory(db)
+    expect(result?.transaction?.categoryId).toBe(cat!.id)
+  })
+
+  it('does NOT book a transaction for other liabilities (e.g. a loan) — scoped to credit cards', async () => {
+    const db = await makeTestDb()
+    const loan = await createAccount(db, { name: 'Car loan', kind: 'liability', type: 'loan', currentValue: 1000000 })
+    const result = await reconcileAccount(db, loan.id, { value: 900000, date: '2026-07-07' })
+    expect(result?.transaction).toBeNull()
+    expect(await db.select().from(transactions)).toHaveLength(0)
+    // value still snapped
+    expect((await getAccountById(db, loan.id))?.currentValue).toBe(900000)
+  })
+})
