@@ -296,6 +296,7 @@
   "accounts.reconcile.title": "Rapprocher le solde",
   "accounts.reconcile.subtitle": "Saisissez le solde réel actuel de « {name} ». L'écart est imputé à la catégorie Rapprochement.",
   "accounts.reconcile.hint": "L'écart avec la valeur suivie est enregistré en revenu ou en dépense pour garder votre trésorerie juste.",
+  "accounts.reconcile.hintNoCashFlow": "La valeur de ce compte est mise à jour seule — une réévaluation comme celle-ci n'est pas un flux de trésorerie, donc aucune entrée de revenu ou de dépense n'est créée.",
   "accounts.reconcile.confirm": "Rapprocher",
   "accounts.kind.asset": "Actif",
   "accounts.kind.liability": "Passif",

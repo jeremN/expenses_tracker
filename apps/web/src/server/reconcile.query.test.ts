@@ -86,3 +86,41 @@ describe('reconcileAccount (balancing cash-flow entry, reserved category)', () =
     expect(result).toBeUndefined()
   })
 })
+
+describe('reconcileAccount scopes the cash-flow entry to cash-type accounts', () => {
+  it('does NOT book a transaction when reconciling a non-cash account (revaluation)', async () => {
+    const db = await makeTestDb()
+    // A property revaluation is not cash flow: only the value moves.
+    const house = await createAccount(db, { name: 'House', kind: 'asset', type: 'real_estate', currentValue: 30000000 })
+
+    const result = await reconcileAccount(db, house.id, { value: 32000000, date: '2026-07-07' })
+
+    expect(result?.transaction).toBeNull() // no phantom income
+    expect(await db.select().from(transactions)).toHaveLength(0)
+    // value still snapped + valuation still recorded
+    expect((await getAccountById(db, house.id))?.currentValue).toBe(32000000)
+    const vals = await db.select().from(accountValuations).where(eq(accountValuations.accountId, house.id))
+    expect(vals).toHaveLength(1)
+    expect(vals[0].value).toBe(32000000)
+  })
+
+  it('does NOT book a transaction for a brokerage account either', async () => {
+    const db = await makeTestDb()
+    const brokerage = await createAccount(db, { name: 'Brokerage', kind: 'asset', type: 'brokerage', currentValue: 500000 })
+    const result = await reconcileAccount(db, brokerage.id, { value: 560000, date: '2026-07-07' })
+    expect(result?.transaction).toBeNull()
+    expect(await db.select().from(transactions)).toHaveLength(0)
+  })
+
+  it('STILL books a transaction for cash-type accounts (cash / checking / savings)', async () => {
+    const db = await makeTestDb()
+    const savings = await createAccount(db, { name: 'Savings', kind: 'asset', type: 'savings', currentValue: 100000 })
+    const cash = await createAccount(db, { name: 'Wallet', kind: 'asset', type: 'cash', currentValue: 5000 })
+
+    const r1 = await reconcileAccount(db, savings.id, { value: 105000, date: '2026-07-07' })
+    const r2 = await reconcileAccount(db, cash.id, { value: 3000, date: '2026-07-07' })
+
+    expect(r1?.transaction).toMatchObject({ type: 'income', amount: 5000 })
+    expect(r2?.transaction).toMatchObject({ type: 'expense', amount: 2000 })
+  })
+})
