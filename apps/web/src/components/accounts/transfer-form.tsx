@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form'
 import { useZodResolver } from '~/i18n/use-zod-resolver'
 import { z } from 'zod'
 import type { Account, CreateTransfer } from '@tracker/shared'
+import { ArrowLeftRight } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import {
@@ -65,6 +66,13 @@ export function TransferForm({ accounts, onSubmit, isSubmitting }: TransferFormP
   // optionally be booked as income/expense.
   const isExternal = (form.watch('fromAccountId') === EXTERNAL) !== (form.watch('toAccountId') === EXTERNAL)
 
+  function swapLegs() {
+    const from = form.getValues('fromAccountId')
+    const to = form.getValues('toAccountId')
+    form.setValue('fromAccountId', to)
+    form.setValue('toAccountId', from)
+  }
+
   function handleSubmit(values: FormValues) {
     const from = values.fromAccountId === EXTERNAL ? null : Number(values.fromAccountId)
     const to = values.toAccountId === EXTERNAL ? null : Number(values.toAccountId)
@@ -123,9 +131,20 @@ export function TransferForm({ accounts, onSubmit, isSubmitting }: TransferFormP
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          {legField('fromAccountId', t('transfers.from'))}
-          {legField('toAccountId', t('transfers.to'))}
+        <div className="flex items-end gap-2">
+          <div className="flex-1">{legField('fromAccountId', t('transfers.from'))}</div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={swapLegs}
+            aria-label={t('transfers.swap')}
+            title={t('transfers.swap')}
+            className="mb-0.5 shrink-0"
+          >
+            <ArrowLeftRight className="h-4 w-4" />
+          </Button>
+          <div className="flex-1">{legField('toAccountId', t('transfers.to'))}</div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TransfersRouteImport } from './routes/transfers'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as StatsRouteImport } from './routes/stats'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -47,6 +48,11 @@ import { Route as ApiAccountsIdRouteImport } from './routes/api/accounts.$id'
 import { Route as ApiNetWorthSnapshotsIdRouteImport } from './routes/api/net-worth.snapshots.$id'
 import { Route as ApiAccountsIdReconcileRouteImport } from './routes/api/accounts.$id.reconcile'
 
+const TransfersRoute = TransfersRouteImport.update({
+  id: '/transfers',
+  path: '/transfers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
   path: '/transactions',
@@ -246,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/stats': typeof StatsRoute
   '/transactions': typeof TransactionsRoute
+  '/transfers': typeof TransfersRoute
   '/api/accounts': typeof ApiAccountsRouteWithChildren
   '/api/budgets': typeof ApiBudgetsRouteWithChildren
   '/api/categories': typeof ApiCategoriesRouteWithChildren
@@ -285,6 +292,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/stats': typeof StatsRoute
   '/transactions': typeof TransactionsRoute
+  '/transfers': typeof TransfersRoute
   '/api/accounts': typeof ApiAccountsRouteWithChildren
   '/api/budgets': typeof ApiBudgetsRouteWithChildren
   '/api/categories': typeof ApiCategoriesRouteWithChildren
@@ -325,6 +333,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/stats': typeof StatsRoute
   '/transactions': typeof TransactionsRoute
+  '/transfers': typeof TransfersRoute
   '/api/accounts': typeof ApiAccountsRouteWithChildren
   '/api/budgets': typeof ApiBudgetsRouteWithChildren
   '/api/categories': typeof ApiCategoriesRouteWithChildren
@@ -366,6 +375,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/stats'
     | '/transactions'
+    | '/transfers'
     | '/api/accounts'
     | '/api/budgets'
     | '/api/categories'
@@ -405,6 +415,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/stats'
     | '/transactions'
+    | '/transfers'
     | '/api/accounts'
     | '/api/budgets'
     | '/api/categories'
@@ -444,6 +455,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/stats'
     | '/transactions'
+    | '/transfers'
     | '/api/accounts'
     | '/api/budgets'
     | '/api/categories'
@@ -484,6 +496,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   StatsRoute: typeof StatsRoute
   TransactionsRoute: typeof TransactionsRoute
+  TransfersRoute: typeof TransfersRoute
   ApiAccountsRoute: typeof ApiAccountsRouteWithChildren
   ApiBudgetsRoute: typeof ApiBudgetsRouteWithChildren
   ApiCategoriesRoute: typeof ApiCategoriesRouteWithChildren
@@ -503,6 +516,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/transfers': {
+      id: '/transfers'
+      path: '/transfers'
+      fullPath: '/transfers'
+      preLoaderRoute: typeof TransfersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/transactions': {
       id: '/transactions'
       path: '/transactions'
@@ -908,6 +928,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   StatsRoute: StatsRoute,
   TransactionsRoute: TransactionsRoute,
+  TransfersRoute: TransfersRoute,
   ApiAccountsRoute: ApiAccountsRouteWithChildren,
   ApiBudgetsRoute: ApiBudgetsRouteWithChildren,
   ApiCategoriesRoute: ApiCategoriesRouteWithChildren,

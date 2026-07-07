@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createFileRoute, useRouter, Link } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import { getDB } from '~/server/db'
@@ -13,8 +13,6 @@ import {
   reconcileAccount,
   createHolding,
   deleteHolding,
-  createTransfer,
-  deleteTransfer,
   CASH_FLOW_ACCOUNT_TYPES,
 } from '@tracker/db'
 import {
@@ -22,13 +20,13 @@ import {
   updateAccountSchema,
   createHoldingSchema,
   reconcileAccountSchema,
-  createTransferSchema,
   assertFound,
-  AppError,
 } from '@tracker/shared'
 import type { Account, Holding, AssetTransfer, CreateAccount, CreateHolding, CreateTransfer } from '@tracker/shared'
-import { Plus, Pencil, Trash2, Scale, ArrowLeftRight, ArrowRight } from 'lucide-react'
+import { Plus, Pencil, Trash2, Scale, ArrowLeftRight } from 'lucide-react'
 import { TransferForm } from '~/components/accounts/transfer-form'
+import { TransferList } from '~/components/accounts/transfer-list'
+import { createServerTransfer, deleteServerTransfer } from '~/server/transfer-fns'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Card } from '~/components/ui/card'
@@ -103,32 +101,6 @@ const createServerHolding = createServerFn({ method: 'POST' })
     return createHolding(getDB(), data)
   }))
 
-const createServerTransfer = createServerFn({ method: 'POST' })
-  .inputValidator(createTransferSchema)
-  .handler(withServerFn('server-fn:createServerTransfer', async ({ data }) => {
-    const result = await createTransfer(getDB(), {
-      amount: data.amount,
-      date: data.date ?? new Date().toISOString().slice(0, 10),
-      fromAccountId: data.fromAccountId,
-      toAccountId: data.toAccountId,
-      note: data.note,
-      countAsCashFlow: data.countAsCashFlow,
-    })
-    if (!result.ok) {
-      if (result.reason === 'not_found') throw new AppError('NOT_FOUND', 'Account not found')
-      if (result.reason === 'tracked_leg') throw new AppError('VALIDATION', 'Transfers are only allowed on manually-valued accounts')
-      throw new AppError('VALIDATION', 'A transfer needs at least one account')
-    }
-    return result.transfer
-  }))
-
-const deleteServerTransfer = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.number() }))
-  .handler(withServerFn('server-fn:deleteServerTransfer', async ({ data }) => {
-    assertFound(await deleteTransfer(getDB(), data.id), 'Transfer not found')
-    return { success: true }
-  }))
-
 const deleteServerHolding = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerHolding', async ({ data }) => {
@@ -177,11 +149,6 @@ function AccountsPage() {
   const [reconcileValue, setReconcileValue] = useState('')
   const [transferOpen, setTransferOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const accountName = (id: number | null) => {
-    if (id == null) return t('transfers.external')
-    return data.accounts.find((a) => a.id === id)?.name ?? t('transfers.external')
-  }
 
   async function run(fn: () => Promise<unknown>, successKey: string, onDone?: () => void) {
     setIsSubmitting(true)
@@ -338,37 +305,18 @@ function AccountsPage() {
 
       {data.transfers.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-sm font-semibold text-muted-foreground">{t('transfers.title')}</h2>
-          <Card className="divide-y divide-border">
-            {data.transfers.map((tr) => (
-              <div key={tr.id} className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm">
-                <div className="flex min-w-0 items-center gap-2">
-                  <span className="truncate">{accountName(tr.fromAccountId)}</span>
-                  <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                  <span className="truncate">{accountName(tr.toAccountId)}</span>
-                  {tr.note && <span className="truncate text-muted-foreground">· {tr.note}</span>}
-                  {tr.transactionId != null && (
-                    <span className="shrink-0 rounded bg-secondary px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-                      {t('transfers.cashFlowTag')}
-                    </span>
-                  )}
-                </div>
-                <div className="flex shrink-0 items-center gap-3">
-                  <span className="text-xs text-muted-foreground">{tr.date}</span>
-                  <span className="font-medium tabular-nums">{formatMoney(tr.amount)}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteTransfer(tr.id)}
-                    disabled={isSubmitting}
-                    aria-label={t('transfers.delete')}
-                    className="text-muted-foreground transition-colors hover:text-expense"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </Card>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-muted-foreground">{t('transfers.title')}</h2>
+            <Link to="/transfers" className="text-xs font-medium text-primary hover:underline">
+              {t('transfers.viewAll')}
+            </Link>
+          </div>
+          <TransferList
+            transfers={data.transfers}
+            accounts={data.accounts}
+            onDelete={handleDeleteTransfer}
+            isSubmitting={isSubmitting}
+          />
         </section>
       )}
 

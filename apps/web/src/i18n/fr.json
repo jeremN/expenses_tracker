@@ -353,5 +353,11 @@
   "transfers.new.subtitle": "Déplacez de la valeur entre deux comptes, ou depuis/vers un compte externe.",
   "transfers.countAsCashFlow": "Compter comme revenu / dépense",
   "transfers.countAsCashFlowHint": "Enregistrer ce mouvement externe dans votre trésorerie (ex. un cadeau ou un remboursement). Laissez décoché si vous déplacez simplement de l'argent vers un compte non suivi.",
-  "transfers.cashFlowTag": "trésorerie"
+  "transfers.cashFlowTag": "trésorerie",
+  "transfers.swap": "Inverser les comptes",
+  "transfers.viewAll": "Tout voir",
+  "transfers.page.title": "Virements",
+  "transfers.page.subtitle": "Tous les mouvements entre vos comptes, du plus récent au plus ancien.",
+  "transfers.page.empty": "Aucun virement pour l'instant",
+  "transfers.page.emptyHint": "Enregistrez un virement pour déplacer de la valeur entre vos comptes."
 }
