@@ -353,5 +353,11 @@
   "transfers.new.subtitle": "Move value between two accounts, or to/from an external account.",
   "transfers.countAsCashFlow": "Count as income / expense",
   "transfers.countAsCashFlowHint": "Book this external movement in your cash flow (e.g. a gift or refund). Leave off if you're just moving money to an untracked account.",
-  "transfers.cashFlowTag": "cash flow"
+  "transfers.cashFlowTag": "cash flow",
+  "transfers.swap": "Swap accounts",
+  "transfers.viewAll": "View all",
+  "transfers.page.title": "Transfers",
+  "transfers.page.subtitle": "Every movement between your accounts, newest first.",
+  "transfers.page.empty": "No transfers yet",
+  "transfers.page.emptyHint": "Record a transfer to move value between your accounts."
 }
