@@ -147,8 +147,10 @@ export const accountValuations = sqliteTable('account_valuations', {
 ])
 
 // A move of value between accounts (cash → brokerage, cash → loan paydown).
-// Net-worth-neutral: it changes composition, not the total. from/to are
-// nullable so one leg can be external (opening balance, external withdrawal).
+// Two-legged transfers are net-worth-neutral (composition, not total); from/to
+// are nullable so one leg can be external. An external (one-legged) transfer can
+// optionally book a cash-flow transaction — transaction_id links to it so the
+// transfer owns that entry and deleting the transfer removes it too.
 export const assetTransfers = sqliteTable('asset_transfers', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   date: text('date').notNull(), // YYYY-MM-DD
@@ -156,6 +158,7 @@ export const assetTransfers = sqliteTable('asset_transfers', {
   toAccountId: integer('to_account_id').references(() => accounts.id),
   amount: integer('amount').notNull(), // cents moved, positive
   note: text('note'),
+  transactionId: integer('transaction_id').references(() => transactions.id), // set when an external leg counts as cash flow
   createdAt: text('created_at').default(sql`(current_timestamp)`).notNull(),
 }, (table) => [
   index('idx_asset_transfers_date').on(table.date),

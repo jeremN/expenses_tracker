@@ -1,0 +1,1 @@
+ALTER TABLE `asset_transfers` ADD `transaction_id` integer REFERENCES transactions(id);

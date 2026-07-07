@@ -32,6 +32,7 @@ const formSchema = z.object({
   amount: z.string().min(1, 'error.form.amountRequired'),
   date: z.string().optional(),
   note: z.string().optional(),
+  countAsCashFlow: z.boolean(),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -56,8 +57,13 @@ export function TransferForm({ accounts, onSubmit, isSubmitting }: TransferFormP
       amount: '',
       date: '',
       note: '',
+      countAsCashFlow: false,
     },
   })
+
+  // "One-legged" = exactly one side is external; only then can the transfer
+  // optionally be booked as income/expense.
+  const isExternal = (form.watch('fromAccountId') === EXTERNAL) !== (form.watch('toAccountId') === EXTERNAL)
 
   function handleSubmit(values: FormValues) {
     const from = values.fromAccountId === EXTERNAL ? null : Number(values.fromAccountId)
@@ -83,6 +89,7 @@ export function TransferForm({ accounts, onSubmit, isSubmitting }: TransferFormP
       toAccountId: to,
       date: values.date || undefined,
       note: values.note || undefined,
+      countAsCashFlow: isExternal ? values.countAsCashFlow : undefined,
     })
     form.reset()
   }
@@ -163,6 +170,29 @@ export function TransferForm({ accounts, onSubmit, isSubmitting }: TransferFormP
             </FormItem>
           )}
         />
+
+        {isExternal && (
+          <FormField
+            control={form.control}
+            name="countAsCashFlow"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start gap-2 space-y-0 rounded-md border border-border p-3">
+                <FormControl>
+                  <input
+                    type="checkbox"
+                    checked={field.value}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-input accent-primary"
+                  />
+                </FormControl>
+                <div className="space-y-0.5">
+                  <FormLabel className="font-normal">{t('transfers.countAsCashFlow')}</FormLabel>
+                  <p className="text-xs text-muted-foreground">{t('transfers.countAsCashFlowHint')}</p>
+                </div>
+              </FormItem>
+            )}
+          />
+        )}
 
         <p className="text-xs text-muted-foreground">{t('transfers.hint')}</p>
 

@@ -112,6 +112,7 @@ const createServerTransfer = createServerFn({ method: 'POST' })
       fromAccountId: data.fromAccountId,
       toAccountId: data.toAccountId,
       note: data.note,
+      countAsCashFlow: data.countAsCashFlow,
     })
     if (!result.ok) {
       if (result.reason === 'not_found') throw new AppError('NOT_FOUND', 'Account not found')
@@ -346,6 +347,11 @@ function AccountsPage() {
                   <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                   <span className="truncate">{accountName(tr.toAccountId)}</span>
                   {tr.note && <span className="truncate text-muted-foreground">· {tr.note}</span>}
+                  {tr.transactionId != null && (
+                    <span className="shrink-0 rounded bg-secondary px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                      {t('transfers.cashFlowTag')}
+                    </span>
+                  )}
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   <span className="text-xs text-muted-foreground">{tr.date}</span>
