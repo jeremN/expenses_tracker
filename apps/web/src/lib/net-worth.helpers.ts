@@ -40,3 +40,20 @@ export function withValuationDeltas(valuations: AccountValuationEntry[]): Valuat
     change: i < valuations.length - 1 ? v.value - valuations[i + 1].value : null,
   }))
 }
+
+export interface ValuationSeriesPoint {
+  id: number
+  date: string
+  value: number
+}
+
+/**
+ * A chronologically-ascending series for charting an account's balance over
+ * time. Valuations arrive newest-first, but a time axis needs oldest→newest,
+ * so this sorts ascending by date. Non-mutating (works on a copy).
+ */
+export function toValuationSeries(valuations: AccountValuationEntry[]): ValuationSeriesPoint[] {
+  return [...valuations]
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .map((v) => ({ id: v.id, date: v.date, value: v.value }))
+}

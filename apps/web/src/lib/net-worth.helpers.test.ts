@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { groupAccountsByKind, latestNetWorthDelta, withValuationDeltas } from './net-worth.helpers'
+import { groupAccountsByKind, latestNetWorthDelta, withValuationDeltas, toValuationSeries } from './net-worth.helpers'
 import type { Account, NetWorthSnapshot, AccountValuationEntry } from '@tracker/shared'
 
 const account = (over: Partial<Account>): Account => ({
@@ -74,5 +74,42 @@ describe('withValuationDeltas', () => {
 
   it('returns an empty array unchanged', () => {
     expect(withValuationDeltas([])).toEqual([])
+  })
+})
+
+describe('toValuationSeries', () => {
+  const val = (date: string, value: number): AccountValuationEntry => ({
+    id: date.length, accountId: 1, date, value, createdAt: 'now',
+  })
+
+  it('reverses newest-first rows into a chronologically ascending series', () => {
+    // as the query returns them: newest first
+    const series = toValuationSeries([
+      val('2026-07-01', 31000000),
+      val('2026-06-01', 30800000),
+      val('2026-05-01', 30500000),
+    ])
+    expect(series.map((p) => p.date)).toEqual(['2026-05-01', '2026-06-01', '2026-07-01'])
+    expect(series.map((p) => p.value)).toEqual([30500000, 30800000, 31000000])
+  })
+
+  it('sorts by date even when input is not perfectly ordered', () => {
+    const series = toValuationSeries([
+      val('2026-06-01', 2),
+      val('2026-07-01', 3),
+      val('2026-05-01', 1),
+    ])
+    expect(series.map((p) => p.value)).toEqual([1, 2, 3])
+  })
+
+  it('does not mutate the input array', () => {
+    const input = [val('2026-07-01', 2), val('2026-05-01', 1)]
+    toValuationSeries(input)
+    expect(input.map((v) => v.date)).toEqual(['2026-07-01', '2026-05-01'])
+  })
+
+  it('handles empty and single-entry inputs', () => {
+    expect(toValuationSeries([])).toEqual([])
+    expect(toValuationSeries([val('2026-07-01', 5)]).map((p) => p.value)).toEqual([5])
   })
 })

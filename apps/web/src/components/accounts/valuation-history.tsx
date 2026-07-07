@@ -1,5 +1,6 @@
 import type { AccountValuationEntry } from '@tracker/shared'
 import { withValuationDeltas } from '~/lib/net-worth.helpers'
+import { ValuationChart } from './valuation-chart'
 import { useFormat } from '~/lib/format'
 import { useTranslation } from '~/i18n'
 
@@ -18,7 +19,11 @@ export function ValuationHistory({ valuations }: ValuationHistoryProps) {
   const rows = withValuationDeltas(valuations)
 
   return (
-    <ul className="divide-y divide-border">
+    <div className="space-y-3">
+      {/* Chart self-guards: renders only with ≥2 points, so 0–1 valuations
+          fall through to the list below. */}
+      <ValuationChart valuations={valuations} />
+      <ul className="divide-y divide-border">
       {rows.map((r) => (
         <li key={r.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
           <span className="text-muted-foreground">{r.date}</span>
@@ -34,6 +39,7 @@ export function ValuationHistory({ valuations }: ValuationHistoryProps) {
           </div>
         </li>
       ))}
-    </ul>
+      </ul>
+    </div>
   )
 }
