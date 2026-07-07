@@ -175,3 +175,13 @@ export interface AssetTransfer {
   transactionId: number | null
   createdAt: string
 }
+
+// A recorded balance for an account on a date (from reconciliations). Distinct
+// from the `AccountValuation` mode enum ('manual' | 'tracked') above.
+export interface AccountValuationEntry {
+  id: number
+  accountId: number
+  date: string
+  value: number
+  createdAt: string
+}

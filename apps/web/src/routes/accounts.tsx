@@ -7,6 +7,7 @@ import {
   getAccounts,
   getHoldings,
   getTransfers,
+  getAccountValuations,
   createAccount,
   updateAccount,
   deleteAccount,
@@ -22,10 +23,11 @@ import {
   reconcileAccountSchema,
   assertFound,
 } from '@tracker/shared'
-import type { Account, Holding, AssetTransfer, CreateAccount, CreateHolding, CreateTransfer } from '@tracker/shared'
-import { Plus, Pencil, Trash2, Scale, ArrowLeftRight } from 'lucide-react'
+import type { Account, Holding, AssetTransfer, AccountValuationEntry, CreateAccount, CreateHolding, CreateTransfer } from '@tracker/shared'
+import { Plus, Pencil, Trash2, Scale, ArrowLeftRight, History } from 'lucide-react'
 import { TransferForm } from '~/components/accounts/transfer-form'
 import { TransferList } from '~/components/accounts/transfer-list'
+import { ValuationHistory } from '~/components/accounts/valuation-history'
 import { createServerTransfer, deleteServerTransfer } from '~/server/transfer-fns'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -64,6 +66,14 @@ const getServerAccounts = createServerFn({ method: 'GET' }).handler(
     return { accounts, holdings, transfers }
   }),
 )
+
+// Fetched on demand when the History dialog opens (valuation rows grow over
+// time, so they're not loaded with every accounts page render).
+const getServerAccountValuations = createServerFn({ method: 'GET' })
+  .inputValidator(z.object({ accountId: z.number() }))
+  .handler(withServerFn('server-fn:getServerAccountValuations', async ({ data }) => {
+    return getAccountValuations(getDB(), data.accountId, 60)
+  }))
 
 const createServerAccount = createServerFn({ method: 'POST' })
   .inputValidator(createAccountSchema)
@@ -148,7 +158,21 @@ function AccountsPage() {
   const [reconcileTarget, setReconcileTarget] = useState<Account | null>(null)
   const [reconcileValue, setReconcileValue] = useState('')
   const [transferOpen, setTransferOpen] = useState(false)
+  const [historyTarget, setHistoryTarget] = useState<Account | null>(null)
+  const [historyRows, setHistoryRows] = useState<AccountValuationEntry[] | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  async function openHistory(account: Account) {
+    setHistoryTarget(account)
+    setHistoryRows(null) // loading
+    try {
+      setHistoryRows(await getServerAccountValuations({ data: { accountId: account.id } }))
+    } catch (error) {
+      console.error('Failed to load valuation history:', error)
+      toast.error(translateApiError(error, t))
+      setHistoryRows([])
+    }
+  }
 
   async function run(fn: () => Promise<unknown>, successKey: string, onDone?: () => void) {
     setIsSubmitting(true)
@@ -256,6 +280,9 @@ function AccountsPage() {
                   <div className="flex shrink-0 items-center gap-3">
                     <Amount cents={account.currentValue} tone="neutral" className="font-semibold" />
                     <div className="flex items-center gap-1">
+                      <IconButton label={t('accounts.historyAction')} onClick={() => openHistory(account)}>
+                        <History className="h-4 w-4" />
+                      </IconButton>
                       <IconButton label={t('accounts.reconcileAction')} onClick={() => { setReconcileTarget(account); setReconcileValue((account.currentValue / 100).toString()) }}>
                         <Scale className="h-4 w-4" />
                       </IconButton>
@@ -328,6 +355,25 @@ function AccountsPage() {
             <DialogDescription>{t('transfers.new.subtitle')}</DialogDescription>
           </DialogHeader>
           <TransferForm accounts={data.accounts} onSubmit={handleCreateTransfer} isSubmitting={isSubmitting} />
+        </DialogContent>
+      </Dialog>
+
+      {/* Valuation history dialog */}
+      <Dialog open={!!historyTarget} onOpenChange={(open) => { if (!open) { setHistoryTarget(null); setHistoryRows(null) } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('accounts.history.title')}</DialogTitle>
+            <DialogDescription>{t('accounts.history.subtitle', { name: historyTarget?.name ?? '' })}</DialogDescription>
+          </DialogHeader>
+          {historyRows == null ? (
+            <div className="space-y-2 py-2">
+              <Skeleton className="h-8" />
+              <Skeleton className="h-8" />
+              <Skeleton className="h-8" />
+            </div>
+          ) : (
+            <ValuationHistory valuations={historyRows} />
+          )}
         </DialogContent>
       </Dialog>
 

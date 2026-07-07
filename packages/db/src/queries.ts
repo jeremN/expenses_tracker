@@ -578,6 +578,14 @@ export async function reconcileAccount(db: DB, accountId: number, data: {
   return { account: updated, valuation, transaction }
 }
 
+/** An account's recorded balances over time (from reconciliations), newest first. */
+export function getAccountValuations(db: DB, accountId: number, limit?: number) {
+  const query = db.select().from(schema.accountValuations)
+    .where(eq(schema.accountValuations.accountId, accountId))
+    .orderBy(desc(schema.accountValuations.date), desc(schema.accountValuations.id))
+  return limit ? query.limit(limit) : query
+}
+
 // --- Asset transfers ---
 // A transfer moves `amount` (cents, positive) between accounts, applying a
 // kind-signed delta to each present leg's current_value:
