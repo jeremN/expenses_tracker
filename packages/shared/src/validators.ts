@@ -98,6 +98,9 @@ export const createTransferSchema = z.object({
   fromAccountId: z.number().int().positive().nullable().optional(),
   toAccountId: z.number().int().positive().nullable().optional(),
   note: z.string().max(200).optional(),
+  // Opt-in: book a cash-flow transaction for an external (one-legged) transfer.
+  // Ignored for two-legged transfers (they are net-worth-neutral).
+  countAsCashFlow: z.boolean().optional(),
 })
   .refine((d) => d.fromAccountId != null || d.toAccountId != null, {
     message: 'A transfer needs at least one account',

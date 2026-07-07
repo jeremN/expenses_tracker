@@ -350,5 +350,8 @@
   "transfers.notePlaceholder": "ex. Épargne mensuelle",
   "transfers.hint": "Déplacer de l'argent entre vos comptes ne change pas votre patrimoine. Utilisez « Externe » d'un côté pour de l'argent qui entre ou sort de vos comptes suivis.",
   "transfers.new.title": "Enregistrer un virement",
-  "transfers.new.subtitle": "Déplacez de la valeur entre deux comptes, ou depuis/vers un compte externe."
+  "transfers.new.subtitle": "Déplacez de la valeur entre deux comptes, ou depuis/vers un compte externe.",
+  "transfers.countAsCashFlow": "Compter comme revenu / dépense",
+  "transfers.countAsCashFlowHint": "Enregistrer ce mouvement externe dans votre trésorerie (ex. un cadeau ou un remboursement). Laissez décoché si vous déplacez simplement de l'argent vers un compte non suivi.",
+  "transfers.cashFlowTag": "trésorerie"
 }

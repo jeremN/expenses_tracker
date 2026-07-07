@@ -584,9 +584,10 @@ export async function reconcileAccount(db: DB, accountId: number, data: {
 
 type AccountRow = typeof schema.accounts.$inferSelect
 type AssetTransferRow = typeof schema.assetTransfers.$inferSelect
+type TransactionRow = typeof schema.transactions.$inferSelect
 
 export type CreateTransferResult =
-  | { ok: true; transfer: AssetTransferRow; from?: AccountRow; to?: AccountRow }
+  | { ok: true; transfer: AssetTransferRow; from?: AccountRow; to?: AccountRow; transaction?: TransactionRow }
   | { ok: false; reason: 'no_legs' | 'not_found' | 'tracked_leg'; accountId?: number }
 
 /** Signed delta applied to a leg's current_value. Positive = value grows. */
@@ -596,7 +597,8 @@ function transferLegDelta(kind: AccountKind, leg: 'from' | 'to', amount: number)
 }
 
 export async function createTransfer(db: DB, data: {
-  amount: number; date: string; fromAccountId?: number | null; toAccountId?: number | null; note?: string;
+  amount: number; date: string; fromAccountId?: number | null; toAccountId?: number | null;
+  note?: string; countAsCashFlow?: boolean;
 }): Promise<CreateTransferResult> {
   const fromId = data.fromAccountId ?? null
   const toId = data.toAccountId ?? null
@@ -615,9 +617,24 @@ export async function createTransfer(db: DB, data: {
     loaded[leg] = acc
   }
 
+  // Opt-in cash-flow entry: only for a one-legged (external) transfer. External
+  // IN (to leg) is income; external OUT (from leg) is expense. Uncategorized so
+  // it counts in cash-flow stats (unlike the excluded Reconciliation category).
+  let transaction: TransactionRow | undefined
+  if (data.countAsCashFlow && legs.length === 1) {
+    const external = legs[0]
+    transaction = await db.insert(schema.transactions).values({
+      type: external.leg === 'to' ? 'income' : 'expense',
+      amount: data.amount,
+      description: data.note ?? (external.leg === 'to' ? 'Transfer in' : 'Transfer out'),
+      date: data.date,
+    }).returning().get()
+  }
+
   const transfer = await db.insert(schema.assetTransfers).values({
     date: data.date, amount: data.amount, note: data.note,
     fromAccountId: fromId, toAccountId: toId,
+    transactionId: transaction?.id ?? null,
   }).returning().get()
 
   const applied: { from?: AccountRow; to?: AccountRow } = {}
@@ -630,7 +647,7 @@ export async function createTransfer(db: DB, data: {
       .returning().get()
   }
 
-  return { ok: true, transfer, from: applied.from, to: applied.to }
+  return { ok: true, transfer, from: applied.from, to: applied.to, transaction }
 }
 
 export function getTransfers(db: DB, limit?: number) {
@@ -664,7 +681,13 @@ export async function deleteTransfer(db: DB, id: number): Promise<AssetTransferR
       .where(eq(schema.accounts.id, accId)).run()
   }
 
-  return db.delete(schema.assetTransfers)
+  const deleted = await db.delete(schema.assetTransfers)
     .where(eq(schema.assetTransfers.id, id))
     .returning().get()
+  // Remove the owned cash-flow entry after the FK reference is gone.
+  if (transfer.transactionId != null) {
+    await db.delete(schema.transactions)
+      .where(eq(schema.transactions.id, transfer.transactionId)).run()
+  }
+  return deleted
 }

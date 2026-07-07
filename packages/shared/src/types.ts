@@ -172,5 +172,6 @@ export interface AssetTransfer {
   toAccountId: number | null
   amount: number
   note: string | null
+  transactionId: number | null
   createdAt: string
 }

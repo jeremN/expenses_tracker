@@ -31,6 +31,7 @@ export const Route = createFileRoute('/api/transfers')({
           fromAccountId: parsed.data.fromAccountId,
           toAccountId: parsed.data.toAccountId,
           note: parsed.data.note,
+          countAsCashFlow: parsed.data.countAsCashFlow,
         })
         if (!result.ok) {
           if (result.reason === 'not_found') {

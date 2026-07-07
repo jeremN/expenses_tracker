@@ -787,6 +787,23 @@ describe('POST /api/transfers', () => {
     expect(errSpy).not.toHaveBeenCalled()
   })
 
+  it('forwards countAsCashFlow through to createTransfer', async () => {
+    const { createTransfer } = await import('@tracker/db')
+    vi.mocked(createTransfer).mockResolvedValue({
+      ok: true,
+      transfer: { id: 8, date: '2026-07-07', fromAccountId: null, toAccountId: 2, amount: 5000, note: null, transactionId: 3, createdAt: 'now' },
+    } as never)
+
+    const handler = await getHandler('./transfers', 'POST')
+    const res = await handler({ request: jsonRequest('http://x', 'POST', { toAccountId: 2, amount: 5000, countAsCashFlow: true }) })
+
+    expect(res.status).toBe(201)
+    expect(vi.mocked(createTransfer)).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ toAccountId: 2, amount: 5000, countAsCashFlow: true }),
+    )
+  })
+
   it('returns 404 + NOT_FOUND when a leg account is missing', async () => {
     const { createTransfer } = await import('@tracker/db')
     vi.mocked(createTransfer).mockResolvedValue({ ok: false, reason: 'not_found', accountId: 9999 } as never)

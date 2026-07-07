@@ -350,5 +350,8 @@
   "transfers.notePlaceholder": "e.g. Monthly savings",
   "transfers.hint": "Moving money between your accounts leaves net worth unchanged. Use \"External\" on one side for money entering or leaving your tracked accounts.",
   "transfers.new.title": "Record a transfer",
-  "transfers.new.subtitle": "Move value between two accounts, or to/from an external account."
+  "transfers.new.subtitle": "Move value between two accounts, or to/from an external account.",
+  "transfers.countAsCashFlow": "Count as income / expense",
+  "transfers.countAsCashFlowHint": "Book this external movement in your cash flow (e.g. a gift or refund). Leave off if you're just moving money to an untracked account.",
+  "transfers.cashFlowTag": "cash flow"
 }

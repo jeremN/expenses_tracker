@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { makeTestDb } from '~/test/make-test-db'
+import { eq } from 'drizzle-orm'
 import {
   createAccount,
   getAccountById,
@@ -8,6 +9,7 @@ import {
   deleteTransfer,
   getTransfers,
   deleteAccount,
+  transactions,
 } from '@tracker/db'
 
 type TestDb = Awaited<ReturnType<typeof makeTestDb>>
@@ -102,6 +104,56 @@ describe('createTransfer (kind-signed, net-worth-neutral when two-legged)', () =
   })
 })
 
+describe('createTransfer with countAsCashFlow (external legs only)', () => {
+  it('external IN + opt-in books an INCOME transaction and links it to the transfer', async () => {
+    const db = await makeTestDb()
+    const checking = await asset(db, 'Checking', 100000)
+
+    const res = await createTransfer(db, { toAccountId: checking.id, amount: 30000, date: '2026-07-07', note: 'Gift', countAsCashFlow: true })
+
+    expect(res.ok).toBe(true)
+    const tx = await db.select().from(transactions)
+    expect(tx).toHaveLength(1)
+    expect(tx[0]).toMatchObject({ type: 'income', amount: 30000, description: 'Gift', categoryId: null })
+    // transfer owns the transaction
+    expect(res.ok && res.transfer.transactionId).toBe(tx[0].id)
+    // account still moved
+    expect((await getAccountById(db, checking.id))?.currentValue).toBe(130000)
+  })
+
+  it('external OUT + opt-in books an EXPENSE transaction', async () => {
+    const db = await makeTestDb()
+    const checking = await asset(db, 'Checking', 100000)
+
+    await createTransfer(db, { fromAccountId: checking.id, amount: 40000, date: '2026-07-07', countAsCashFlow: true })
+
+    const tx = await db.select().from(transactions)
+    expect(tx).toHaveLength(1)
+    expect(tx[0]).toMatchObject({ type: 'expense', amount: 40000 })
+  })
+
+  it('external leg WITHOUT opt-in books no transaction (net-worth change only)', async () => {
+    const db = await makeTestDb()
+    const checking = await asset(db, 'Checking', 100000)
+
+    const res = await createTransfer(db, { toAccountId: checking.id, amount: 30000, date: '2026-07-07' })
+
+    expect(await db.select().from(transactions)).toHaveLength(0)
+    expect(res.ok && res.transfer.transactionId).toBeNull()
+  })
+
+  it('IGNORES the flag for a two-legged (net-worth-neutral) transfer', async () => {
+    const db = await makeTestDb()
+    const a = await asset(db, 'A', 200000)
+    const b = await asset(db, 'B', 50000)
+
+    const res = await createTransfer(db, { fromAccountId: a.id, toAccountId: b.id, amount: 75000, date: '2026-07-07', countAsCashFlow: true })
+
+    expect(await db.select().from(transactions)).toHaveLength(0)
+    expect(res.ok && res.transfer.transactionId).toBeNull()
+  })
+})
+
 describe('deleteTransfer', () => {
   it('reverses both legs then removes the row', async () => {
     const db = await makeTestDb()
@@ -116,6 +168,20 @@ describe('deleteTransfer', () => {
     expect((await getAccountById(db, a.id))?.currentValue).toBe(200000) // restored
     expect((await getAccountById(db, b.id))?.currentValue).toBe(100000)
     expect(await getTransfers(db)).toHaveLength(0)
+  })
+
+  it('also deletes the linked cash-flow transaction (external opt-in transfer)', async () => {
+    const db = await makeTestDb()
+    const checking = await asset(db, 'Checking', 100000)
+    const res = await createTransfer(db, { toAccountId: checking.id, amount: 30000, date: '2026-07-07', countAsCashFlow: true })
+    const transferId = res.ok ? res.transfer.id : 0
+    const txId = res.ok ? res.transfer.transactionId : null
+    expect(await db.select().from(transactions).where(eq(transactions.id, txId!))).toHaveLength(1)
+
+    await deleteTransfer(db, transferId)
+
+    expect(await db.select().from(transactions)).toHaveLength(0) // linked entry removed
+    expect((await getAccountById(db, checking.id))?.currentValue).toBe(100000) // account reversed
   })
 
   it('returns undefined for a missing transfer', async () => {
