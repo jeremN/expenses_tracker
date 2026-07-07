@@ -507,10 +507,15 @@ export const RECONCILIATION_CATEGORY = 'Reconciliation'
 // Reconciling one of these types treats a balance discrepancy as real cash flow
 // (unrecorded income/spending) and books a balancing transaction. Every other
 // type is a revaluation (investments, property, vehicles) or a non-spending
-// liability (loans), where a value change is NOT cash flow — those reconcile
-// silently (value only). Credit cards are included because a balance change IS
-// spending/paydown; the sign is derived per-kind in reconcileAccount (a liability
-// owing MORE is an expense, the inverse of an asset gaining value).
+// liability, where a value change is NOT cash flow — those reconcile silently
+// (value + valuation row only). Credit cards are included because a balance
+// change IS spending/paydown; the sign is derived per-kind in reconcileAccount
+// (a liability owing MORE is an expense, the inverse of an asset gaining value).
+//
+// Loans are DELIBERATELY excluded (do not add them): a loan paydown is a
+// transfer of cash — your cash drops and the debt drops (net-worth-neutral), so
+// booking it as income would double-count the money as arriving. Locked by a
+// test in reconcile.query.test.ts.
 export const CASH_FLOW_ACCOUNT_TYPES = new Set<AccountType>(['cash', 'checking', 'savings', 'credit_card'])
 
 async function getOrCreateReconciliationCategoryId(db: DB): Promise<number> {
