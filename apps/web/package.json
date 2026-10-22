@@ -58,7 +58,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "jsdom": "^29.1.1",
     "typescript": "^6.0.3",
-    "vite": "^8.1.4",
+    "vite": "^8.1.6",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.11",
     "wrangler": "^4.110.0"
