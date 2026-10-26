@@ -7,7 +7,7 @@ import { withServerFn } from '~/server/logger'
 
 // Shared by the /accounts panel and the dedicated /transfers page.
 export const createServerTransfer = createServerFn({ method: 'POST' })
-  .inputValidator(createTransferSchema)
+  .validator(createTransferSchema)
   .handler(withServerFn('server-fn:createServerTransfer', async ({ data }) => {
     const result = await createTransfer(getDB(), {
       amount: data.amount,
@@ -26,7 +26,7 @@ export const createServerTransfer = createServerFn({ method: 'POST' })
   }))
 
 export const deleteServerTransfer = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.number() }))
+  .validator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerTransfer', async ({ data }) => {
     assertFound(await deleteTransfer(getDB(), data.id), 'Transfer not found')
     return { success: true }

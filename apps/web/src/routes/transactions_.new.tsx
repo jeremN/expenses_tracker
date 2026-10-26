@@ -15,7 +15,7 @@ import { translateApiError } from '~/i18n/errors'
 import { withServerFn } from '~/server/logger'
 
 const createServerTransaction = createServerFn({ method: 'POST' })
-  .inputValidator(createTransactionSchema)
+  .validator(createTransactionSchema)
   .handler(withServerFn('server-fn:createServerTransaction', async ({ data }) => {
     const db = getDB()
     return createTransaction(db, data)
@@ -27,7 +27,7 @@ export const Route = createFileRoute('/transactions_/new')({
   loader: () => getServerCategories(),
   component: NewTransactionPage,
   pendingComponent: TransactionFormSkeleton,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })
 
 // --- Page Component ---

@@ -118,7 +118,7 @@ export const Route = createFileRoute('/')({
   loader: () => getDashboardData(),
   component: DashboardPage,
   pendingComponent: DashboardSkeleton,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })
 
 function DashboardSkeleton() {

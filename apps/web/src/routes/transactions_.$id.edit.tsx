@@ -18,7 +18,7 @@ import { withServerFn } from '~/server/logger'
 // --- Server Functions ---
 
 const getServerTransaction = createServerFn({ method: 'GET' })
-  .inputValidator(z.object({ id: z.number() }))
+  .validator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:getServerTransaction', async ({ data }) => {
     const db = getDB()
     const row = await getTransactionById(db, data.id)
@@ -27,7 +27,7 @@ const getServerTransaction = createServerFn({ method: 'GET' })
   }))
 
 const updateServerTransaction = createServerFn({ method: 'POST' })
-  .inputValidator(updateTransactionSchema.extend({ id: z.number() }))
+  .validator(updateTransactionSchema.extend({ id: z.number() }))
   .handler(withServerFn('server-fn:updateServerTransaction', async ({ data }) => {
     const { id, ...rest } = data
     const db = getDB()
@@ -47,7 +47,7 @@ export const Route = createFileRoute('/transactions_/$id/edit')({
   },
   component: EditTransactionPage,
   pendingComponent: TransactionFormSkeleton,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })
 
 // --- Page Component ---

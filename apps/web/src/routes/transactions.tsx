@@ -40,7 +40,7 @@ type TxSearch = z.infer<typeof txSearchSchema>
 // --- Server Functions ---
 
 const getServerTransactions = createServerFn({ method: 'GET' })
-  .inputValidator(txSearchSchema)
+  .validator(txSearchSchema)
   .handler(withServerFn('server-fn:getServerTransactions', async ({ data }) => {
     const db = getDB()
     const filters = {
@@ -68,7 +68,7 @@ const getServerTransactions = createServerFn({ method: 'GET' })
   }))
 
 const deleteServerTransaction = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.number() }))
+  .validator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerTransaction', async ({ data }) => {
     const db = getDB()
     assertFound(await deleteTransaction(db, data.id), 'Transaction not found')
@@ -83,7 +83,7 @@ export const Route = createFileRoute('/transactions')({
   loader: ({ deps }) => getServerTransactions({ data: deps }),
   component: TransactionsPage,
   pendingComponent: TransactionsSkeleton,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })
 
 function TransactionsSkeleton() {

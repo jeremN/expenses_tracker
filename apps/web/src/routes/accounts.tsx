@@ -70,32 +70,32 @@ const getServerAccounts = createServerFn({ method: 'GET' }).handler(
 // Fetched on demand when the History dialog opens (valuation rows grow over
 // time, so they're not loaded with every accounts page render).
 const getServerAccountValuations = createServerFn({ method: 'GET' })
-  .inputValidator(z.object({ accountId: z.number() }))
+  .validator(z.object({ accountId: z.number() }))
   .handler(withServerFn('server-fn:getServerAccountValuations', async ({ data }) => {
     return getAccountValuations(getDB(), data.accountId, 60)
   }))
 
 const createServerAccount = createServerFn({ method: 'POST' })
-  .inputValidator(createAccountSchema)
+  .validator(createAccountSchema)
   .handler(withServerFn('server-fn:createServerAccount', async ({ data }) => {
     return createAccount(getDB(), data)
   }))
 
 const updateServerAccount = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.number(), data: updateAccountSchema }))
+  .validator(z.object({ id: z.number(), data: updateAccountSchema }))
   .handler(withServerFn('server-fn:updateServerAccount', async ({ data }) => {
     return assertFound(await updateAccount(getDB(), data.id, data.data), 'Account not found')
   }))
 
 const deleteServerAccount = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.number() }))
+  .validator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerAccount', async ({ data }) => {
     assertFound(await deleteAccount(getDB(), data.id), 'Account not found')
     return { success: true }
   }))
 
 const reconcileServerAccount = createServerFn({ method: 'POST' })
-  .inputValidator(reconcileAccountSchema.extend({ id: z.number() }))
+  .validator(reconcileAccountSchema.extend({ id: z.number() }))
   .handler(withServerFn('server-fn:reconcileServerAccount', async ({ data }) => {
     const result = await reconcileAccount(getDB(), data.id, {
       value: data.value,
@@ -106,13 +106,13 @@ const reconcileServerAccount = createServerFn({ method: 'POST' })
   }))
 
 const createServerHolding = createServerFn({ method: 'POST' })
-  .inputValidator(createHoldingSchema)
+  .validator(createHoldingSchema)
   .handler(withServerFn('server-fn:createServerHolding', async ({ data }) => {
     return createHolding(getDB(), data)
   }))
 
 const deleteServerHolding = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.number() }))
+  .validator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerHolding', async ({ data }) => {
     assertFound(await deleteHolding(getDB(), data.id), 'Holding not found')
     return { success: true }
@@ -124,7 +124,7 @@ export const Route = createFileRoute('/accounts')({
   loader: () => getServerAccounts(),
   component: AccountsPage,
   pendingComponent: AccountsSkeleton,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })
 
 interface AccountsData {

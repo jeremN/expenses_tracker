@@ -9,93 +9,48 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TransfersRouteImport } from './routes/transfers'
-import { Route as TransactionsRouteImport } from './routes/transactions'
-import { Route as StatsRouteImport } from './routes/stats'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as RecurringRouteImport } from './routes/recurring'
-import { Route as NetWorthRouteImport } from './routes/net-worth'
-import { Route as InvestmentsRouteImport } from './routes/investments'
-import { Route as ImportRouteImport } from './routes/import'
-import { Route as CategoriesRouteImport } from './routes/categories'
-import { Route as BudgetsRouteImport } from './routes/budgets'
-import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TransactionsNewRouteImport } from './routes/transactions_.new'
-import { Route as ApiTransfersRouteImport } from './routes/api/transfers'
-import { Route as ApiTransactionsRouteImport } from './routes/api/transactions'
-import { Route as ApiRecurringRouteImport } from './routes/api/recurring'
-import { Route as ApiNetWorthRouteImport } from './routes/api/net-worth'
-import { Route as ApiInvestmentsRouteImport } from './routes/api/investments'
-import { Route as ApiImportRouteImport } from './routes/api/import'
-import { Route as ApiHoldingsRouteImport } from './routes/api/holdings'
-import { Route as ApiExportRouteImport } from './routes/api/export'
-import { Route as ApiCategoriesRouteImport } from './routes/api/categories'
-import { Route as ApiBudgetsRouteImport } from './routes/api/budgets'
+import { Route as AccountsRouteImport } from './routes/accounts'
+import { Route as BudgetsRouteImport } from './routes/budgets'
+import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as ImportRouteImport } from './routes/import'
+import { Route as InvestmentsRouteImport } from './routes/investments'
+import { Route as NetWorthRouteImport } from './routes/net-worth'
+import { Route as RecurringRouteImport } from './routes/recurring'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as StatsRouteImport } from './routes/stats'
+import { Route as TransactionsRouteImport } from './routes/transactions'
+import { Route as TransfersRouteImport } from './routes/transfers'
 import { Route as ApiAccountsRouteImport } from './routes/api/accounts'
-import { Route as TransactionsIdEditRouteImport } from './routes/transactions_.$id.edit'
-import { Route as ApiTransfersIdRouteImport } from './routes/api/transfers.$id'
-import { Route as ApiTransactionsIdRouteImport } from './routes/api/transactions.$id'
-import { Route as ApiStatsMonthlySummaryRouteImport } from './routes/api/stats.monthly-summary'
-import { Route as ApiStatsCategoryBreakdownRouteImport } from './routes/api/stats.category-breakdown'
-import { Route as ApiRecurringIdRouteImport } from './routes/api/recurring.$id'
-import { Route as ApiNetWorthSnapshotsRouteImport } from './routes/api/net-worth.snapshots'
-import { Route as ApiInvestmentsIdRouteImport } from './routes/api/investments.$id'
-import { Route as ApiHoldingsIdRouteImport } from './routes/api/holdings.$id'
-import { Route as ApiCategoriesIdRouteImport } from './routes/api/categories.$id'
-import { Route as ApiBudgetsCategoryIdRouteImport } from './routes/api/budgets.$categoryId'
+import { Route as ApiBudgetsRouteImport } from './routes/api/budgets'
+import { Route as ApiCategoriesRouteImport } from './routes/api/categories'
+import { Route as ApiExportRouteImport } from './routes/api/export'
+import { Route as ApiHoldingsRouteImport } from './routes/api/holdings'
+import { Route as ApiImportRouteImport } from './routes/api/import'
+import { Route as ApiInvestmentsRouteImport } from './routes/api/investments'
+import { Route as ApiNetWorthRouteImport } from './routes/api/net-worth'
+import { Route as ApiRecurringRouteImport } from './routes/api/recurring'
+import { Route as ApiTransactionsRouteImport } from './routes/api/transactions'
+import { Route as ApiTransfersRouteImport } from './routes/api/transfers'
+import { Route as TransactionsNewRouteImport } from './routes/transactions_.new'
 import { Route as ApiAccountsIdRouteImport } from './routes/api/accounts.$id'
-import { Route as ApiNetWorthSnapshotsIdRouteImport } from './routes/api/net-worth.snapshots.$id'
+import { Route as ApiBudgetsCategoryIdRouteImport } from './routes/api/budgets.$categoryId'
+import { Route as ApiCategoriesIdRouteImport } from './routes/api/categories.$id'
+import { Route as ApiHoldingsIdRouteImport } from './routes/api/holdings.$id'
+import { Route as ApiInvestmentsIdRouteImport } from './routes/api/investments.$id'
+import { Route as ApiNetWorthSnapshotsRouteImport } from './routes/api/net-worth.snapshots'
+import { Route as ApiRecurringIdRouteImport } from './routes/api/recurring.$id'
+import { Route as ApiStatsCategoryBreakdownRouteImport } from './routes/api/stats.category-breakdown'
+import { Route as ApiStatsMonthlySummaryRouteImport } from './routes/api/stats.monthly-summary'
+import { Route as ApiTransactionsIdRouteImport } from './routes/api/transactions.$id'
+import { Route as ApiTransfersIdRouteImport } from './routes/api/transfers.$id'
+import { Route as TransactionsIdEditRouteImport } from './routes/transactions_.$id.edit'
 import { Route as ApiAccountsIdReconcileRouteImport } from './routes/api/accounts.$id.reconcile'
+import { Route as ApiNetWorthSnapshotsIdRouteImport } from './routes/api/net-worth.snapshots.$id'
 
-const TransfersRoute = TransfersRouteImport.update({
-  id: '/transfers',
-  path: '/transfers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TransactionsRoute = TransactionsRouteImport.update({
-  id: '/transactions',
-  path: '/transactions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StatsRoute = StatsRouteImport.update({
-  id: '/stats',
-  path: '/stats',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecurringRoute = RecurringRouteImport.update({
-  id: '/recurring',
-  path: '/recurring',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NetWorthRoute = NetWorthRouteImport.update({
-  id: '/net-worth',
-  path: '/net-worth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvestmentsRoute = InvestmentsRouteImport.update({
-  id: '/investments',
-  path: '/investments',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ImportRoute = ImportRouteImport.update({
-  id: '/import',
-  path: '/import',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CategoriesRoute = CategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BudgetsRoute = BudgetsRouteImport.update({
-  id: '/budgets',
-  path: '/budgets',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountsRoute = AccountsRouteImport.update({
@@ -103,64 +58,54 @@ const AccountsRoute = AccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const BudgetsRoute = BudgetsRouteImport.update({
+  id: '/budgets',
+  path: '/budgets',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TransactionsNewRoute = TransactionsNewRouteImport.update({
-  id: '/transactions_/new',
-  path: '/transactions/new',
+const CategoriesRoute = CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiTransfersRoute = ApiTransfersRouteImport.update({
-  id: '/api/transfers',
-  path: '/api/transfers',
+const ImportRoute = ImportRouteImport.update({
+  id: '/import',
+  path: '/import',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiTransactionsRoute = ApiTransactionsRouteImport.update({
-  id: '/api/transactions',
-  path: '/api/transactions',
+const InvestmentsRoute = InvestmentsRouteImport.update({
+  id: '/investments',
+  path: '/investments',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiRecurringRoute = ApiRecurringRouteImport.update({
-  id: '/api/recurring',
-  path: '/api/recurring',
+const NetWorthRoute = NetWorthRouteImport.update({
+  id: '/net-worth',
+  path: '/net-worth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiNetWorthRoute = ApiNetWorthRouteImport.update({
-  id: '/api/net-worth',
-  path: '/api/net-worth',
+const RecurringRoute = RecurringRouteImport.update({
+  id: '/recurring',
+  path: '/recurring',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiInvestmentsRoute = ApiInvestmentsRouteImport.update({
-  id: '/api/investments',
-  path: '/api/investments',
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiImportRoute = ApiImportRouteImport.update({
-  id: '/api/import',
-  path: '/api/import',
+const StatsRoute = StatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiHoldingsRoute = ApiHoldingsRouteImport.update({
-  id: '/api/holdings',
-  path: '/api/holdings',
+const TransactionsRoute = TransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiExportRoute = ApiExportRouteImport.update({
-  id: '/api/export',
-  path: '/api/export',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCategoriesRoute = ApiCategoriesRouteImport.update({
-  id: '/api/categories',
-  path: '/api/categories',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiBudgetsRoute = ApiBudgetsRouteImport.update({
-  id: '/api/budgets',
-  path: '/api/budgets',
+const TransfersRoute = TransfersRouteImport.update({
+  id: '/transfers',
+  path: '/transfers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAccountsRoute = ApiAccountsRouteImport.update({
@@ -168,25 +113,95 @@ const ApiAccountsRoute = ApiAccountsRouteImport.update({
   path: '/api/accounts',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TransactionsIdEditRoute = TransactionsIdEditRouteImport.update({
-  id: '/transactions_/$id/edit',
-  path: '/transactions/$id/edit',
+const ApiBudgetsRoute = ApiBudgetsRouteImport.update({
+  id: '/api/budgets',
+  path: '/api/budgets',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiTransfersIdRoute = ApiTransfersIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiTransfersRoute,
-} as any)
-const ApiTransactionsIdRoute = ApiTransactionsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiTransactionsRoute,
-} as any)
-const ApiStatsMonthlySummaryRoute = ApiStatsMonthlySummaryRouteImport.update({
-  id: '/api/stats/monthly-summary',
-  path: '/api/stats/monthly-summary',
+const ApiCategoriesRoute = ApiCategoriesRouteImport.update({
+  id: '/api/categories',
+  path: '/api/categories',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiExportRoute = ApiExportRouteImport.update({
+  id: '/api/export',
+  path: '/api/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHoldingsRoute = ApiHoldingsRouteImport.update({
+  id: '/api/holdings',
+  path: '/api/holdings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiImportRoute = ApiImportRouteImport.update({
+  id: '/api/import',
+  path: '/api/import',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiInvestmentsRoute = ApiInvestmentsRouteImport.update({
+  id: '/api/investments',
+  path: '/api/investments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiNetWorthRoute = ApiNetWorthRouteImport.update({
+  id: '/api/net-worth',
+  path: '/api/net-worth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRecurringRoute = ApiRecurringRouteImport.update({
+  id: '/api/recurring',
+  path: '/api/recurring',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTransactionsRoute = ApiTransactionsRouteImport.update({
+  id: '/api/transactions',
+  path: '/api/transactions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTransfersRoute = ApiTransfersRouteImport.update({
+  id: '/api/transfers',
+  path: '/api/transfers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TransactionsNewRoute = TransactionsNewRouteImport.update({
+  id: '/transactions_/new',
+  path: '/transactions/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAccountsIdRoute = ApiAccountsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiAccountsRoute,
+} as any)
+const ApiBudgetsCategoryIdRoute = ApiBudgetsCategoryIdRouteImport.update({
+  id: '/$categoryId',
+  path: '/$categoryId',
+  getParentRoute: () => ApiBudgetsRoute,
+} as any)
+const ApiCategoriesIdRoute = ApiCategoriesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiCategoriesRoute,
+} as any)
+const ApiHoldingsIdRoute = ApiHoldingsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiHoldingsRoute,
+} as any)
+const ApiInvestmentsIdRoute = ApiInvestmentsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiInvestmentsRoute,
+} as any)
+const ApiNetWorthSnapshotsRoute = ApiNetWorthSnapshotsRouteImport.update({
+  id: '/snapshots',
+  path: '/snapshots',
+  getParentRoute: () => ApiNetWorthRoute,
+} as any)
+const ApiRecurringIdRoute = ApiRecurringIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiRecurringRoute,
 } as any)
 const ApiStatsCategoryBreakdownRoute =
   ApiStatsCategoryBreakdownRouteImport.update({
@@ -194,50 +209,35 @@ const ApiStatsCategoryBreakdownRoute =
     path: '/api/stats/category-breakdown',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiRecurringIdRoute = ApiRecurringIdRouteImport.update({
+const ApiStatsMonthlySummaryRoute = ApiStatsMonthlySummaryRouteImport.update({
+  id: '/api/stats/monthly-summary',
+  path: '/api/stats/monthly-summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTransactionsIdRoute = ApiTransactionsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => ApiRecurringRoute,
+  getParentRoute: () => ApiTransactionsRoute,
 } as any)
-const ApiNetWorthSnapshotsRoute = ApiNetWorthSnapshotsRouteImport.update({
-  id: '/snapshots',
-  path: '/snapshots',
-  getParentRoute: () => ApiNetWorthRoute,
-} as any)
-const ApiInvestmentsIdRoute = ApiInvestmentsIdRouteImport.update({
+const ApiTransfersIdRoute = ApiTransfersIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => ApiInvestmentsRoute,
+  getParentRoute: () => ApiTransfersRoute,
 } as any)
-const ApiHoldingsIdRoute = ApiHoldingsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiHoldingsRoute,
-} as any)
-const ApiCategoriesIdRoute = ApiCategoriesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiCategoriesRoute,
-} as any)
-const ApiBudgetsCategoryIdRoute = ApiBudgetsCategoryIdRouteImport.update({
-  id: '/$categoryId',
-  path: '/$categoryId',
-  getParentRoute: () => ApiBudgetsRoute,
-} as any)
-const ApiAccountsIdRoute = ApiAccountsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiAccountsRoute,
-} as any)
-const ApiNetWorthSnapshotsIdRoute = ApiNetWorthSnapshotsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiNetWorthSnapshotsRoute,
+const TransactionsIdEditRoute = TransactionsIdEditRouteImport.update({
+  id: '/transactions_/$id/edit',
+  path: '/transactions/$id/edit',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAccountsIdReconcileRoute = ApiAccountsIdReconcileRouteImport.update({
   id: '/reconcile',
   path: '/reconcile',
   getParentRoute: () => ApiAccountsIdRoute,
+} as any)
+const ApiNetWorthSnapshotsIdRoute = ApiNetWorthSnapshotsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiNetWorthSnapshotsRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -516,74 +516,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/transfers': {
-      id: '/transfers'
-      path: '/transfers'
-      fullPath: '/transfers'
-      preLoaderRoute: typeof TransfersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/transactions': {
-      id: '/transactions'
-      path: '/transactions'
-      fullPath: '/transactions'
-      preLoaderRoute: typeof TransactionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/stats': {
-      id: '/stats'
-      path: '/stats'
-      fullPath: '/stats'
-      preLoaderRoute: typeof StatsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recurring': {
-      id: '/recurring'
-      path: '/recurring'
-      fullPath: '/recurring'
-      preLoaderRoute: typeof RecurringRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/net-worth': {
-      id: '/net-worth'
-      path: '/net-worth'
-      fullPath: '/net-worth'
-      preLoaderRoute: typeof NetWorthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/investments': {
-      id: '/investments'
-      path: '/investments'
-      fullPath: '/investments'
-      preLoaderRoute: typeof InvestmentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/import': {
-      id: '/import'
-      path: '/import'
-      fullPath: '/import'
-      preLoaderRoute: typeof ImportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/categories': {
-      id: '/categories'
-      path: '/categories'
-      fullPath: '/categories'
-      preLoaderRoute: typeof CategoriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/budgets': {
-      id: '/budgets'
-      path: '/budgets'
-      fullPath: '/budgets'
-      preLoaderRoute: typeof BudgetsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/accounts': {
@@ -593,88 +530,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/budgets': {
+      id: '/budgets'
+      path: '/budgets'
+      fullPath: '/budgets'
+      preLoaderRoute: typeof BudgetsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/transactions_/new': {
-      id: '/transactions_/new'
-      path: '/transactions/new'
-      fullPath: '/transactions/new'
-      preLoaderRoute: typeof TransactionsNewRouteImport
+    '/categories': {
+      id: '/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/transfers': {
-      id: '/api/transfers'
-      path: '/api/transfers'
-      fullPath: '/api/transfers'
-      preLoaderRoute: typeof ApiTransfersRouteImport
+    '/import': {
+      id: '/import'
+      path: '/import'
+      fullPath: '/import'
+      preLoaderRoute: typeof ImportRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/transactions': {
-      id: '/api/transactions'
-      path: '/api/transactions'
-      fullPath: '/api/transactions'
-      preLoaderRoute: typeof ApiTransactionsRouteImport
+    '/investments': {
+      id: '/investments'
+      path: '/investments'
+      fullPath: '/investments'
+      preLoaderRoute: typeof InvestmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/recurring': {
-      id: '/api/recurring'
-      path: '/api/recurring'
-      fullPath: '/api/recurring'
-      preLoaderRoute: typeof ApiRecurringRouteImport
+    '/net-worth': {
+      id: '/net-worth'
+      path: '/net-worth'
+      fullPath: '/net-worth'
+      preLoaderRoute: typeof NetWorthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/net-worth': {
-      id: '/api/net-worth'
-      path: '/api/net-worth'
-      fullPath: '/api/net-worth'
-      preLoaderRoute: typeof ApiNetWorthRouteImport
+    '/recurring': {
+      id: '/recurring'
+      path: '/recurring'
+      fullPath: '/recurring'
+      preLoaderRoute: typeof RecurringRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/investments': {
-      id: '/api/investments'
-      path: '/api/investments'
-      fullPath: '/api/investments'
-      preLoaderRoute: typeof ApiInvestmentsRouteImport
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/import': {
-      id: '/api/import'
-      path: '/api/import'
-      fullPath: '/api/import'
-      preLoaderRoute: typeof ApiImportRouteImport
+    '/stats': {
+      id: '/stats'
+      path: '/stats'
+      fullPath: '/stats'
+      preLoaderRoute: typeof StatsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/holdings': {
-      id: '/api/holdings'
-      path: '/api/holdings'
-      fullPath: '/api/holdings'
-      preLoaderRoute: typeof ApiHoldingsRouteImport
+    '/transactions': {
+      id: '/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof TransactionsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/export': {
-      id: '/api/export'
-      path: '/api/export'
-      fullPath: '/api/export'
-      preLoaderRoute: typeof ApiExportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/categories': {
-      id: '/api/categories'
-      path: '/api/categories'
-      fullPath: '/api/categories'
-      preLoaderRoute: typeof ApiCategoriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/budgets': {
-      id: '/api/budgets'
-      path: '/api/budgets'
-      fullPath: '/api/budgets'
-      preLoaderRoute: typeof ApiBudgetsRouteImport
+    '/transfers': {
+      id: '/transfers'
+      path: '/transfers'
+      fullPath: '/transfers'
+      preLoaderRoute: typeof TransfersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/accounts': {
@@ -684,82 +607,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAccountsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/transactions_/$id/edit': {
-      id: '/transactions_/$id/edit'
-      path: '/transactions/$id/edit'
-      fullPath: '/transactions/$id/edit'
-      preLoaderRoute: typeof TransactionsIdEditRouteImport
+    '/api/budgets': {
+      id: '/api/budgets'
+      path: '/api/budgets'
+      fullPath: '/api/budgets'
+      preLoaderRoute: typeof ApiBudgetsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/transfers/$id': {
-      id: '/api/transfers/$id'
-      path: '/$id'
-      fullPath: '/api/transfers/$id'
-      preLoaderRoute: typeof ApiTransfersIdRouteImport
-      parentRoute: typeof ApiTransfersRoute
-    }
-    '/api/transactions/$id': {
-      id: '/api/transactions/$id'
-      path: '/$id'
-      fullPath: '/api/transactions/$id'
-      preLoaderRoute: typeof ApiTransactionsIdRouteImport
-      parentRoute: typeof ApiTransactionsRoute
-    }
-    '/api/stats/monthly-summary': {
-      id: '/api/stats/monthly-summary'
-      path: '/api/stats/monthly-summary'
-      fullPath: '/api/stats/monthly-summary'
-      preLoaderRoute: typeof ApiStatsMonthlySummaryRouteImport
+    '/api/categories': {
+      id: '/api/categories'
+      path: '/api/categories'
+      fullPath: '/api/categories'
+      preLoaderRoute: typeof ApiCategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/stats/category-breakdown': {
-      id: '/api/stats/category-breakdown'
-      path: '/api/stats/category-breakdown'
-      fullPath: '/api/stats/category-breakdown'
-      preLoaderRoute: typeof ApiStatsCategoryBreakdownRouteImport
+    '/api/export': {
+      id: '/api/export'
+      path: '/api/export'
+      fullPath: '/api/export'
+      preLoaderRoute: typeof ApiExportRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/recurring/$id': {
-      id: '/api/recurring/$id'
-      path: '/$id'
-      fullPath: '/api/recurring/$id'
-      preLoaderRoute: typeof ApiRecurringIdRouteImport
-      parentRoute: typeof ApiRecurringRoute
+    '/api/holdings': {
+      id: '/api/holdings'
+      path: '/api/holdings'
+      fullPath: '/api/holdings'
+      preLoaderRoute: typeof ApiHoldingsRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/api/net-worth/snapshots': {
-      id: '/api/net-worth/snapshots'
-      path: '/snapshots'
-      fullPath: '/api/net-worth/snapshots'
-      preLoaderRoute: typeof ApiNetWorthSnapshotsRouteImport
-      parentRoute: typeof ApiNetWorthRoute
+    '/api/import': {
+      id: '/api/import'
+      path: '/api/import'
+      fullPath: '/api/import'
+      preLoaderRoute: typeof ApiImportRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/api/investments/$id': {
-      id: '/api/investments/$id'
-      path: '/$id'
-      fullPath: '/api/investments/$id'
-      preLoaderRoute: typeof ApiInvestmentsIdRouteImport
-      parentRoute: typeof ApiInvestmentsRoute
+    '/api/investments': {
+      id: '/api/investments'
+      path: '/api/investments'
+      fullPath: '/api/investments'
+      preLoaderRoute: typeof ApiInvestmentsRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/api/holdings/$id': {
-      id: '/api/holdings/$id'
-      path: '/$id'
-      fullPath: '/api/holdings/$id'
-      preLoaderRoute: typeof ApiHoldingsIdRouteImport
-      parentRoute: typeof ApiHoldingsRoute
+    '/api/net-worth': {
+      id: '/api/net-worth'
+      path: '/api/net-worth'
+      fullPath: '/api/net-worth'
+      preLoaderRoute: typeof ApiNetWorthRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/api/categories/$id': {
-      id: '/api/categories/$id'
-      path: '/$id'
-      fullPath: '/api/categories/$id'
-      preLoaderRoute: typeof ApiCategoriesIdRouteImport
-      parentRoute: typeof ApiCategoriesRoute
+    '/api/recurring': {
+      id: '/api/recurring'
+      path: '/api/recurring'
+      fullPath: '/api/recurring'
+      preLoaderRoute: typeof ApiRecurringRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/api/budgets/$categoryId': {
-      id: '/api/budgets/$categoryId'
-      path: '/$categoryId'
-      fullPath: '/api/budgets/$categoryId'
-      preLoaderRoute: typeof ApiBudgetsCategoryIdRouteImport
-      parentRoute: typeof ApiBudgetsRoute
+    '/api/transactions': {
+      id: '/api/transactions'
+      path: '/api/transactions'
+      fullPath: '/api/transactions'
+      preLoaderRoute: typeof ApiTransactionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/transfers': {
+      id: '/api/transfers'
+      path: '/api/transfers'
+      fullPath: '/api/transfers'
+      preLoaderRoute: typeof ApiTransfersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/transactions_/new': {
+      id: '/transactions_/new'
+      path: '/transactions/new'
+      fullPath: '/transactions/new'
+      preLoaderRoute: typeof TransactionsNewRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/accounts/$id': {
       id: '/api/accounts/$id'
@@ -768,12 +691,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAccountsIdRouteImport
       parentRoute: typeof ApiAccountsRoute
     }
-    '/api/net-worth/snapshots/$id': {
-      id: '/api/net-worth/snapshots/$id'
+    '/api/budgets/$categoryId': {
+      id: '/api/budgets/$categoryId'
+      path: '/$categoryId'
+      fullPath: '/api/budgets/$categoryId'
+      preLoaderRoute: typeof ApiBudgetsCategoryIdRouteImport
+      parentRoute: typeof ApiBudgetsRoute
+    }
+    '/api/categories/$id': {
+      id: '/api/categories/$id'
       path: '/$id'
-      fullPath: '/api/net-worth/snapshots/$id'
-      preLoaderRoute: typeof ApiNetWorthSnapshotsIdRouteImport
-      parentRoute: typeof ApiNetWorthSnapshotsRoute
+      fullPath: '/api/categories/$id'
+      preLoaderRoute: typeof ApiCategoriesIdRouteImport
+      parentRoute: typeof ApiCategoriesRoute
+    }
+    '/api/holdings/$id': {
+      id: '/api/holdings/$id'
+      path: '/$id'
+      fullPath: '/api/holdings/$id'
+      preLoaderRoute: typeof ApiHoldingsIdRouteImport
+      parentRoute: typeof ApiHoldingsRoute
+    }
+    '/api/investments/$id': {
+      id: '/api/investments/$id'
+      path: '/$id'
+      fullPath: '/api/investments/$id'
+      preLoaderRoute: typeof ApiInvestmentsIdRouteImport
+      parentRoute: typeof ApiInvestmentsRoute
+    }
+    '/api/net-worth/snapshots': {
+      id: '/api/net-worth/snapshots'
+      path: '/snapshots'
+      fullPath: '/api/net-worth/snapshots'
+      preLoaderRoute: typeof ApiNetWorthSnapshotsRouteImport
+      parentRoute: typeof ApiNetWorthRoute
+    }
+    '/api/recurring/$id': {
+      id: '/api/recurring/$id'
+      path: '/$id'
+      fullPath: '/api/recurring/$id'
+      preLoaderRoute: typeof ApiRecurringIdRouteImport
+      parentRoute: typeof ApiRecurringRoute
+    }
+    '/api/stats/category-breakdown': {
+      id: '/api/stats/category-breakdown'
+      path: '/api/stats/category-breakdown'
+      fullPath: '/api/stats/category-breakdown'
+      preLoaderRoute: typeof ApiStatsCategoryBreakdownRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/stats/monthly-summary': {
+      id: '/api/stats/monthly-summary'
+      path: '/api/stats/monthly-summary'
+      fullPath: '/api/stats/monthly-summary'
+      preLoaderRoute: typeof ApiStatsMonthlySummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/transactions/$id': {
+      id: '/api/transactions/$id'
+      path: '/$id'
+      fullPath: '/api/transactions/$id'
+      preLoaderRoute: typeof ApiTransactionsIdRouteImport
+      parentRoute: typeof ApiTransactionsRoute
+    }
+    '/api/transfers/$id': {
+      id: '/api/transfers/$id'
+      path: '/$id'
+      fullPath: '/api/transfers/$id'
+      preLoaderRoute: typeof ApiTransfersIdRouteImport
+      parentRoute: typeof ApiTransfersRoute
+    }
+    '/transactions_/$id/edit': {
+      id: '/transactions_/$id/edit'
+      path: '/transactions/$id/edit'
+      fullPath: '/transactions/$id/edit'
+      preLoaderRoute: typeof TransactionsIdEditRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/accounts/$id/reconcile': {
       id: '/api/accounts/$id/reconcile'
@@ -781,6 +774,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/accounts/$id/reconcile'
       preLoaderRoute: typeof ApiAccountsIdReconcileRouteImport
       parentRoute: typeof ApiAccountsIdRoute
+    }
+    '/api/net-worth/snapshots/$id': {
+      id: '/api/net-worth/snapshots/$id'
+      path: '/$id'
+      fullPath: '/api/net-worth/snapshots/$id'
+      preLoaderRoute: typeof ApiNetWorthSnapshotsIdRouteImport
+      parentRoute: typeof ApiNetWorthSnapshotsRoute
     }
   }
 }

@@ -28,14 +28,14 @@ import { translateApiError } from '~/i18n/errors'
 // --- Server Functions ---
 
 const createServerCategory = createServerFn({ method: 'POST' })
-  .inputValidator(createCategorySchema)
+  .validator(createCategorySchema)
   .handler(withServerFn('server-fn:createServerCategory', async ({ data }) => {
     const db = getDB()
     return await createCategory(db, data)
   }))
 
 const updateServerCategory = createServerFn({ method: 'POST' })
-  .inputValidator(updateCategorySchema.extend({ id: z.number() }))
+  .validator(updateCategorySchema.extend({ id: z.number() }))
   .handler(withServerFn('server-fn:updateServerCategory', async ({ data }) => {
     const { id, ...rest } = data
     const db = getDB()
@@ -43,7 +43,7 @@ const updateServerCategory = createServerFn({ method: 'POST' })
   }))
 
 const deleteServerCategory = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.number() }))
+  .validator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerCategory', async ({ data }) => {
     const db = getDB()
     assertFound(await deleteCategory(db, data.id), 'Category not found')
@@ -56,7 +56,7 @@ export const Route = createFileRoute('/categories')({
   loader: () => getServerCategories(),
   component: CategoriesPage,
   pendingComponent: CategoriesSkeleton,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })
 
 function CategoriesSkeleton() {
