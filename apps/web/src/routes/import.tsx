@@ -29,7 +29,7 @@ const parseFileSchema = z.object({
 })
 
 const parseFile = createServerFn({ method: 'POST' })
-  .inputValidator((d: unknown) => parseFileSchema.parse(d))
+  .validator((d: unknown) => parseFileSchema.parse(d))
   .handler(withServerFn('server-fn:parseFile', async ({ data }) => {
     try {
       const { parseCSV } = await import('~/server/parsers/csv')
@@ -48,7 +48,7 @@ const detectColumnsSchema = z.object({
 })
 
 const detectFileColumns = createServerFn({ method: 'POST' })
-  .inputValidator((d: unknown) => detectColumnsSchema.parse(d))
+  .validator((d: unknown) => detectColumnsSchema.parse(d))
   .handler(withServerFn('server-fn:detectFileColumns', async ({ data }) => {
     const { detectColumns } = await import('~/server/parsers/csv')
     return detectColumns(data.headers)
@@ -66,7 +66,7 @@ const checkDuplicatesSchema = z.object({
 })
 
 const checkDuplicates = createServerFn({ method: 'POST' })
-  .inputValidator((d: unknown) => checkDuplicatesSchema.parse(d))
+  .validator((d: unknown) => checkDuplicatesSchema.parse(d))
   .handler(withServerFn('server-fn:checkDuplicates', async ({ data }) => {
     const db = getDB()
 
@@ -105,7 +105,7 @@ const suggestCategoriesSchema = z.object({
 const MIN_PARTIAL_MATCH_LEN = 4
 
 const suggestCategories = createServerFn({ method: 'POST' })
-  .inputValidator((d: unknown) => suggestCategoriesSchema.parse(d))
+  .validator((d: unknown) => suggestCategoriesSchema.parse(d))
   .handler(withServerFn('server-fn:suggestCategories', async ({ data }) => {
     const db = getDB()
     const [descRows, categories] = await Promise.all([
@@ -210,7 +210,7 @@ const importTransactionsSchema = z.object({
 })
 
 const importTransactions = createServerFn({ method: 'POST' })
-  .inputValidator((d: unknown) => importTransactionsSchema.parse(d))
+  .validator((d: unknown) => importTransactionsSchema.parse(d))
   .handler(withServerFn('server-fn:importTransactions', async ({ data }) => {
     try {
       return await processImport(data)
@@ -227,7 +227,7 @@ const importTransactions = createServerFn({ method: 'POST' })
 
 export const Route = createFileRoute('/import')({
   component: ImportPage,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })
 
 // --- Step indicator ---

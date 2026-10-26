@@ -123,5 +123,5 @@ export const Route = createFileRoute('/transfers')({
   loader: () => getServerTransfers(),
   component: TransfersPage,
   pendingComponent: TransfersSkeleton,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })

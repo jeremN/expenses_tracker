@@ -30,7 +30,7 @@ import { withServerFn } from '~/server/logger'
 // --- Server Functions ---
 
 const getMonthlyStats = createServerFn({ method: 'GET' })
-  .inputValidator(z.object({ year: z.string().regex(/^\d{4}$/) }))
+  .validator(z.object({ year: z.string().regex(/^\d{4}$/) }))
   .handler(withServerFn('server-fn:getMonthlyStats', async ({ data }) => {
     const db = getDB()
     const result = await getMonthlySummary(db, data.year)
@@ -38,7 +38,7 @@ const getMonthlyStats = createServerFn({ method: 'GET' })
   }))
 
 const getCategoryStats = createServerFn({ method: 'GET' })
-  .inputValidator(z.object({ month: z.string().regex(/^\d{4}-\d{2}$/) }))
+  .validator(z.object({ month: z.string().regex(/^\d{4}-\d{2}$/) }))
   .handler(withServerFn('server-fn:getCategoryStats', async ({ data }) => {
     const db = getDB()
     const result = await getCategoryBreakdown(db, data.month)
@@ -76,7 +76,7 @@ export const Route = createFileRoute('/stats')({
   },
   component: StatsPage,
   pendingComponent: StatsSkeleton,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })
 
 function StatsSkeleton() {

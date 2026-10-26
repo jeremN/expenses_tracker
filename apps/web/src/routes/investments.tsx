@@ -46,14 +46,14 @@ const getServerSnapshots = createServerFn({ method: 'GET' }).handler(
 )
 
 const createServerSnapshot = createServerFn({ method: 'POST' })
-  .inputValidator(createInvestmentSnapshotSchema)
+  .validator(createInvestmentSnapshotSchema)
   .handler(withServerFn('server-fn:createServerSnapshot', async ({ data }) => {
     const db = getDB()
     return createInvestmentSnapshot(db, data)
   }))
 
 const deleteServerSnapshot = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.number() }))
+  .validator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerSnapshot', async ({ data }) => {
     const db = getDB()
     assertFound(await deleteInvestmentSnapshot(db, data.id), 'Investment snapshot not found')
@@ -66,7 +66,7 @@ export const Route = createFileRoute('/investments')({
   loader: () => getServerSnapshots(),
   component: InvestmentsPage,
   pendingComponent: InvestmentsSkeleton,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })
 
 function InvestmentsSkeleton() {

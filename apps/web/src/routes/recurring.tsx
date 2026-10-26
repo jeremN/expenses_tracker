@@ -48,14 +48,14 @@ const getServerRecurringRules = createServerFn({ method: 'GET' }).handler(
 )
 
 const createServerRecurringRule = createServerFn({ method: 'POST' })
-  .inputValidator(createRecurringRuleSchema)
+  .validator(createRecurringRuleSchema)
   .handler(withServerFn('server-fn:createServerRecurringRule', async ({ data }) => {
     const db = getDB()
     return createRecurringRule(db, data)
   }))
 
 const updateServerRecurringRule = createServerFn({ method: 'POST' })
-  .inputValidator(updateRecurringRuleSchema.extend({ id: z.number() }))
+  .validator(updateRecurringRuleSchema.extend({ id: z.number() }))
   .handler(withServerFn('server-fn:updateServerRecurringRule', async ({ data }) => {
     const { id, ...rest } = data
     const db = getDB()
@@ -63,7 +63,7 @@ const updateServerRecurringRule = createServerFn({ method: 'POST' })
   }))
 
 const deleteServerRecurringRule = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.number() }))
+  .validator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerRecurringRule', async ({ data }) => {
     const db = getDB()
     assertFound(await deleteRecurringRule(db, data.id), 'Recurring rule not found')
@@ -71,7 +71,7 @@ const deleteServerRecurringRule = createServerFn({ method: 'POST' })
   }))
 
 const toggleServerRecurringRule = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.number(), isActive: z.boolean() }))
+  .validator(z.object({ id: z.number(), isActive: z.boolean() }))
   .handler(withServerFn('server-fn:toggleServerRecurringRule', async ({ data }) => {
     const db = getDB()
     return assertFound(
@@ -86,7 +86,7 @@ export const Route = createFileRoute('/recurring')({
   loader: () => getServerRecurringRules(),
   component: RecurringPage,
   pendingComponent: RecurringSkeleton,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })
 
 function RecurringSkeleton() {

@@ -59,14 +59,14 @@ const getBudgetData = createServerFn({ method: 'GET' }).handler(
 )
 
 const setServerBudget = createServerFn({ method: 'POST' })
-  .inputValidator(upsertBudgetSchema)
+  .validator(upsertBudgetSchema)
   .handler(withServerFn('server-fn:setServerBudget', async ({ data }) => {
     const db = getDB()
     return upsertBudget(db, data.categoryId, data.amount)
   }))
 
 const clearServerBudget = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ categoryId: z.number() }))
+  .validator(z.object({ categoryId: z.number() }))
   .handler(withServerFn('server-fn:clearServerBudget', async ({ data }) => {
     const db = getDB()
     await deleteBudget(db, data.categoryId)
@@ -79,7 +79,7 @@ export const Route = createFileRoute('/budgets')({
   loader: () => getBudgetData(),
   component: BudgetsPage,
   pendingComponent: BudgetsSkeleton,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })
 
 function BudgetsSkeleton() {

@@ -47,7 +47,7 @@ const getServerNetWorth = createServerFn({ method: 'GET' }).handler(
 )
 
 const createServerSnapshot = createServerFn({ method: 'POST' })
-  .inputValidator(createNetWorthSnapshotSchema)
+  .validator(createNetWorthSnapshotSchema)
   .handler(withServerFn('server-fn:createServerNetWorthSnapshot', async ({ data }) => {
     const db = getDB()
     // Totals computed server-side — a snapshot always reflects real state.
@@ -62,7 +62,7 @@ const createServerSnapshot = createServerFn({ method: 'POST' })
   }))
 
 const deleteServerSnapshot = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.number() }))
+  .validator(z.object({ id: z.number() }))
   .handler(withServerFn('server-fn:deleteServerNetWorthSnapshot', async ({ data }) => {
     const db = getDB()
     assertFound(await deleteNetWorthSnapshot(db, data.id), 'Net worth snapshot not found')
@@ -75,7 +75,7 @@ export const Route = createFileRoute('/net-worth')({
   loader: () => getServerNetWorth(),
   component: NetWorthPage,
   pendingComponent: NetWorthSkeleton,
-  errorComponent: ({ error }) => <RouteError error={error} />,
+  errorComponent: ({ error }) => <RouteError error={error as Error} />,
 })
 
 interface NetWorthData {
